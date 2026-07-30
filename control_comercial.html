@@ -1750,7 +1750,13 @@ function renderCostosCiaSocial() {
   if(!head||!body) return;
   head.innerHTML=`<tr><th>Puesto</th>${colArr.map(c=>`<th class="num">${c}</th>`).join('')}</tr>`;
   body.innerHTML=Object.entries(TABLA_COSTOS_SOCIAL).map(([puesto,costos])=>
-    `<tr><td>${puesto}</td>${colArr.map(c=>`<td class="num">${fmtCosto(costos[c]||0)}</td>`).join('')}</tr>`
+    `<tr><td style="color:var(--text)">${puesto}</td>${colArr.map(c=>`<td class="num">
+      <input type="number" value="${costos[c]||0}" step="1000"
+        style="background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:'Poppins',sans-serif;font-size:12px;width:110px;text-align:right;outline:none;padding:2px 4px"
+        onfocus="this.style.borderBottomColor='var(--purple)'"
+        onblur="this.style.borderBottomColor='var(--border)'"
+        data-puesto="${puesto}" data-col="${c}">
+    </td>`).join('')}</tr>`
   ).join('');
   const vigEl=document.getElementById('colVigenteLabelSocial');
   if(vigEl) vigEl.textContent=getColCostoSocial(MES_ACTIVO_SOCIAL);
@@ -1764,17 +1770,15 @@ function agregarMesSocial() {
 }
 
 function guardarCostosSocial() {
-  const rows=document.querySelectorAll('#bodyCostoCiaSocial tr');
-  const cols=[...document.querySelectorAll('#headCostoCiaSocial th')].map(th=>th.textContent).slice(1);
-  rows.forEach(row=>{
-    const cells=row.querySelectorAll('td');
-    const puesto=cells[0]?.textContent;
-    if(!puesto||!TABLA_COSTOS_SOCIAL[puesto]) return;
-    cols.forEach((col,i)=>{
-      const val=parseFloat(cells[i+1]?.textContent?.replace(/[$\s.]/g,'').replace(',','.'))||0;
-      TABLA_COSTOS_SOCIAL[puesto][col]=val;
-      postSheet('costos_social',{puesto,col,valor:val});
-    });
+  const inputs=document.querySelectorAll('#bodyCostoCiaSocial input');
+  inputs.forEach(inp=>{
+    const puesto=inp.dataset.puesto;
+    const col=inp.dataset.col;
+    const val=parseFloat(inp.value)||0;
+    if(!puesto||!col) return;
+    if(!TABLA_COSTOS_SOCIAL[puesto]) TABLA_COSTOS_SOCIAL[puesto]={};
+    TABLA_COSTOS_SOCIAL[puesto][col]=val;
+    postSheet('costos_social',{puesto,col,valor:val});
   });
   MES_VIGENTE_SOCIAL=getColCostoSocial(MES_ACTIVO_SOCIAL);
   renderSocialCompleto();
