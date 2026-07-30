@@ -243,6 +243,7 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
     <button class="page-tab active" onclick="switchPage('comercial', this)">📊 Control Comercial</button>
     <button class="page-tab" onclick="switchPage('rentabilidad', this)">👥 Clientes Big 7 <span class="tab-badge" id="alertBadge" style="display:none">!</span></button>
     <button class="page-tab" onclick="switchPage('performance', this)">🚀 Performance</button>
+    <button class="page-tab" onclick="switchPage('social', this)">📱 Social</button>
   </div>
 
   <!-- ══════════════════════════════════════════ -->
@@ -755,6 +756,109 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
   </div>
 </div><!-- /page-performance -->
 
+<div id="page-social" class="page">
+  <div class="rent-tabs">
+    <button class="rent-tab active" onclick="switchSocialTab('social-consolidado',this)">📊 Consolidado por Cliente</button>
+    <button class="rent-tab" onclick="switchSocialTab('social-detalle',this)">🔍 Detalle por Cliente</button>
+    <button class="rent-tab" onclick="switchSocialTab('social-costos',this)">💼 Tabla Costo Compañía</button>
+  </div>
+
+  <div id="social-consolidado" class="rent-section" style="display:block">
+    <div class="mes-selector-row">
+      <span class="mes-label">MES DE ANÁLISIS</span>
+      <div id="mesSelectorSocial" class="mes-btns"></div>
+    </div>
+    <div id="kpisSocial" class="kpis"></div>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+      <button id="btnOHSocial" onclick="toggleOH('social')" style="background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:6px 18px;color:var(--text-muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:.5px">Con OH</button>
+    </div>
+    <div class="section-header">
+      <div><div class="section-title">Tabla Consolidada · Social</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <div class="section-sub">Fee − Costo de Equipo · CMO % = CMO $ / Fee</div>
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+          <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#666;white-space:nowrap"><div style="width:8px;height:8px;border-radius:50%;background:#ff4455;flex-shrink:0"></div>CMO % ≤ 0%</div>
+          <div style="width:1px;height:12px;background:#333"></div>
+          <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#666;white-space:nowrap"><div style="width:8px;height:8px;border-radius:50%;background:#f5c400;flex-shrink:0"></div>0% – 25%</div>
+          <div style="width:1px;height:12px;background:#333"></div>
+          <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#666;white-space:nowrap"><div style="width:8px;height:8px;border-radius:50%;background:#00c853;flex-shrink:0"></div>≥ 25%</div>
+        </div>
+      </div></div>
+    </div>
+    <div class="table-card">
+      <table>
+        <thead><tr>
+          <th>Cliente</th><th class="num">Fee</th><th class="num">Costo Equipo</th>
+          <th class="num">CMO $</th><th class="num">CMO %</th><th>Con OH</th>
+        </tr></thead>
+        <tbody id="tbodySocialConsolidado"></tbody>
+      </table>
+    </div>
+    <div class="ranking-grid">
+      <div class="rank-card">
+        <div class="rank-card-title">Ranking · CMO $ (mayor a menor)</div>
+        <div id="rankingSocialCM"></div>
+      </div>
+      <div class="rank-card">
+        <div class="rank-card-title">Ranking · CMO % (mayor a menor)</div>
+        <div id="rankingSocialPct"></div>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-legend">
+        <span class="legend-item"><span class="legend-sq" style="background:#4488ff"></span>Fee</span>
+        <span class="legend-item"><span class="legend-sq" style="background:#f5c400"></span>Costo Equipo</span>
+        <span class="legend-item"><span class="legend-sq" style="background:#00c853"></span>CMO $</span>
+      </div>
+      <div style="position:relative;width:100%;height:270px">
+        <canvas id="chartSocial"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div id="social-detalle" class="rent-section" style="display:none">
+    <div class="mes-selector-row">
+      <span class="mes-label">MES DE ANÁLISIS</span>
+      <div id="mesSelectorSocialDetalle" class="mes-btns"></div>
+    </div>
+    <div id="clienteSelectorSocial" class="director-filter" style="margin:16px 0 8px 0;gap:8px;flex-wrap:wrap;display:flex"></div>
+    <div class="vigencia-banner">
+      <span>⚡</span>
+      <span>Costo Cía. aplicado: columna <strong id="vigenciaMesSocial">—</strong></span>
+    </div>
+    <div class="table-card" style="margin-top:12px">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:8px;flex-wrap:wrap">
+        <span style="color:var(--text-muted);font-size:13px">Fee (millones $)</span>
+        <input id="ingresosEditableSocial" type="number" placeholder="0"
+          style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-size:13px;width:150px"
+          onchange="saveIngresosSocial(clienteDetalleActivoSocial, MES_ACTIVO_SOCIAL, this.value)">
+      </div>
+      <p style="font-size:12px;color:var(--text-muted);margin-bottom:10px">Editá el FTE de cada puesto directamente en la tabla.</p>
+      <table class="data-table">
+        <thead><tr><th>Puesto</th><th class="num">FTE %</th><th class="num">Costo Cía.</th><th class="num">Costo Mensual</th><th class="num">% del total</th></tr></thead>
+        <tbody id="tbodySocialDetalle"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="social-costos" class="rent-section" style="display:none">
+    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+      <button class="btn-action" onclick="agregarMesSocial()">+ Nuevo mes RRHH</button>
+      <button class="btn-action primary" onclick="guardarCostosSocial()">✓ Guardar y recalcular</button>
+    </div>
+    <div class="vigencia-banner">
+      <span>⚡</span>
+      <span>Columna activa: <strong id="colVigenteLabelSocial">—</strong></span>
+    </div>
+    <div class="table-card costo-cia-wrap">
+      <table id="tablaCostoCiaSocial">
+        <thead id="headCostoCiaSocial"></thead>
+        <tbody id="bodyCostoCiaSocial"></tbody>
+      </table>
+    </div>
+  </div>
+</div><!-- /page-social -->
+
 
 <!-- ══════════════════════════════════════════ -->
 <!-- MODAL CARGA DATOS CONTROL COMERCIAL       -->
@@ -855,6 +959,42 @@ let DIFERENCIAL_PERF = {
 };
 
 let MES_VIGENTE_PERF = 'Febrero';
+
+/* ═══════════════════════════════════════════════════════════
+   SOCIAL
+═══════════════════════════════════════════════════════════ */
+const OH_SOCIAL = 0.68;
+
+const DIRECTORES_SOCIAL = {
+  'Escorial':  { color: '#9c27b0' },
+  'CAAM':      { color: '#2196f3' },
+  'Ignis M&C': { color: '#ff9800' },
+};
+
+const TABLA_COSTOS_SOCIAL = {
+  'Digital Strategy Lead':  { 'Diciembre': 0, 'Febrero': 0 },
+  'Social Media Specialist':{ 'Diciembre': 0, 'Febrero': 0 },
+  'Social Media Analyst':   { 'Diciembre': 0, 'Febrero': 0 },
+};
+
+let CLIENTES_FTE_SOCIAL = {
+  'Escorial': {}, 'CAAM': {}, 'Ignis M&C': {},
+};
+
+let INGRESOS_SOCIAL = {
+  'Escorial': {}, 'CAAM': {}, 'Ignis M&C': {},
+};
+
+const MAPA_MES_COSTO_SOCIAL = {
+  'Total':'Febrero','Enero':'Diciembre','Febrero':'Febrero','Marzo':'Febrero','Abril':'Febrero',
+  'Mayo':'Febrero','Junio':'Febrero','Julio':'Febrero','Agosto':'Febrero','Septiembre':'Febrero',
+  'Octubre':'Febrero','Noviembre':'Febrero','Diciembre':'Febrero'
+};
+let MES_VIGENTE_SOCIAL = 'Febrero';
+let MES_ACTIVO_SOCIAL  = 'Total';
+let ohActivoSocial     = false;
+let clienteDetalleActivoSocial = 'Escorial';
+
 const MAPA_MES_COSTO_PERF = {
   'Total':'Febrero','Enero':'Diciembre','Febrero':'Febrero','Marzo':'Febrero','Abril':'Febrero',
   'Mayo':'Febrero','Junio':'Febrero','Julio':'Febrero','Agosto':'Febrero','Septiembre':'Febrero',
@@ -1034,6 +1174,9 @@ function switchPage(page, btn) {
         if (window._perfDataReady) { clearInterval(waitPerf); renderPerfCompleto(); }
       }, 300);
     }
+  }
+  if (page === 'social') {
+    renderSocialCompleto();
   }
 }
 function switchRentTab(tab, btn) {
@@ -1400,6 +1543,252 @@ function enviarResumenEjecutivo() {
   .catch(() => alert('❌ Error de conexión con Slack.'));
 }
 
+
+
+/* ── SOCIAL FUNCTIONS ── */
+function getColCostoSocial(mes) { return MAPA_MES_COSTO_SOCIAL[mes] || MES_VIGENTE_SOCIAL; }
+function getCostoPuestoSocial(puesto, mes) { const col=getColCostoSocial(mes); return (TABLA_COSTOS_SOCIAL[puesto]&&TABLA_COSTOS_SOCIAL[puesto][col])||0; }
+
+function calcCostoEquipoSocial(cliente, mes) {
+  if (mes==='Total') return MESES_2026.filter(m=>m!=='Total').reduce((a,m)=>a+calcCostoEquipoSocial(cliente,m),0);
+  const puestos=(CLIENTES_FTE_SOCIAL[cliente]&&CLIENTES_FTE_SOCIAL[cliente][mes])||{};
+  let total=0;
+  for (const [p,fte] of Object.entries(puestos)) total+=getCostoPuestoSocial(p,mes)*fte;
+  return total/1000000;
+}
+
+function calcRentabilidadSocial(mes) {
+  if (mes==='Total') {
+    return Object.keys(DIRECTORES_SOCIAL).map(nombre => {
+      let totalCosto=0, totalFte=0;
+      MESES_2026.filter(m=>m!=='Total').forEach(m=>{
+        totalCosto+=calcCostoEquipoSocial(nombre,m);
+        const p=(CLIENTES_FTE_SOCIAL[nombre]&&CLIENTES_FTE_SOCIAL[nombre][m])||{};
+        totalFte+=Object.values(p).reduce((a,b)=>a+b,0);
+      });
+      const fee=MESES_2026.filter(m=>m!=='Total').reduce((_,m)=>_+((INGRESOS_SOCIAL[nombre]&&INGRESOS_SOCIAL[nombre][m])||0),0);
+      const cm=fee-totalCosto; const cmPct=fee>0?(cm/fee)*100:0;
+      return {nombre,ingresos:fee,costoEq:totalCosto,cm,cmPct,fte:totalFte};
+    });
+  }
+  return Object.keys(DIRECTORES_SOCIAL).map(nombre=>{
+    const fee=(INGRESOS_SOCIAL[nombre]&&INGRESOS_SOCIAL[nombre][mes])||0;
+    const costoEq=calcCostoEquipoSocial(nombre,mes);
+    const cm=fee-costoEq; const cmPct=fee>0?(cm/fee)*100:0;
+    const puestos=(CLIENTES_FTE_SOCIAL[nombre]&&CLIENTES_FTE_SOCIAL[nombre][mes])||{};
+    const fte=Object.values(puestos).reduce((a,b)=>a+b,0);
+    return {nombre,ingresos:fee,costoEq,cm,cmPct,fte};
+  });
+}
+
+function renderKPIsSocial(rows) {
+  const tIng=rows.reduce((a,r)=>a+r.ingresos,0);
+  const tCosto=ohActivoSocial?rows.reduce((a,r)=>a+r.costoEq*(1+OH_SOCIAL),0):rows.reduce((a,r)=>a+r.costoEq,0);
+  const tCM=tIng-tCosto; const tPct=tIng>0?(tCM/tIng)*100:0;
+  document.getElementById('kpisSocial').innerHTML=`
+    <div class="kpi"><div class="kpi-label">Fees</div><div class="kpi-value" style="font-size:26px">${fmtM(tIng)}</div><div class="kpi-sub">Fee facturado al cliente</div><div class="kpi-accent" style="background:#4488ff"></div></div>
+    <div class="kpi"><div class="kpi-label">Costo Equipo Total</div><div class="kpi-value" style="font-size:26px">${fmtM(tCosto)}</div><div class="kpi-sub">FTE x Costo Compania${ohActivoSocial?' (con OH)':''}</div><div class="kpi-accent" style="background:var(--yellow)"></div></div>
+    <div class="kpi"><div class="kpi-label">CMO Total</div><div class="kpi-value" style="font-size:26px;color:${tCM>=0?'#00c853':'#ff4455'}">${fmtM(tCM)}</div><div class="kpi-sub">Fee − Costo Equipo</div><div class="kpi-accent" style="background:var(--green)"></div></div>
+    <div class="kpi"><div class="kpi-label">CMO % Promedio</div><div class="kpi-value" style="font-size:26px;color:${tPct>=20?'#00c853':tPct>=5?'#f5c400':'#ff4455'}">${tPct.toFixed(1)}%</div><div class="kpi-sub">CMO $ / Fee Total</div><div class="kpi-accent" style="background:var(--purple)"></div></div>`;
+}
+
+function renderSocialConsolidado(rows) {
+  const maxCM=Math.max(...rows.map(r=>r.cm),0.01);
+  let html=rows.map(r=>{
+    const d=DIRECTORES_SOCIAL[r.nombre]||{};
+    const costoD=ohActivoSocial?r.costoEq*(1+OH_SOCIAL):r.costoEq;
+    const cmD=r.ingresos-costoD;
+    const pctD=r.ingresos>0?(cmD/r.ingresos)*100:0;
+    const pct=Math.max(0,Math.min(100,(cmD/maxCM)*100));
+    const barColor=pctD>=25?'#00c853':pctD>0?'#f5c400':'#ff4455';
+    return `<tr>
+      <td><div class="client-name"><div class="client-dot" style="background:${d.color||'#606060'}"></div>${r.nombre}</div></td>
+      <td class="num" style="color:#aaa">${fmtM(r.ingresos)}</td>
+      <td class="num" style="color:var(--yellow)">${fmtM(costoD)}</td>
+      <td class="num"><div class="cm-bar-wrap"><div class="cm-bar-bg"><div class="cm-bar-fill" style="width:${pct.toFixed(0)}%;background:${barColor}"></div></div><span style="min-width:65px;text-align:right;color:${cmD>=0?'#f0f0f0':'#ff4455'}">${fmtM(cmD)}</span></div></td>
+      <td class="num" style="color:${pctD>=25?'#00c853':pctD>0?'#f5c400':'#ff4455'};font-weight:600">${pctD.toFixed(1)}%</td>
+      <td>${ohActivoSocial?getSemaforoOH(pctD,true):''}</td></tr>`;
+  }).join('');
+  const tI=rows.reduce((a,r)=>a+r.ingresos,0);
+  const tC=ohActivoSocial?rows.reduce((a,r)=>a+r.costoEq*(1+OH_SOCIAL),0):rows.reduce((a,r)=>a+r.costoEq,0);
+  const tM=tI-tC; const tP=tI>0?(tM/tI)*100:0;
+  html+=`<tr class="total-row"><td>TOTAL</td><td class="num">${fmtM(tI)}</td><td class="num">${fmtM(tC)}</td><td class="num" style="color:${tM>=0?'#f0f0f0':'#ff4455'}">${fmtM(tM)}</td><td class="num" style="color:${tP>=25?'#00c853':tP>0?'#f5c400':'#ff4455'}">${tP.toFixed(1)}%</td><td></td></tr>`;
+  document.getElementById('tbodySocialConsolidado').innerHTML=html;
+}
+
+function renderRankingSocial(rows) {
+  const medals=['🥇','🥈','🥉'];
+  const rowsD=rows.map(r=>{const costoD=ohActivoSocial?r.costoEq*(1+OH_SOCIAL):r.costoEq;const cmD=r.ingresos-costoD;const pctD=r.ingresos>0?(cmD/r.ingresos)*100:0;return{...r,cmD,pctD};});
+  const byCM=[...rowsD].sort((a,b)=>b.cmD-a.cmD);
+  const byPct=[...rowsD].sort((a,b)=>b.pctD-a.pctD);
+  document.getElementById('rankingSocialCM').innerHTML=byCM.map((r,i)=>{const d=DIRECTORES_SOCIAL[r.nombre]||{};return`<div class="rank-item"><div class="rank-num">${medals[i]||(i+1)}</div><div class="rank-name"><div class="client-dot" style="background:${d.color||'#606060'};display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;vertical-align:middle"></div>${r.nombre}</div><div class="rank-val" style="color:${r.cmD>=0?'#00c853':'#ff4455'}">${fmtM(r.cmD)}</div></div>`;}).join('');
+  document.getElementById('rankingSocialPct').innerHTML=byPct.map((r,i)=>`<div class="rank-item"><div class="rank-num">${medals[i]||(i+1)}</div><div class="rank-name">${r.nombre}</div><div class="rank-val" style="color:${r.pctD>=25?'#00c853':r.pctD>0?'#f5c400':'#ff4455'}">${r.pctD.toFixed(1)}%</div></div>`).join('');
+}
+
+let chartSocialInstance = null;
+function renderChartSocial(rows) {
+  const ctx=document.getElementById('chartSocial');
+  if(!ctx) return;
+  if(chartSocialInstance){chartSocialInstance.destroy();chartSocialInstance=null;}
+  chartSocialInstance=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:rows.map(r=>r.nombre),
+      datasets:[
+        {label:'Fee',data:rows.map(r=>parseFloat(r.ingresos.toFixed(2))),backgroundColor:'rgba(68,136,255,0.7)',borderColor:'#4488ff',borderWidth:1,borderRadius:4},
+        {label:'Costo Equipo',data:rows.map(r=>parseFloat((ohActivoSocial?r.costoEq*(1+OH_SOCIAL):r.costoEq).toFixed(2))),backgroundColor:'rgba(245,196,0,0.65)',borderColor:'#f5c400',borderWidth:1,borderRadius:4},
+        {label:'CMO $',data:rows.map(r=>parseFloat((r.ingresos-(ohActivoSocial?r.costoEq*(1+OH_SOCIAL):r.costoEq)).toFixed(2))),backgroundColor:'rgba(0,200,83,0.65)',borderColor:'#00c853',borderWidth:1,borderRadius:4},
+      ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#aaa',font:{family:'Poppins',size:11}}}},
+      scales:{x:{ticks:{color:'#606060',font:{family:'Poppins',size:11}},grid:{color:'rgba(255,255,255,0.03)'}},
+              y:{ticks:{color:'#606060',font:{family:'Poppins',size:11},callback:v=>'$'+v+' M'},grid:{color:'rgba(255,255,255,0.05)'}}}}
+  });
+}
+
+function renderSocialCompleto() {
+  const rows=calcRentabilidadSocial(MES_ACTIVO_SOCIAL);
+  renderKPIsSocial(rows); renderSocialConsolidado(rows); renderRankingSocial(rows);
+  setTimeout(()=>renderChartSocial(rows),80);
+  renderMesSelectorSocial();
+  renderClienteSelectorSocial();
+  renderDetalleSocial(clienteDetalleActivoSocial);
+  renderCostosCiaSocial();
+}
+
+function renderMesSelectorSocial() {
+  const cont=document.getElementById('mesSelectorSocial');
+  const cont2=document.getElementById('mesSelectorSocialDetalle');
+  const btns=MESES_2026.map(m=>`<button class="dir-btn${m===MES_ACTIVO_SOCIAL?' active':''}" onclick="setMesActivoSocial('${m}',this)">${m}</button>`).join('');
+  if(cont) cont.innerHTML=btns;
+  if(cont2) cont2.innerHTML=btns.replace(/onclick="setMesActivoSocial/g,'onclick="setMesActivoSocial');
+}
+
+function setMesActivoSocial(mes,btn) {
+  MES_ACTIVO_SOCIAL=mes;
+  document.querySelectorAll('#mesSelectorSocial .dir-btn, #mesSelectorSocialDetalle .dir-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll(`#mesSelectorSocial .dir-btn, #mesSelectorSocialDetalle .dir-btn`).forEach(b=>{if(b.textContent===mes)b.classList.add('active');});
+  const rows=calcRentabilidadSocial(mes);
+  renderKPIsSocial(rows); renderSocialConsolidado(rows); renderRankingSocial(rows);
+  setTimeout(()=>renderChartSocial(rows),60);
+  renderDetalleSocial(clienteDetalleActivoSocial);
+}
+
+function renderClienteSelectorSocial() {
+  const cont=document.getElementById('clienteSelectorSocial');
+  if(!cont) return;
+  cont.innerHTML=Object.keys(DIRECTORES_SOCIAL).map(c=>`<button class="dir-btn${c===clienteDetalleActivoSocial?' active':''}" onclick="selectClienteSocial('${c}',this)">${c}</button>`).join('');
+}
+
+function selectClienteSocial(cliente,btn) {
+  clienteDetalleActivoSocial=cliente;
+  document.querySelectorAll('#clienteSelectorSocial .dir-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderDetalleSocial(cliente);
+}
+
+function renderDetalleSocial(cliente) {
+  const mes=MES_ACTIVO_SOCIAL;
+  const colCosto=getColCostoSocial(mes);
+  const vigEl=document.getElementById('vigenciaMesSocial');
+  if(vigEl) vigEl.textContent=colCosto;
+  const fteActual=(CLIENTES_FTE_SOCIAL[cliente]&&CLIENTES_FTE_SOCIAL[cliente][mes])||{};
+  const ingActual=(INGRESOS_SOCIAL[cliente]&&INGRESOS_SOCIAL[cliente][mes])||0;
+  const ingEl=document.getElementById('ingresosEditableSocial');
+  if(ingEl) ingEl.value=ingActual||'';
+  const puestos=Object.keys(TABLA_COSTOS_SOCIAL);
+  const totalCostoRaw=puestos.reduce((acc,p)=>{const fte=fteActual[p]||0;return acc+getCostoPuestoSocial(p,mes)*fte;},0);
+  const totalCosto=totalCostoRaw/1000000;
+  let html=puestos.map(puesto=>{
+    const costoUnit=getCostoPuestoSocial(puesto,mes),fteVal=fteActual[puesto]||0,costoMes=(costoUnit*fteVal)/1000000;
+    const pct=totalCosto>0?(costoMes/totalCosto)*100:0;
+    const barW=Math.min(pct,100).toFixed(0);
+    return `<tr>
+      <td style="color:${fteVal>0?'var(--text)':'#404040'}">${puesto}</td>
+      <td class="num"><input type="number" step="0.001" min="0" value="${fteVal||''}" placeholder="0"
+        style="background:transparent;border:none;border-bottom:1px solid ${fteVal>0?'var(--purple)':'var(--border)'};color:var(--text);font-family:'Poppins',sans-serif;font-size:13px;width:80px;text-align:right;outline:none;padding:2px 4px"
+        onchange="saveFTESocial('${cliente}','${mes}','${puesto}',this.value)"
+        onfocus="this.style.borderBottomColor='var(--purple)'" onblur="this.style.borderBottomColor=this.value?'var(--purple)':'var(--border)'">
+      </td>
+      <td class="num" style="color:${fteVal>0?'var(--yellow)':'#404040'}">${fmtCosto(costoUnit)}</td>
+      <td class="num" style="color:${fteVal>0?'#f0f0f0':'#404040'};font-size:12px">${fteVal>0?fmtM(costoMes):'—'}</td>
+      <td class="num"><div style="display:flex;align-items:center;gap:6px">
+        <div style="flex:1;height:4px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden">
+          <div style="width:${barW}%;height:100%;background:var(--purple);border-radius:2px"></div></div>
+        <span style="font-size:11px;color:#606060;min-width:32px;text-align:right">${fteVal>0?pct.toFixed(1)+'%':''}</span>
+      </div></td></tr>`;
+  }).join('');
+  html+=`<tr class="total-row"><td colspan="2">TOTAL - ${cliente} - ${mes}</td><td style="color:var(--text-muted);font-size:11px">Col: ${colCosto}</td><td class="num" style="color:var(--yellow)">${fmtM(totalCosto)}</td><td class="num" style="color:#aaa">100%</td></tr>`;
+  document.getElementById('tbodySocialDetalle').innerHTML=html;
+}
+
+function saveFTESocial(cliente,mes,puesto,valor) {
+  const v=parseFloat(valor)||0;
+  if(!CLIENTES_FTE_SOCIAL[cliente]) CLIENTES_FTE_SOCIAL[cliente]={};
+  if(!CLIENTES_FTE_SOCIAL[cliente][mes]) CLIENTES_FTE_SOCIAL[cliente][mes]={};
+  if(!isNaN(v)&&v>0){CLIENTES_FTE_SOCIAL[cliente][mes][puesto]=v;postSheet('fte_social',{cliente,mes,puesto,fte:v});}
+  else{delete CLIENTES_FTE_SOCIAL[cliente][mes][puesto];postSheet('fte_social',{cliente,mes,puesto,fte:0});}
+  renderDetalleSocial(cliente);
+  const rows=calcRentabilidadSocial(MES_ACTIVO_SOCIAL);
+  renderKPIsSocial(rows);renderSocialConsolidado(rows);renderRankingSocial(rows);
+}
+
+function saveIngresosSocial(cliente,mes,valor) {
+  const val=parseFloat(valor)||0;
+  if(!INGRESOS_SOCIAL[cliente]) INGRESOS_SOCIAL[cliente]={};
+  INGRESOS_SOCIAL[cliente][mes]=val;
+  postSheet('ingresos_social',{cliente,mes,valor:val*1000});
+  renderDetalleSocial(cliente);
+  const rows=calcRentabilidadSocial(MES_ACTIVO_SOCIAL);
+  renderKPIsSocial(rows);renderSocialConsolidado(rows);renderRankingSocial(rows);
+}
+
+function renderCostosCiaSocial() {
+  const cols=Object.values(TABLA_COSTOS_SOCIAL).reduce((set,row)=>{Object.keys(row).forEach(k=>set.add(k));return set;},new Set());
+  const colArr=[...cols];
+  const head=document.getElementById('headCostoCiaSocial');
+  const body=document.getElementById('bodyCostoCiaSocial');
+  if(!head||!body) return;
+  head.innerHTML=`<tr><th>Puesto</th>${colArr.map(c=>`<th class="num">${c}</th>`).join('')}</tr>`;
+  body.innerHTML=Object.entries(TABLA_COSTOS_SOCIAL).map(([puesto,costos])=>
+    `<tr><td>${puesto}</td>${colArr.map(c=>`<td class="num">${fmtCosto(costos[c]||0)}</td>`).join('')}</tr>`
+  ).join('');
+  const vigEl=document.getElementById('colVigenteLabelSocial');
+  if(vigEl) vigEl.textContent=getColCostoSocial(MES_ACTIVO_SOCIAL);
+}
+
+function agregarMesSocial() {
+  const mes=prompt('Nombre del mes (ej: Marzo):');
+  if(!mes) return;
+  Object.keys(TABLA_COSTOS_SOCIAL).forEach(p=>{ if(!TABLA_COSTOS_SOCIAL[p][mes]) TABLA_COSTOS_SOCIAL[p][mes]=0; });
+  renderCostosCiaSocial();
+}
+
+function guardarCostosSocial() {
+  const rows=document.querySelectorAll('#bodyCostoCiaSocial tr');
+  const cols=[...document.querySelectorAll('#headCostoCiaSocial th')].map(th=>th.textContent).slice(1);
+  rows.forEach(row=>{
+    const cells=row.querySelectorAll('td');
+    const puesto=cells[0]?.textContent;
+    if(!puesto||!TABLA_COSTOS_SOCIAL[puesto]) return;
+    cols.forEach((col,i)=>{
+      const val=parseFloat(cells[i+1]?.textContent?.replace(/[$\s.]/g,'').replace(',','.'))||0;
+      TABLA_COSTOS_SOCIAL[puesto][col]=val;
+      postSheet('costos_social',{puesto,col,valor:val});
+    });
+  });
+  MES_VIGENTE_SOCIAL=getColCostoSocial(MES_ACTIVO_SOCIAL);
+  renderSocialCompleto();
+  alert('✓ Costos Social actualizados.');
+}
+
+function switchSocialTab(tab, btn) {
+  document.querySelectorAll('#page-social .rent-section').forEach(s=>s.style.display='none');
+  document.querySelectorAll('#page-social .rent-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById(tab).style.display='block';
+  if(btn) btn.classList.add('active');
+  if(tab==='social-detalle') renderDetalleSocial(clienteDetalleActivoSocial);
+  if(tab==='social-costos') renderCostosCiaSocial();
+}
 
 async function loadData() {
   // Control Comercial
