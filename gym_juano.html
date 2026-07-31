@@ -227,248 +227,67 @@
 
 <!-- ==================== RUTINAS ==================== -->
 <div id="view-rutinas" class="view active">
-  <div class="tip"><strong>Tu plan:</strong> L-M-V al mediodía · máx 60 min · 3 días/semana. Cargá el peso que usaste en cada ejercicio — se guarda automáticamente.</div>
+  <div class="tip"><strong>Plan MEV/MAV:</strong> Upper A · Lower · Upper B · L-M-V · 60 min máximo. Tocá ⏱ para el timer de descanso. Cargá kg y RM en cada ejercicio.</div>
 
   <div class="rutinas-nav">
-    <button class="rut-btn fb active" onclick="showRutina('fb1',this)">Full Body 1</button>
-    <button class="rut-btn fb" onclick="showRutina('fb2',this)">Full Body 2</button>
-    <button class="rut-btn fb" onclick="showRutina('fb3',this)">Full Body 3</button>
-    <button class="rut-btn pi" onclick="showRutina('pi1',this)">Pierna 1</button>
-    <button class="rut-btn ts" onclick="showRutina('ts1',this)">Tren Superior 1</button>
+    <button class="rut-btn fb active" onclick="showRutina('ua',this)">Upper A</button>
+    <button class="rut-btn pi" onclick="showRutina('lower',this)">Lower</button>
+    <button class="rut-btn ts" onclick="showRutina('ub',this)">Upper B</button>
   </div>
 
-  <!-- ===== FULL BODY 1 ===== -->
-  <div id="rut-fb1" class="rutina-view">
-    <p class="section-title">Entrada en calor · Superserie x3 rondas</p>
+  <!-- ===== UPPER A — LUNES ===== -->
+  <div id="rut-ua" class="rutina-view">
+    <div class="tip tip-blue"><strong>Lunes · Pecho + Espalda + Bíceps + Core</strong> · ~55 min · Dejá 1-2 reps en el tanque en las primeras series. Fallo solo en la última.</div>
+
+    <p class="section-title">Pecho</p>
     <div class="card">
-      <div class="card-header"><div class="card-icon orange">🔥</div><div><div class="card-title">Movilidad</div><div class="card-sub">3 rondas · sin pausa entre ejercicios</div></div><div class="card-badge">Calor</div></div>
+      <div class="card-header"><div class="card-icon yellow">💪</div><div><div class="card-title">Pecho</div><div class="card-sub">7 series · empuje inclinado y plano</div></div></div>
       <div class="ex-row">
         <div class="ex-num">1</div>
         <div class="ex-info">
-          <div class="ex-name">Estiramiento de la Cobra</div>
-          <div class="ex-meta"><span>30" · 0" desc</span></div>
-        </div>
-      </div>
-      <div class="ex-row">
-        <div class="ex-num">2</div>
-        <div class="ex-info">
-          <div class="ex-name">Estiramiento Caderas 90/90</div>
-          <div class="ex-meta"><span>30" · 0" desc</span></div>
-        </div>
-      </div>
-      <div class="ex-row">
-        <div class="ex-num">3</div>
-        <div class="ex-info">
-          <div class="ex-name">Estiramiento Flexor de Cadera (Half Kneeling)</div>
-          <div class="ex-meta"><span>20" · 30" desc</span></div>
-        </div>
-      </div>
-    </div>
-
-    <p class="section-title">Zona Media · Superserie x3 rondas</p>
-    <div class="card">
-      <div class="card-header"><div class="card-icon blue">⚡</div><div><div class="card-title">Core</div><div class="card-sub">Prepará la lumbar antes de levantar</div></div><div class="card-badge">Superserie</div></div>
-      <div class="super-label"><span>⚡ Superserie</span></div>
-      <div class="ex-row superserie-start">
-        <div class="ex-num super">A</div>
-        <div class="ex-info">
-          <div class="ex-name">Plancha Corporal</div>
-          <div class="ex-meta"><span>45" · 0" desc</span></div>
-        </div>
-      </div>
-      <div class="ex-row superserie-end">
-        <div class="ex-num super">B</div>
-        <div class="ex-info">
-          <div class="ex-name">Twist Soviético con Disco</div>
-          <div class="ex-meta"><span>10-15 reps/lado · 60" desc</span></div>
+          <div class="ex-name">Press Inclinado con Mancuernas</div>
+          <div class="ex-meta"><span>4×8-10 · <span class="timer-time" data-secs="90">90" desc</span></span></div>
           <div class="ex-peso-row">
-            <input class="ex-peso-input" type="number" step="0.5" placeholder="kg" data-ex="twist-sovietico" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label">kg disco</span>
-            <span class="ex-peso-prev" id="prev-twist-sovietico"></span>
-          
+            <input class="ex-peso-input" type="number" step="1" placeholder="kg" data-ex="press-inclinado-mancuernas" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
+            <span class="ex-peso-label">kg c/mano</span>
+            <span class="ex-peso-prev" id="prev-press-inclinado-mancuernas"></span>
             <span class="ex-peso-sep">·</span>
-            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="twist-sovietico" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
+            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="press-inclinado-mancuernas" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
             <span class="ex-peso-label" style="color:#44bbff">RM</span>
           </div>
         </div>
-      </div>
-    </div>
-
-    <p class="section-title">Tren Inferior</p>
-    <div class="card">
-      <div class="card-header"><div class="card-icon red">🦵</div><div><div class="card-title">Piernas</div><div class="card-sub">El grupo muscular más grande primero</div></div></div>
-      <div class="ex-row">
-        <div class="ex-num">1</div>
-        <div class="ex-info">
-          <div class="ex-name">Sentadilla con Barra Smith</div>
-          <div class="ex-meta"><span>3×8-10 · 120" desc</span></div>
-          <div class="ex-peso-row">
-            <input class="ex-peso-input" type="number" step="2.5" placeholder="kg" data-ex="sentadilla-barra-smith" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label">kg barra</span>
-            <span class="ex-peso-prev" id="prev-sentadilla-barra-smith"></span>
-          
-            <span class="ex-peso-sep">·</span>
-            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="sentadilla-barra-smith" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label" style="color:#44bbff">RM</span>
-          </div>
-        </div>
-        <div class="ex-right" onclick="openHist('sentadilla-barra-smith','Sentadilla con Barra Smith')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
-      </div>
-      <div class="ex-row">
-        <div class="ex-num">2</div>
-        <div class="ex-info">
-          <div class="ex-name">Camilla de Isquiotibiales</div>
-          <div class="ex-meta"><span>3×10-12 · 90" desc · bajada lenta 3"</span></div>
-          <div class="ex-peso-row">
-            <input class="ex-peso-input" type="number" step="2.5" placeholder="kg" data-ex="camilla-isquio" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label">kg máquina</span>
-            <span class="ex-peso-prev" id="prev-camilla-isquio"></span>
-          
-            <span class="ex-peso-sep">·</span>
-            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="camilla-isquio" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label" style="color:#44bbff">RM</span>
-          </div>
-        </div>
-        <div class="ex-right" onclick="openHist('camilla-isquio','Camilla de Isquiotibiales')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
-      </div>
-    </div>
-
-    <p class="section-title">Tren Superior — Push</p>
-    <div class="card">
-      <div class="card-header"><div class="card-icon yellow">💪</div><div><div class="card-title">Pecho · Tríceps · Hombros</div><div class="card-sub">Empuje inclinado y plano</div></div></div>
-      <div class="ex-row">
-        <div class="ex-num">1</div>
-        <div class="ex-info">
-          <div class="ex-name">Press Inclinado en Barra Smith</div>
-          <div class="ex-meta"><span>3×8-10 · 120" desc · 45° · codos a 75°</span></div>
-          <div class="ex-peso-row">
-            <input class="ex-peso-input" type="number" step="2.5" placeholder="kg" data-ex="press-inclinado-smith" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label">kg barra</span>
-            <span class="ex-peso-prev" id="prev-press-inclinado-smith"></span>
-          
-            <span class="ex-peso-sep">·</span>
-            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="press-inclinado-smith" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label" style="color:#44bbff">RM</span>
-          </div>
-        </div>
-        <div class="ex-right" onclick="openHist('press-inclinado-smith','Press Inclinado Barra Smith')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
+        <div class="ex-right" onclick="openHist('press-inclinado-mancuernas','Press Inclinado Mancuernas')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
       </div>
       <div class="ex-row">
         <div class="ex-num">2</div>
         <div class="ex-info">
           <div class="ex-name">Press Plano en Máquina</div>
-          <div class="ex-meta"><span>3×10-12 · 90" desc · rango completo</span></div>
+          <div class="ex-meta"><span>3×10-12 · <span class="timer-time" data-secs="90">90" desc</span></span></div>
           <div class="ex-peso-row">
             <input class="ex-peso-input" type="number" step="2.5" placeholder="kg" data-ex="press-plano-maquina" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
             <span class="ex-peso-label">kg máquina</span>
             <span class="ex-peso-prev" id="prev-press-plano-maquina"></span>
-          
             <span class="ex-peso-sep">·</span>
             <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="press-plano-maquina" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
             <span class="ex-peso-label" style="color:#44bbff">RM</span>
           </div>
         </div>
-        <div class="ex-right" onclick="openHist('press-plano-maquina','Press Plano en Máquina')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
-      </div>
-      <div class="ex-row">
-        <div class="ex-num">3</div>
-        <div class="ex-info">
-          <div class="ex-name">Trícep en Polea (Pushdown)</div>
-          <div class="ex-meta"><span>3×12-15 · 90" desc · codos fijos</span></div>
-          <div class="ex-peso-row">
-            <input class="ex-peso-input" type="number" step="2.5" placeholder="kg" data-ex="tricep-polea" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label">kg polea</span>
-            <span class="ex-peso-prev" id="prev-tricep-polea"></span>
-          
-            <span class="ex-peso-sep">·</span>
-            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="tricep-polea" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label" style="color:#44bbff">RM</span>
-          </div>
-        </div>
-        <div class="ex-right" onclick="openHist('tricep-polea','Trícep en Polea')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
-      </div>
-      <div class="ex-row">
-        <div class="ex-num">4</div>
-        <div class="ex-info">
-          <div class="ex-name">Vuelos Laterales con Mancuernas</div>
-          <div class="ex-meta"><span>3×12-15 · 90" desc · codos semiflexionados</span></div>
-          <div class="ex-peso-row">
-            <input class="ex-peso-input" type="number" step="1" placeholder="kg" data-ex="vuelos-laterales" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label">kg c/mancuerna</span>
-            <span class="ex-peso-prev" id="prev-vuelos-laterales"></span>
-          
-            <span class="ex-peso-sep">·</span>
-            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="vuelos-laterales" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label" style="color:#44bbff">RM</span>
-          </div>
-        </div>
-        <div class="ex-right" onclick="openHist('vuelos-laterales','Vuelos Laterales Mancuernas')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
+        <div class="ex-right" onclick="openHist('press-plano-maquina','Press Plano Máquina')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
       </div>
     </div>
-  </div>
 
-  <!-- ===== FULL BODY 2 ===== -->
-  <div id="rut-fb2" class="rutina-view" style="display:none">
-    <p class="section-title">Entrada en calor · Superserie x3 rondas</p>
+    <p class="section-title">Espalda</p>
     <div class="card">
-      <div class="card-header"><div class="card-icon orange">🔥</div><div><div class="card-title">Movilidad — Foco Hombros</div><div class="card-sub">3 rondas · sin pausa</div></div><div class="card-badge">Calor</div></div>
-      <div class="ex-row"><div class="ex-num">1</div><div class="ex-info"><div class="ex-name">Movilidad Completa de Hombro</div><div class="ex-meta"><span>×10 · 0" desc</span></div></div></div>
-      <div class="ex-row"><div class="ex-num">2</div><div class="ex-info"><div class="ex-name">90/90 Movilidad Cadera</div><div class="ex-meta"><span>×10 c/lado · 0" desc</span></div></div></div>
-      <div class="ex-row"><div class="ex-num">3</div><div class="ex-info"><div class="ex-name">Estiramiento Flexor de Cadera (Half Kneeling)</div><div class="ex-meta"><span>20" · 30" desc</span></div></div></div>
-    </div>
-
-    <p class="section-title">Tren Inferior</p>
-    <div class="card">
-      <div class="card-header"><div class="card-icon red">🦵</div><div><div class="card-title">Piernas Unilateral</div><div class="card-sub">Corregimos asimetrías</div></div></div>
+      <div class="card-header"><div class="card-icon green">🏋️</div><div><div class="card-title">Espalda</div><div class="card-sub">7 series · tracción vertical y horizontal</div></div></div>
       <div class="ex-row">
         <div class="ex-num">1</div>
         <div class="ex-info">
-          <div class="ex-name">Prensa Unilateral</div>
-          <div class="ex-meta"><span>3×8-10 · 120" desc · pie al centro</span></div>
-          <div class="ex-peso-row">
-            <input class="ex-peso-input" type="number" step="5" placeholder="kg" data-ex="prensa-unilateral" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label">kg prensa</span>
-            <span class="ex-peso-prev" id="prev-prensa-unilateral"></span>
-          
-            <span class="ex-peso-sep">·</span>
-            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="prensa-unilateral" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label" style="color:#44bbff">RM</span>
-          </div>
-        </div>
-        <div class="ex-right" onclick="openHist('prensa-unilateral','Prensa Unilateral')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
-      </div>
-      <div class="ex-row">
-        <div class="ex-num">2</div>
-        <div class="ex-info">
-          <div class="ex-name">Camilla de Cuádriceps</div>
-          <div class="ex-meta"><span>3×12-15 · 90" desc · pausa 1" arriba</span></div>
-          <div class="ex-peso-row">
-            <input class="ex-peso-input" type="number" step="2.5" placeholder="kg" data-ex="camilla-cuadriceps" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label">kg máquina</span>
-            <span class="ex-peso-prev" id="prev-camilla-cuadriceps"></span>
-          
-            <span class="ex-peso-sep">·</span>
-            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="camilla-cuadriceps" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label" style="color:#44bbff">RM</span>
-          </div>
-        </div>
-        <div class="ex-right" onclick="openHist('camilla-cuadriceps','Camilla de Cuádriceps')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
-      </div>
-    </div>
-
-    <p class="section-title">Tren Superior — Pull</p>
-    <div class="card">
-      <div class="card-header"><div class="card-icon green">🏋️</div><div><div class="card-title">Espalda · Bíceps · Deltoides posterior</div><div class="card-sub">Tracción vertical y horizontal</div></div></div>
-      <div class="ex-row">
-        <div class="ex-num">1</div>
-        <div class="ex-info">
-          <div class="ex-name">Dorsalera</div>
-          <div class="ex-meta"><span>3×10-12 · 120" desc · codos abajo y atrás</span></div>
+          <div class="ex-name">Dorsalera agarre triángulo</div>
+          <div class="ex-meta"><span>4×10-12 · <span class="timer-time" data-secs="90">90" desc</span> · codos abajo y atrás</span></div>
           <div class="ex-peso-row">
             <input class="ex-peso-input" type="number" step="2.5" placeholder="kg" data-ex="dorsalera" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
             <span class="ex-peso-label">kg polea</span>
             <span class="ex-peso-prev" id="prev-dorsalera"></span>
-          
             <span class="ex-peso-sep">·</span>
             <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="dorsalera" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
             <span class="ex-peso-label" style="color:#44bbff">RM</span>
@@ -479,423 +298,12 @@
       <div class="ex-row">
         <div class="ex-num">2</div>
         <div class="ex-info">
-          <div class="ex-name">Remo en T</div>
-          <div class="ex-meta"><span>3×10-12 · 120" desc · pecho apoyado o inclinado al frente</span></div>
-          <div class="ex-peso-row">
-            <input class="ex-peso-input" type="number" step="2.5" placeholder="kg" data-ex="remo-en-t" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label">kg</span>
-            <span class="ex-peso-prev" id="prev-remo-en-t"></span>
-          
-            <span class="ex-peso-sep">·</span>
-            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="remo-en-t" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label" style="color:#44bbff">RM</span>
-          </div>
-        </div>
-        <div class="ex-right" onclick="openHist('remo-en-t','Remo en T')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
-      </div>
-      <div class="ex-row">
-        <div class="ex-num">3</div>
-        <div class="ex-info">
-          <div class="ex-name">Bícep Martillo con Mancuernas</div>
-          <div class="ex-meta"><span>3×10-12 · 90" desc · agarre neutro</span></div>
-          <div class="ex-peso-row">
-            <input class="ex-peso-input" type="number" step="1" placeholder="kg" data-ex="bicep-martillo" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label">kg c/mancuerna</span>
-            <span class="ex-peso-prev" id="prev-bicep-martillo"></span>
-          
-            <span class="ex-peso-sep">·</span>
-            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="bicep-martillo" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label" style="color:#44bbff">RM</span>
-          </div>
-        </div>
-        <div class="ex-right" onclick="openHist('bicep-martillo','Bícep Martillo')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
-      </div>
-      <div class="ex-row">
-        <div class="ex-num">4</div>
-        <div class="ex-info">
-          <div class="ex-name">Vuelos Posteriores con Mancuernas</div>
-          <div class="ex-meta"><span>3×12-15 · 90" desc · inclinado · deltoides posterior</span></div>
-          <div class="ex-peso-row">
-            <input class="ex-peso-input" type="number" step="1" placeholder="kg" data-ex="vuelos-posteriores" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label">kg c/mancuerna</span>
-            <span class="ex-peso-prev" id="prev-vuelos-posteriores"></span>
-          
-            <span class="ex-peso-sep">·</span>
-            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="vuelos-posteriores" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label" style="color:#44bbff">RM</span>
-          </div>
-        </div>
-        <div class="ex-right" onclick="openHist('vuelos-posteriores','Vuelos Posteriores')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== FULL BODY 3 ===== -->
-  <div id="rut-fb3" class="rutina-view" style="display:none">
-    <p class="section-title">Entrada en calor · Superserie x3 rondas</p>
-    <div class="card">
-      <div class="card-header"><div class="card-icon orange">🔥</div><div><div class="card-title">Movilidad</div><div class="card-sub">Hombros + cadera</div></div><div class="card-badge">Calor</div></div>
-      <div class="ex-row"><div class="ex-num">1</div><div class="ex-info"><div class="ex-name">Movilidad Completa de Hombro</div><div class="ex-meta"><span>×12 · 0" desc</span></div></div></div>
-      <div class="ex-row"><div class="ex-num">2</div><div class="ex-info"><div class="ex-name">90/90 Movilidad Cadera</div><div class="ex-meta"><span>×10 c/lado · 0" desc</span></div></div></div>
-      <div class="ex-row"><div class="ex-num">3</div><div class="ex-info"><div class="ex-name">Estiramiento Flexor de Cadera (Half Kneeling)</div><div class="ex-meta"><span>20" · 0" desc</span></div></div></div>
-    </div>
-
-    <p class="section-title">Zona Media · Superserie x3 rondas</p>
-    <div class="card">
-      <div class="card-header"><div class="card-icon blue">⚡</div><div><div class="card-title">Core</div><div class="card-sub">Rotación + estabilización</div></div><div class="card-badge">Superserie</div></div>
-      <div class="super-label"><span>⚡ Superserie</span></div>
-      <div class="ex-row superserie-start">
-        <div class="ex-num super">A</div>
-        <div class="ex-info">
-          <div class="ex-name">Twist en Banco Declinado</div>
-          <div class="ex-meta"><span>15-20 reps · 0" desc · rotación completa</span></div>
-        </div>
-      </div>
-      <div class="ex-row superserie-end">
-        <div class="ex-num super">B</div>
-        <div class="ex-info">
-          <div class="ex-name">Plancha Alta Toco y Toco</div>
-          <div class="ex-meta"><span>×10 c/lado · 60" desc · tocá hombro alterno</span></div>
-        </div>
-      </div>
-    </div>
-
-    <p class="section-title">Tren Inferior</p>
-    <div class="card">
-      <div class="card-header"><div class="card-icon red">🦵</div><div><div class="card-title">Piernas</div><div class="card-sub">Prensa bilateral + unilateral</div></div></div>
-      <div class="ex-row">
-        <div class="ex-num">1</div>
-        <div class="ex-info">
-          <div class="ex-name">Prensa</div>
-          <div class="ex-meta"><span>3×8-10 · 120" desc · rango completo</span></div>
-          <div class="ex-peso-row">
-            <input class="ex-peso-input" type="number" step="5" placeholder="kg" data-ex="prensa-bilateral" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label">kg prensa</span>
-            <span class="ex-peso-prev" id="prev-prensa-bilateral"></span>
-          
-            <span class="ex-peso-sep">·</span>
-            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="prensa-bilateral" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label" style="color:#44bbff">RM</span>
-          </div>
-        </div>
-        <div class="ex-right" onclick="openHist('prensa-bilateral','Prensa Bilateral')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
-      </div>
-      <div class="ex-row">
-        <div class="ex-num">2</div>
-        <div class="ex-info">
-          <div class="ex-name">Sentadilla Búlgara con Mancuernas</div>
-          <div class="ex-meta"><span>3×8-10 · 90" desc · pie trasero elevado</span></div>
-          <div class="ex-peso-row">
-            <input class="ex-peso-input" type="number" step="1" placeholder="kg" data-ex="bulgara-mancuernas" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label">kg c/mancuerna</span>
-            <span class="ex-peso-prev" id="prev-bulgara-mancuernas"></span>
-          
-            <span class="ex-peso-sep">·</span>
-            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="bulgara-mancuernas" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label" style="color:#44bbff">RM</span>
-          </div>
-        </div>
-        <div class="ex-right" onclick="openHist('bulgara-mancuernas','Sentadilla Búlgara')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
-      </div>
-    </div>
-
-    <p class="section-title">Tren Superior — Press Hombro</p>
-    <div class="card">
-      <div class="card-header"><div class="card-icon yellow">💪</div><div><div class="card-title">Hombros</div><div class="card-sub">Empuje vertical</div></div></div>
-      <div class="ex-row">
-        <div class="ex-num">1</div>
-        <div class="ex-info">
-          <div class="ex-name">Press de Hombro con Mancuernas</div>
-          <div class="ex-meta"><span>3×8-10 · 120" desc · sentado</span></div>
-          <div class="ex-peso-row">
-            <input class="ex-peso-input" type="number" step="1" placeholder="kg" data-ex="press-hombro-mancuernas" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label">kg c/mancuerna</span>
-            <span class="ex-peso-prev" id="prev-press-hombro-mancuernas"></span>
-          
-            <span class="ex-peso-sep">·</span>
-            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="press-hombro-mancuernas" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label" style="color:#44bbff">RM</span>
-          </div>
-        </div>
-        <div class="ex-right" onclick="openHist('press-hombro-mancuernas','Press Hombro Mancuernas')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
-      </div>
-    </div>
-
-    <p class="section-title">Tren Superior — Superseries x3 rondas</p>
-    <div class="card">
-      <div class="card-header"><div class="card-icon green">🏋️</div><div><div class="card-title">Espalda + Hombros</div><div class="card-sub">Superserie: Remo ↔ Vuelos Laterales</div></div><div class="card-badge">Superserie</div></div>
-      <div class="super-label"><span>⚡ Superserie</span></div>
-      <div class="ex-row superserie-start">
-        <div class="ex-num super">A</div>
-        <div class="ex-info">
-          <div class="ex-name">Remo Unilateral con Mancuerna</div>
-          <div class="ex-meta"><span>8-10 reps · 20" desc · apoyo en banco</span></div>
-          <div class="ex-peso-row">
-            <input class="ex-peso-input" type="number" step="1" placeholder="kg" data-ex="remo-unilateral" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label">kg mancuerna</span>
-            <span class="ex-peso-prev" id="prev-remo-unilateral"></span>
-          
-            <span class="ex-peso-sep">·</span>
-            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="remo-unilateral" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label" style="color:#44bbff">RM</span>
-          </div>
-        </div>
-        <div class="ex-right" onclick="openHist('remo-unilateral','Remo Unilateral')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
-      </div>
-      <div class="ex-row superserie-end">
-        <div class="ex-num super">B</div>
-        <div class="ex-info">
-          <div class="ex-name">Vuelos Laterales con Mancuernas</div>
-          <div class="ex-meta"><span>10-12 reps · 120" desc · sin impulso</span></div>
-          <div class="ex-peso-row">
-            <input class="ex-peso-input" type="number" step="1" placeholder="kg" data-ex="vuelos-laterales" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label">kg c/mancuerna</span>
-            <span class="ex-peso-prev" id="prev-vuelos-laterales-fb3"></span>
-          
-            <span class="ex-peso-sep">·</span>
-            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="vuelos-laterales" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label" style="color:#44bbff">RM</span>
-          </div>
-        </div>
-        <div class="ex-right" onclick="openHist('vuelos-laterales','Vuelos Laterales Mancuernas')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-header"><div class="card-icon blue">⚡</div><div><div class="card-title">Bíceps + Tríceps</div><div class="card-sub">Superserie: Pushdown ↔ Bícep Cable</div></div><div class="card-badge">Superserie</div></div>
-      <div class="super-label"><span>⚡ Superserie</span></div>
-      <div class="ex-row superserie-start">
-        <div class="ex-num super">A</div>
-        <div class="ex-info">
-          <div class="ex-name">Trícep Pushdown</div>
-          <div class="ex-meta"><span>12-15 reps · 15" desc · codos fijos</span></div>
-          <div class="ex-peso-row">
-            <input class="ex-peso-input" type="number" step="2.5" placeholder="kg" data-ex="tricep-polea" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label">kg polea</span>
-            <span class="ex-peso-prev" id="prev-tricep-polea-fb3"></span>
-          
-            <span class="ex-peso-sep">·</span>
-            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="tricep-polea" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label" style="color:#44bbff">RM</span>
-          </div>
-        </div>
-        <div class="ex-right" onclick="openHist('tricep-polea','Trícep en Polea')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
-      </div>
-      <div class="ex-row superserie-end">
-        <div class="ex-num super">B</div>
-        <div class="ex-info">
-          <div class="ex-name">Bícep en Cable</div>
-          <div class="ex-meta"><span>10-12 reps · 90" desc · codo fijo</span></div>
-          <div class="ex-peso-row">
-            <input class="ex-peso-input" type="number" step="2.5" placeholder="kg" data-ex="bicep-cable" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label">kg polea</span>
-            <span class="ex-peso-prev" id="prev-bicep-cable"></span>
-          
-            <span class="ex-peso-sep">·</span>
-            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="bicep-cable" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label" style="color:#44bbff">RM</span>
-          </div>
-        </div>
-        <div class="ex-right" onclick="openHist('bicep-cable','Bícep en Cable')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== PIERNA 1 ===== -->
-  <div id="rut-pi1" class="rutina-view" style="display:none">
-    <div class="tip tip-red"><strong>⚡ Día de pierna completo.</strong> El más exigente. Hidratate antes. No saltees el calentamiento.</div>
-    <p class="section-title">Entrada en calor · Superserie x3 rondas</p>
-    <div class="card">
-      <div class="card-header"><div class="card-icon orange">🔥</div><div><div class="card-title">Movilidad de cadera y columna</div><div class="card-sub">3 rondas · sin pausa</div></div><div class="card-badge">Calor</div></div>
-      <div class="ex-row"><div class="ex-num">1</div><div class="ex-info"><div class="ex-name">Estiramiento de la Cobra</div><div class="ex-meta"><span>30" · 0" desc</span></div></div></div>
-      <div class="ex-row"><div class="ex-num">2</div><div class="ex-info"><div class="ex-name">Estiramiento Caderas 90/90</div><div class="ex-meta"><span>30" · 0" desc</span></div></div></div>
-      <div class="ex-row"><div class="ex-num">3</div><div class="ex-info"><div class="ex-name">Estiramiento Flexor de Cadera (Half Kneeling)</div><div class="ex-meta"><span>20" · 30" desc</span></div></div></div>
-    </div>
-
-    <p class="section-title">Zona Media · Superserie x3 rondas</p>
-    <div class="card">
-      <div class="card-header"><div class="card-icon blue">⚡</div><div><div class="card-title">Core</div><div class="card-sub">Protegemos la lumbar para lo que viene</div></div><div class="card-badge">Superserie</div></div>
-      <div class="super-label"><span>⚡ Superserie</span></div>
-      <div class="ex-row superserie-start">
-        <div class="ex-num super">A</div>
-        <div class="ex-info">
-          <div class="ex-name">Ruedita Abdominal</div>
-          <div class="ex-meta"><span>10-12 reps · 0" desc · extendé hasta donde llegués</span></div>
-        </div>
-      </div>
-      <div class="ex-row superserie-end">
-        <div class="ex-num super">B</div>
-        <div class="ex-info">
-          <div class="ex-name">Twist Soviético con Disco</div>
-          <div class="ex-meta"><span>10-15 reps/lado · 60" desc · pies levantados</span></div>
-          <div class="ex-peso-row">
-            <input class="ex-peso-input" type="number" step="0.5" placeholder="kg" data-ex="twist-sovietico" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label">kg disco</span>
-            <span class="ex-peso-prev" id="prev-twist-sovietico-pi"></span>
-          
-            <span class="ex-peso-sep">·</span>
-            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="twist-sovietico" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label" style="color:#44bbff">RM</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <p class="section-title">Trabajo Principal — Piernas</p>
-    <div class="card">
-      <div class="card-header"><div class="card-icon red">🔥🦵</div><div><div class="card-title">Pierna Completa</div><div class="card-sub">Isquios → cuádriceps → glúteos → gemelos</div></div></div>
-      <div class="ex-row">
-        <div class="ex-num">1</div>
-        <div class="ex-info">
-          <div class="ex-name">Camilla de Isquiotibiales</div>
-          <div class="ex-meta"><span>3×10-12 · 90" desc · bajada lenta 3"</span></div>
-          <div class="ex-peso-row">
-            <input class="ex-peso-input" type="number" step="2.5" placeholder="kg" data-ex="camilla-isquio" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label">kg máquina</span>
-            <span class="ex-peso-prev" id="prev-camilla-isquio-pi"></span>
-          
-            <span class="ex-peso-sep">·</span>
-            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="camilla-isquio" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label" style="color:#44bbff">RM</span>
-          </div>
-        </div>
-        <div class="ex-right" onclick="openHist('camilla-isquio','Camilla de Isquiotibiales')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
-      </div>
-      <div class="ex-row">
-        <div class="ex-num">2</div>
-        <div class="ex-info">
-          <div class="ex-name">Sentadilla con Barra Smith</div>
-          <div class="ex-meta"><span>3×8-10 · 120" desc · profundidad completa</span></div>
-          <div class="ex-peso-row">
-            <input class="ex-peso-input" type="number" step="2.5" placeholder="kg" data-ex="sentadilla-barra-smith" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label">kg barra</span>
-            <span class="ex-peso-prev" id="prev-sentadilla-barra-smith-pi"></span>
-          
-            <span class="ex-peso-sep">·</span>
-            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="sentadilla-barra-smith" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label" style="color:#44bbff">RM</span>
-          </div>
-        </div>
-        <div class="ex-right" onclick="openHist('sentadilla-barra-smith','Sentadilla con Barra Smith')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
-      </div>
-      <div class="ex-row">
-        <div class="ex-num">3</div>
-        <div class="ex-info">
-          <div class="ex-name">Prensa Unilateral</div>
-          <div class="ex-meta"><span>3×10-12 · 120" desc · pie al centro</span></div>
-          <div class="ex-peso-row">
-            <input class="ex-peso-input" type="number" step="5" placeholder="kg" data-ex="prensa-unilateral" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label">kg prensa</span>
-            <span class="ex-peso-prev" id="prev-prensa-unilateral-pi"></span>
-          
-            <span class="ex-peso-sep">·</span>
-            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="prensa-unilateral" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label" style="color:#44bbff">RM</span>
-          </div>
-        </div>
-        <div class="ex-right" onclick="openHist('prensa-unilateral','Prensa Unilateral')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
-      </div>
-      <div class="ex-row">
-        <div class="ex-num">4</div>
-        <div class="ex-info">
-          <div class="ex-name">Camilla de Cuádriceps</div>
-          <div class="ex-meta"><span>3×10-12 · 90" desc · pausa 1" arriba</span></div>
-          <div class="ex-peso-row">
-            <input class="ex-peso-input" type="number" step="2.5" placeholder="kg" data-ex="camilla-cuadriceps" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label">kg máquina</span>
-            <span class="ex-peso-prev" id="prev-camilla-cuadriceps-pi"></span>
-          
-            <span class="ex-peso-sep">·</span>
-            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="camilla-cuadriceps" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label" style="color:#44bbff">RM</span>
-          </div>
-        </div>
-        <div class="ex-right" onclick="openHist('camilla-cuadriceps','Camilla de Cuádriceps')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
-      </div>
-      <div class="ex-row">
-        <div class="ex-num">5</div>
-        <div class="ex-info">
-          <div class="ex-name">Gemelos en Prensa</div>
-          <div class="ex-meta"><span>3×12-15 · 90" desc · rango completo talón-punta</span></div>
-          <div class="ex-peso-row">
-            <input class="ex-peso-input" type="number" step="5" placeholder="kg" data-ex="gemelos-prensa" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label">kg prensa</span>
-            <span class="ex-peso-prev" id="prev-gemelos-prensa"></span>
-          
-            <span class="ex-peso-sep">·</span>
-            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="gemelos-prensa" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label" style="color:#44bbff">RM</span>
-          </div>
-        </div>
-        <div class="ex-right" onclick="openHist('gemelos-prensa','Gemelos en Prensa')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== TREN SUPERIOR 1 ===== -->
-  <div id="rut-ts1" class="rutina-view" style="display:none">
-    <p class="section-title">Entrada en calor · Superserie x3 rondas</p>
-    <div class="card">
-      <div class="card-header"><div class="card-icon orange">🔥</div><div><div class="card-title">Preparación de Hombros</div><div class="card-sub">Crítico antes de press · 3 rondas</div></div><div class="card-badge">Calor</div></div>
-      <div class="super-label"><span>⚡ Superserie</span></div>
-      <div class="ex-row superserie-start"><div class="ex-num super">A</div><div class="ex-info"><div class="ex-name">Movilidad Completa de Hombro</div><div class="ex-meta"><span>×10 · 0" desc</span></div></div></div>
-      <div class="ex-row superserie-start"><div class="ex-num super">B</div><div class="ex-info"><div class="ex-name">Face Pull</div><div class="ex-meta"><span>×15 · 0" desc · codos arriba · manguito rotador</span></div></div></div>
-      <div class="ex-row superserie-end"><div class="ex-num super">C</div><div class="ex-info"><div class="ex-name">Dominadas Colgado Pasivas</div><div class="ex-meta"><span>30" · 60" desc · solo colgarte · descomprime columna</span></div></div></div>
-    </div>
-
-    <p class="section-title">Trabajo Principal — Push</p>
-    <div class="card">
-      <div class="card-header"><div class="card-icon yellow">💪</div><div><div class="card-title">Pecho · Hombros</div><div class="card-sub">Empuje inclinado y plano</div></div></div>
-      <div class="ex-row">
-        <div class="ex-num">1</div>
-        <div class="ex-info">
-          <div class="ex-name">Press Inclinado en Barra Smith</div>
-          <div class="ex-meta"><span>3×8-10 · 120" desc · 45° · escápulas apretadas</span></div>
-          <div class="ex-peso-row">
-            <input class="ex-peso-input" type="number" step="2.5" placeholder="kg" data-ex="press-inclinado-smith" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label">kg barra</span>
-            <span class="ex-peso-prev" id="prev-press-inclinado-smith-ts"></span>
-          
-            <span class="ex-peso-sep">·</span>
-            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="press-inclinado-smith" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label" style="color:#44bbff">RM</span>
-          </div>
-        </div>
-        <div class="ex-right" onclick="openHist('press-inclinado-smith','Press Inclinado Barra Smith')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
-      </div>
-    </div>
-
-    <p class="section-title">Superserie — Pecho + Espalda x3 rondas</p>
-    <div class="card">
-      <div class="card-header"><div class="card-icon green">🏋️</div><div><div class="card-title">Press Plano + Remo Gironda</div><div class="card-sub">Antagonistas · máxima eficiencia</div></div><div class="card-badge">Superserie</div></div>
-      <div class="super-label"><span>⚡ Superserie</span></div>
-      <div class="ex-row superserie-start">
-        <div class="ex-num super">A</div>
-        <div class="ex-info">
-          <div class="ex-name">Press Plano en Máquina</div>
-          <div class="ex-meta"><span>10-12 reps · 15" desc</span></div>
-          <div class="ex-peso-row">
-            <input class="ex-peso-input" type="number" step="2.5" placeholder="kg" data-ex="press-plano-maquina" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label">kg máquina</span>
-            <span class="ex-peso-prev" id="prev-press-plano-maquina-ts"></span>
-          
-            <span class="ex-peso-sep">·</span>
-            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="press-plano-maquina" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label" style="color:#44bbff">RM</span>
-          </div>
-        </div>
-        <div class="ex-right" onclick="openHist('press-plano-maquina','Press Plano en Máquina')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
-      </div>
-      <div class="ex-row superserie-end">
-        <div class="ex-num super">B</div>
-        <div class="ex-info">
           <div class="ex-name">Remo Gironda</div>
-          <div class="ex-meta"><span>10-12 reps · 120" desc · pecho en banco</span></div>
+          <div class="ex-meta"><span>3×10-12 · <span class="timer-time" data-secs="90">90" desc</span> · pecho en banco inclinado</span></div>
           <div class="ex-peso-row">
             <input class="ex-peso-input" type="number" step="2.5" placeholder="kg" data-ex="remo-gironda" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
             <span class="ex-peso-label">kg</span>
-            <span class="ex-peso-prev" id="prev-remo-gironda-ts"></span>
-          
+            <span class="ex-peso-prev" id="prev-remo-gironda"></span>
             <span class="ex-peso-sep">·</span>
             <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="remo-gironda" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
             <span class="ex-peso-label" style="color:#44bbff">RM</span>
@@ -905,54 +313,18 @@
       </div>
     </div>
 
-    <p class="section-title">Dorsalera + Aislamiento x3 rondas</p>
+    <p class="section-title">Bíceps</p>
     <div class="card">
-      <div class="card-header"><div class="card-icon blue">⚡</div><div><div class="card-title">Espalda · Bíceps · Tríceps · Hombros</div><div class="card-sub">Superseries finales</div></div><div class="card-badge">Superserie</div></div>
+      <div class="card-header"><div class="card-icon blue">💪</div><div><div class="card-title">Bíceps</div><div class="card-sub">3 series · estiramiento máximo</div></div></div>
       <div class="ex-row">
         <div class="ex-num">1</div>
         <div class="ex-info">
-          <div class="ex-name">Dorsalera con Agarre Triángulo</div>
-          <div class="ex-meta"><span>3×10-12 · 90" desc · codos abajo y atrás</span></div>
-          <div class="ex-peso-row">
-            <input class="ex-peso-input" type="number" step="2.5" placeholder="kg" data-ex="dorsalera" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label">kg polea</span>
-            <span class="ex-peso-prev" id="prev-dorsalera-ts"></span>
-          
-            <span class="ex-peso-sep">·</span>
-            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="dorsalera" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label" style="color:#44bbff">RM</span>
-          </div>
-        </div>
-        <div class="ex-right" onclick="openHist('dorsalera','Dorsalera')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
-      </div>
-      <div class="super-label" style="margin-top:4px"><span>⚡ Superserie</span></div>
-      <div class="ex-row superserie-start">
-        <div class="ex-num super">A</div>
-        <div class="ex-info">
-          <div class="ex-name">Press Francés con Mancuernas</div>
-          <div class="ex-meta"><span>10-12 reps · 15" desc · codos fijos</span></div>
-          <div class="ex-peso-row">
-            <input class="ex-peso-input" type="number" step="1" placeholder="kg" data-ex="press-frances" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label">kg c/mancuerna</span>
-            <span class="ex-peso-prev" id="prev-press-frances"></span>
-          
-            <span class="ex-peso-sep">·</span>
-            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="press-frances" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label" style="color:#44bbff">RM</span>
-          </div>
-        </div>
-        <div class="ex-right" onclick="openHist('press-frances','Press Francés')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
-      </div>
-      <div class="ex-row superserie-end">
-        <div class="ex-num super">B</div>
-        <div class="ex-info">
-          <div class="ex-name">Bícep con Mancuernas en Banco 45°</div>
-          <div class="ex-meta"><span>10-12 reps · 90" desc · estiramiento máximo en bajada</span></div>
+          <div class="ex-name">Bícep Banco 45° con Mancuernas</div>
+          <div class="ex-meta"><span>3×10-12 · <span class="timer-time" data-secs="90">90" desc</span> · estiramiento máximo en bajada</span></div>
           <div class="ex-peso-row">
             <input class="ex-peso-input" type="number" step="1" placeholder="kg" data-ex="bicep-banco-45" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label">kg c/mancuerna</span>
+            <span class="ex-peso-label">kg c/mano</span>
             <span class="ex-peso-prev" id="prev-bicep-banco-45"></span>
-          
             <span class="ex-peso-sep">·</span>
             <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="bicep-banco-45" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
             <span class="ex-peso-label" style="color:#44bbff">RM</span>
@@ -960,22 +332,315 @@
         </div>
         <div class="ex-right" onclick="openHist('bicep-banco-45','Bícep Banco 45°')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
       </div>
+    </div>
+
+    <p class="section-title">Tríceps</p>
+    <div class="card">
+      <div class="card-header"><div class="card-icon orange">⚡</div><div><div class="card-title">Tríceps</div><div class="card-sub">3 series · polea · codos fijos</div></div></div>
+      <div class="ex-row">
+        <div class="ex-num">1</div>
+        <div class="ex-info">
+          <div class="ex-name">Trícep Pushdown Polea</div>
+          <div class="ex-meta"><span>3×12-15 · <span class="timer-time" data-secs="90">90" desc</span> · codos pegados al cuerpo</span></div>
+          <div class="ex-peso-row">
+            <input class="ex-peso-input" type="number" step="2.5" placeholder="kg" data-ex="tricep-polea" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
+            <span class="ex-peso-label">kg polea</span>
+            <span class="ex-peso-prev" id="prev-tricep-polea"></span>
+            <span class="ex-peso-sep">·</span>
+            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="tricep-polea" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
+            <span class="ex-peso-label" style="color:#44bbff">RM</span>
+          </div>
+        </div>
+        <div class="ex-right" onclick="openHist('tricep-polea','Trícep Pushdown Polea')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
+      </div>
+    </div>
+
+    <p class="section-title">Core</p>
+    <div class="card">
+      <div class="card-header"><div class="card-icon blue">⚡</div><div><div class="card-title">Core</div><div class="card-sub">3 series · cierre de sesión</div></div></div>
+      <div class="ex-row">
+        <div class="ex-num">1</div>
+        <div class="ex-info">
+          <div class="ex-name">Plancha Corporal</div>
+          <div class="ex-meta"><span>3×40-50" · <span class="timer-time" data-secs="60">60" desc</span> · ombligo adentro · glúteos activos</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== LOWER — MIÉRCOLES ===== -->
+  <div id="rut-lower" class="rutina-view" style="display:none">
+    <div class="tip tip-red"><strong>Miércoles · Cuádriceps + Isquios + Glúteos + Gemelos + Core</strong> · ~58 min · El día más exigente. Hidratate antes.</div>
+
+    <p class="section-title">Cuádriceps + Isquios</p>
+    <div class="card">
+      <div class="card-header"><div class="card-icon red">🦵</div><div><div class="card-title">Piernas — Trabajo Principal</div><div class="card-sub">10 series · bilateral y unilateral</div></div></div>
+      <div class="ex-row">
+        <div class="ex-num">1</div>
+        <div class="ex-info">
+          <div class="ex-name">Sentadilla con Barra Smith</div>
+          <div class="ex-meta"><span>4×8-10 · <span class="timer-time" data-secs="120">120" desc</span> · profundidad completa · rodillas afuera</span></div>
+          <div class="ex-peso-row">
+            <input class="ex-peso-input" type="number" step="2.5" placeholder="kg" data-ex="sentadilla-barra-smith" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
+            <span class="ex-peso-label">kg barra</span>
+            <span class="ex-peso-prev" id="prev-sentadilla-barra-smith"></span>
+            <span class="ex-peso-sep">·</span>
+            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="sentadilla-barra-smith" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
+            <span class="ex-peso-label" style="color:#44bbff">RM</span>
+          </div>
+        </div>
+        <div class="ex-right" onclick="openHist('sentadilla-barra-smith','Sentadilla Barra Smith')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
+      </div>
+      <div class="ex-row">
+        <div class="ex-num">2</div>
+        <div class="ex-info">
+          <div class="ex-name">Camilla de Isquiotibiales</div>
+          <div class="ex-meta"><span>3×10-12 · <span class="timer-time" data-secs="90">90" desc</span> · bajada lenta 3 segundos</span></div>
+          <div class="ex-peso-row">
+            <input class="ex-peso-input" type="number" step="2.5" placeholder="kg" data-ex="camilla-isquio" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
+            <span class="ex-peso-label">kg máquina</span>
+            <span class="ex-peso-prev" id="prev-camilla-isquio"></span>
+            <span class="ex-peso-sep">·</span>
+            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="camilla-isquio" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
+            <span class="ex-peso-label" style="color:#44bbff">RM</span>
+          </div>
+        </div>
+        <div class="ex-right" onclick="openHist('camilla-isquio','Camilla Isquiotibiales')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
+      </div>
+      <div class="ex-row">
+        <div class="ex-num">3</div>
+        <div class="ex-info">
+          <div class="ex-name">Prensa Unilateral</div>
+          <div class="ex-meta"><span>3×10-12 · <span class="timer-time" data-secs="90">90" desc</span> · pie al centro de la plataforma</span></div>
+          <div class="ex-peso-row">
+            <input class="ex-peso-input" type="number" step="5" placeholder="kg" data-ex="prensa-unilateral" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
+            <span class="ex-peso-label">kg prensa</span>
+            <span class="ex-peso-prev" id="prev-prensa-unilateral"></span>
+            <span class="ex-peso-sep">·</span>
+            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="prensa-unilateral" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
+            <span class="ex-peso-label" style="color:#44bbff">RM</span>
+          </div>
+        </div>
+        <div class="ex-right" onclick="openHist('prensa-unilateral','Prensa Unilateral')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
+      </div>
+    </div>
+
+    <p class="section-title">Cuádriceps aislado</p>
+    <div class="card">
+      <div class="card-header"><div class="card-icon red">🦵</div><div><div class="card-title">Cuádriceps</div><div class="card-sub">3 series · pausa arriba</div></div></div>
+      <div class="ex-row">
+        <div class="ex-num">1</div>
+        <div class="ex-info">
+          <div class="ex-name">Camilla de Cuádriceps</div>
+          <div class="ex-meta"><span>3×12-15 · <span class="timer-time" data-secs="90">90" desc</span> · pausa 1" arriba · bajada lenta</span></div>
+          <div class="ex-peso-row">
+            <input class="ex-peso-input" type="number" step="2.5" placeholder="kg" data-ex="camilla-cuadriceps" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
+            <span class="ex-peso-label">kg máquina</span>
+            <span class="ex-peso-prev" id="prev-camilla-cuadriceps"></span>
+            <span class="ex-peso-sep">·</span>
+            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="camilla-cuadriceps" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
+            <span class="ex-peso-label" style="color:#44bbff">RM</span>
+          </div>
+        </div>
+        <div class="ex-right" onclick="openHist('camilla-cuadriceps','Camilla Cuádriceps')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
+      </div>
+    </div>
+
+    <p class="section-title">Gemelos</p>
+    <div class="card">
+      <div class="card-header"><div class="card-icon orange">🦵</div><div><div class="card-title">Gemelos</div><div class="card-sub">3 series · rango completo</div></div></div>
+      <div class="ex-row">
+        <div class="ex-num">1</div>
+        <div class="ex-info">
+          <div class="ex-name">Gemelos en Prensa</div>
+          <div class="ex-meta"><span>3×15 · <span class="timer-time" data-secs="60">60" desc</span> · talón abajo completo · punta arriba completo</span></div>
+          <div class="ex-peso-row">
+            <input class="ex-peso-input" type="number" step="5" placeholder="kg" data-ex="gemelos-prensa" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
+            <span class="ex-peso-label">kg prensa</span>
+            <span class="ex-peso-prev" id="prev-gemelos-prensa"></span>
+            <span class="ex-peso-sep">·</span>
+            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="gemelos-prensa" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
+            <span class="ex-peso-label" style="color:#44bbff">RM</span>
+          </div>
+        </div>
+        <div class="ex-right" onclick="openHist('gemelos-prensa','Gemelos en Prensa')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
+      </div>
+    </div>
+
+    <p class="section-title">Core</p>
+    <div class="card">
+      <div class="card-header"><div class="card-icon blue">⚡</div><div><div class="card-title">Core</div><div class="card-sub">3 series · cierre de sesión</div></div></div>
+      <div class="ex-row">
+        <div class="ex-num">1</div>
+        <div class="ex-info">
+          <div class="ex-name">Ruedita Abdominal</div>
+          <div class="ex-meta"><span>3×10-12 · <span class="timer-time" data-secs="60">60" desc</span> · extendé hasta donde llegues · sin hundir la lumbar</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== UPPER B — VIERNES ===== -->
+  <div id="rut-ub" class="rutina-view" style="display:none">
+    <div class="tip tip-blue"><strong>Viernes · Hombros + Espalda + Tríceps + Bíceps + Core</strong> · ~60 min · Foco en la conexión mente-músculo en cada rep.</div>
+
+    <p class="section-title">Hombros</p>
+    <div class="card">
+      <div class="card-header"><div class="card-icon yellow">💪</div><div><div class="card-title">Hombros</div><div class="card-sub">7 series · press + vuelos laterales</div></div></div>
+      <div class="ex-row">
+        <div class="ex-num">1</div>
+        <div class="ex-info">
+          <div class="ex-name">Press de Hombro con Mancuernas</div>
+          <div class="ex-meta"><span>4×8-10 · <span class="timer-time" data-secs="90">90" desc</span> · sentado · neutro o pronado</span></div>
+          <div class="ex-peso-row">
+            <input class="ex-peso-input" type="number" step="1" placeholder="kg" data-ex="press-hombro-mancuernas" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
+            <span class="ex-peso-label">kg c/mano</span>
+            <span class="ex-peso-prev" id="prev-press-hombro-mancuernas"></span>
+            <span class="ex-peso-sep">·</span>
+            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="press-hombro-mancuernas" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
+            <span class="ex-peso-label" style="color:#44bbff">RM</span>
+          </div>
+        </div>
+        <div class="ex-right" onclick="openHist('press-hombro-mancuernas','Press Hombro Mancuernas')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
+      </div>
       <div class="ex-row">
         <div class="ex-num">2</div>
         <div class="ex-info">
           <div class="ex-name">Vuelos Laterales con Mancuernas</div>
-          <div class="ex-meta"><span>3×10-12 · 90" desc · sin impulso</span></div>
+          <div class="ex-meta"><span>3×12-15 · <span class="timer-time" data-secs="90">90" desc</span> · sin impulso · codos semiflexionados</span></div>
           <div class="ex-peso-row">
             <input class="ex-peso-input" type="number" step="1" placeholder="kg" data-ex="vuelos-laterales" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
-            <span class="ex-peso-label">kg c/mancuerna</span>
-            <span class="ex-peso-prev" id="prev-vuelos-laterales-ts"></span>
-          
+            <span class="ex-peso-label">kg c/mano</span>
+            <span class="ex-peso-prev" id="prev-vuelos-laterales"></span>
             <span class="ex-peso-sep">·</span>
             <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="vuelos-laterales" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
             <span class="ex-peso-label" style="color:#44bbff">RM</span>
           </div>
         </div>
-        <div class="ex-right" onclick="openHist('vuelos-laterales','Vuelos Laterales Mancuernas')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
+        <div class="ex-right" onclick="openHist('vuelos-laterales','Vuelos Laterales')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
+      </div>
+    </div>
+
+    <p class="section-title">Espalda</p>
+    <div class="card">
+      <div class="card-header"><div class="card-icon green">🏋️</div><div><div class="card-title">Espalda</div><div class="card-sub">7 series · tracción horizontal</div></div></div>
+      <div class="ex-row">
+        <div class="ex-num">1</div>
+        <div class="ex-info">
+          <div class="ex-name">Remo en T</div>
+          <div class="ex-meta"><span>4×8-10 · <span class="timer-time" data-secs="90">90" desc</span> · espalda plana · codos atrás</span></div>
+          <div class="ex-peso-row">
+            <input class="ex-peso-input" type="number" step="2.5" placeholder="kg" data-ex="remo-en-t" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
+            <span class="ex-peso-label">kg</span>
+            <span class="ex-peso-prev" id="prev-remo-en-t"></span>
+            <span class="ex-peso-sep">·</span>
+            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="remo-en-t" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
+            <span class="ex-peso-label" style="color:#44bbff">RM</span>
+          </div>
+        </div>
+        <div class="ex-right" onclick="openHist('remo-en-t','Remo en T')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
+      </div>
+      <div class="ex-row">
+        <div class="ex-num">2</div>
+        <div class="ex-info">
+          <div class="ex-name">Remo Unilateral con Mancuerna</div>
+          <div class="ex-meta"><span>3×10-12 · <span class="timer-time" data-secs="90">90" desc</span> · apoyo en banco · codo bien atrás</span></div>
+          <div class="ex-peso-row">
+            <input class="ex-peso-input" type="number" step="1" placeholder="kg" data-ex="remo-unilateral" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
+            <span class="ex-peso-label">kg mancuerna</span>
+            <span class="ex-peso-prev" id="prev-remo-unilateral"></span>
+            <span class="ex-peso-sep">·</span>
+            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="remo-unilateral" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
+            <span class="ex-peso-label" style="color:#44bbff">RM</span>
+          </div>
+        </div>
+        <div class="ex-right" onclick="openHist('remo-unilateral','Remo Unilateral')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
+      </div>
+    </div>
+
+    <p class="section-title">Tríceps</p>
+    <div class="card">
+      <div class="card-header"><div class="card-icon orange">⚡</div><div><div class="card-title">Tríceps</div><div class="card-sub">5 series · polea + mancuernas</div></div></div>
+      <div class="ex-row">
+        <div class="ex-num">1</div>
+        <div class="ex-info">
+          <div class="ex-name">Trícep Pushdown Polea</div>
+          <div class="ex-meta"><span>3×12-15 · <span class="timer-time" data-secs="60">60" desc</span> · codos fijos al cuerpo</span></div>
+          <div class="ex-peso-row">
+            <input class="ex-peso-input" type="number" step="2.5" placeholder="kg" data-ex="tricep-polea" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
+            <span class="ex-peso-label">kg polea</span>
+            <span class="ex-peso-prev" id="prev-tricep-polea-ub"></span>
+            <span class="ex-peso-sep">·</span>
+            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="tricep-polea" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
+            <span class="ex-peso-label" style="color:#44bbff">RM</span>
+          </div>
+        </div>
+        <div class="ex-right" onclick="openHist('tricep-polea','Trícep Pushdown Polea')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
+      </div>
+      <div class="ex-row">
+        <div class="ex-num">2</div>
+        <div class="ex-info">
+          <div class="ex-name">Press Francés con Mancuernas</div>
+          <div class="ex-meta"><span>2×10-12 · <span class="timer-time" data-secs="90">90" desc</span> · codos fijos · bajá detrás de la cabeza</span></div>
+          <div class="ex-peso-row">
+            <input class="ex-peso-input" type="number" step="1" placeholder="kg" data-ex="press-frances" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
+            <span class="ex-peso-label">kg c/mano</span>
+            <span class="ex-peso-prev" id="prev-press-frances"></span>
+            <span class="ex-peso-sep">·</span>
+            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="press-frances" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
+            <span class="ex-peso-label" style="color:#44bbff">RM</span>
+          </div>
+        </div>
+        <div class="ex-right" onclick="openHist('press-frances','Press Francés')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
+      </div>
+    </div>
+
+    <p class="section-title">Bíceps</p>
+    <div class="card">
+      <div class="card-header"><div class="card-icon blue">💪</div><div><div class="card-title">Bíceps</div><div class="card-sub">5 series · cable + martillo</div></div></div>
+      <div class="ex-row">
+        <div class="ex-num">1</div>
+        <div class="ex-info">
+          <div class="ex-name">Bícep en Cable</div>
+          <div class="ex-meta"><span>3×10-12 · <span class="timer-time" data-secs="60">60" desc</span> · codo fijo</span></div>
+          <div class="ex-peso-row">
+            <input class="ex-peso-input" type="number" step="2.5" placeholder="kg" data-ex="bicep-cable" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
+            <span class="ex-peso-label">kg polea</span>
+            <span class="ex-peso-prev" id="prev-bicep-cable"></span>
+            <span class="ex-peso-sep">·</span>
+            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="bicep-cable" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
+            <span class="ex-peso-label" style="color:#44bbff">RM</span>
+          </div>
+        </div>
+        <div class="ex-right" onclick="openHist('bicep-cable','Bícep en Cable')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
+      </div>
+      <div class="ex-row">
+        <div class="ex-num">2</div>
+        <div class="ex-info">
+          <div class="ex-name">Bícep Martillo con Mancuernas</div>
+          <div class="ex-meta"><span>2×10-12 · <span class="timer-time" data-secs="90">90" desc</span> · agarre neutro · codo fijo</span></div>
+          <div class="ex-peso-row">
+            <input class="ex-peso-input" type="number" step="1" placeholder="kg" data-ex="bicep-martillo" data-field="peso" oninput="savePesoEx(this)" onclick="stopProp(event)">
+            <span class="ex-peso-label">kg c/mano</span>
+            <span class="ex-peso-prev" id="prev-bicep-martillo"></span>
+            <span class="ex-peso-sep">·</span>
+            <input class="ex-peso-input rm" type="number" step="1" placeholder="reps" data-ex="bicep-martillo" data-field="rm" oninput="savePesoEx(this)" onclick="stopProp(event)">
+            <span class="ex-peso-label" style="color:#44bbff">RM</span>
+          </div>
+        </div>
+        <div class="ex-right" onclick="openHist('bicep-martillo','Bícep Martillo')" style="cursor:pointer"><strong>📊</strong><span>historial</span></div>
+      </div>
+    </div>
+
+    <p class="section-title">Core</p>
+    <div class="card">
+      <div class="card-header"><div class="card-icon blue">⚡</div><div><div class="card-title">Core</div><div class="card-sub">3 series · cierre de sesión</div></div></div>
+      <div class="ex-row">
+        <div class="ex-num">1</div>
+        <div class="ex-info">
+          <div class="ex-name">Twist en Banco Declinado</div>
+          <div class="ex-meta"><span>3×15-20 · <span class="timer-time" data-secs="60">60" desc</span> · rotación completa · pies fijos</span></div>
+        </div>
       </div>
     </div>
   </div>
@@ -983,9 +648,10 @@
   <div style="height:20px"></div>
 </div>
 
+
 <!-- ==================== SEMANA ==================== -->
 <div id="view-semana" class="view">
-  <div class="tip"><strong>Rotación sugerida:</strong> Lunes FB1 → Miércoles Pierna → Viernes FB2 o Tren Superior. Cada 2-3 semanas avanzás al siguiente FB.</div>
+  <div class="tip"><strong>Rotación:</strong> Lunes Upper A → Miércoles Lower → Viernes Upper B. Semanas 1-3 igual, semana 4 sumás 1 serie por ejercicio, semana 7 descarga.</div>
 
   <p class="section-title">Racha de las últimas 8 semanas</p>
   <div class="card" style="padding:14px">
@@ -999,11 +665,11 @@
 
   <p class="section-title">Esta semana</p>
   <div class="week-grid">
-    <div class="week-card" style="border-color:rgba(232,255,71,.3)"><div class="dot" style="background:#e8ff47;margin:0 auto 8px"></div><h3>Lunes</h3><p>Full Body 1</p></div>
+    <div class="week-card" style="border-color:rgba(232,255,71,.3)"><div class="dot" style="background:#e8ff47;margin:0 auto 8px"></div><h3>Lunes</h3><p>Upper A</p></div>
     <div class="week-card"><div class="dot" style="background:#333;margin:0 auto 8px"></div><h3>Martes</h3><p>10.000 pasos</p></div>
-    <div class="week-card" style="border-color:rgba(255,68,68,.3)"><div class="dot" style="background:#ff4444;margin:0 auto 8px"></div><h3>Miércoles</h3><p>Pierna 1</p></div>
+    <div class="week-card" style="border-color:rgba(255,68,68,.3)"><div class="dot" style="background:#ff4444;margin:0 auto 8px"></div><h3>Miércoles</h3><p>Lower</p></div>
     <div class="week-card"><div class="dot" style="background:#333;margin:0 auto 8px"></div><h3>Jueves</h3><p>10.000 pasos</p></div>
-    <div class="week-card" style="border-color:rgba(68,136,255,.3)"><div class="dot" style="background:#4488ff;margin:0 auto 8px"></div><h3>Viernes</h3><p>Full Body 2</p></div>
+    <div class="week-card" style="border-color:rgba(68,136,255,.3)"><div class="dot" style="background:#4488ff;margin:0 auto 8px"></div><h3>Viernes</h3><p>Upper B</p></div>
     <div class="week-card" style="border-color:rgba(68,136,255,.2)"><div class="dot" style="background:#4488ff;opacity:.5;margin:0 auto 8px"></div><h3>Finde</h3><p>Caminata + descanso</p></div>
   </div>
 
@@ -1025,11 +691,9 @@
         <label>Rutina</label>
         <select id="log-rutina">
           <option value="">Seleccioná</option>
-          <option value="Full Body 1">Full Body 1</option>
-          <option value="Full Body 2">Full Body 2</option>
-          <option value="Full Body 3">Full Body 3</option>
-          <option value="Pierna 1">Pierna 1</option>
-          <option value="Tren Superior 1">Tren Superior 1</option>
+          <option value="Upper A — Lunes">Upper A — Lunes</option>
+          <option value="Lower — Miércoles">Lower — Miércoles</option>
+          <option value="Upper B — Viernes">Upper B — Viernes</option>
         </select>
       </div>
       <div class="log-field">
@@ -1329,20 +993,14 @@ function skipRestTimer(){closeRestTimer();}
 
 // Inyectar timer trigger en cada ex-meta al cargar
 function injectTimerTriggers(){
-  document.querySelectorAll('.ex-meta').forEach(meta=>{
-    const span=meta.querySelector('span');
-    if(!span) return;
-    const text=span.textContent;
-    const match=text.match(/(\d+)"\s*desc/);
-    if(!match) return;
-    const secs=parseInt(match[1]);
-    const exRow=meta.closest('.ex-row');
+  document.querySelectorAll('.timer-time').forEach(span=>{
+    const secs=parseInt(span.getAttribute('data-secs'));
+    if(!secs) return;
+    const exRow=span.closest('.ex-row');
     const exName=exRow?.querySelector('.ex-name')?.textContent||'ejercicio';
-    const btn=document.createElement('button');
-    btn.textContent='⏱ '+match[0];
-    btn.style.cssText='background:rgba(68,255,204,.1);border:1px solid rgba(68,255,204,.3);border-radius:20px;padding:2px 10px;color:#44ffcc;font-size:11px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;';
-    btn.onclick=(e)=>{e.stopPropagation();startRestTimer(secs,exName);};
-    meta.appendChild(btn);
+    span.style.cssText='color:#44ffcc;text-decoration:underline dotted;cursor:pointer;font-weight:600;';
+    span.title='Tocar para iniciar timer';
+    span.onclick=(e)=>{e.stopPropagation();startRestTimer(secs,exName);};
   });
 }
 
@@ -1470,15 +1128,24 @@ renderChart();
 
 // ====== STATS ======
 const EX_NAMES={
-  'sentadilla-barra-smith':'Sentadilla Barra Smith','camilla-isquio':'Camilla Isquiotibiales',
-  'press-inclinado-smith':'Press Inclinado Smith','press-plano-maquina':'Press Plano Máquina',
-  'tricep-polea':'Trícep Polea','vuelos-laterales':'Vuelos Laterales','prensa-unilateral':'Prensa Unilateral',
-  'camilla-cuadriceps':'Camilla Cuádriceps','dorsalera':'Dorsalera','remo-gironda':'Remo Gironda',
-  'remo-en-t':'Remo en T','bicep-martillo':'Bícep Martillo','vuelos-posteriores':'Vuelos Posteriores',
-  'prensa-bilateral':'Prensa Bilateral','bulgara-mancuernas':'Sentadilla Búlgara',
-  'press-hombro-mancuernas':'Press Hombro Mancuernas','remo-unilateral':'Remo Unilateral',
-  'bicep-cable':'Bícep Cable','gemelos-prensa':'Gemelos Prensa','twist-sovietico':'Twist Soviético',
-  'press-frances':'Press Francés','bicep-banco-45':'Bícep Banco 45°','vuelos-laterales-fb3':'Vuelos Laterales FB3',
+  'press-inclinado-mancuernas':'Press Inclinado Mancuernas',
+  'press-plano-maquina':'Press Plano Máquina',
+  'dorsalera':'Dorsalera',
+  'remo-gironda':'Remo Gironda',
+  'bicep-banco-45':'Bícep Banco 45°',
+  'tricep-polea':'Trícep Pushdown Polea',
+  'sentadilla-barra-smith':'Sentadilla Barra Smith',
+  'camilla-isquio':'Camilla Isquiotibiales',
+  'prensa-unilateral':'Prensa Unilateral',
+  'camilla-cuadriceps':'Camilla Cuádriceps',
+  'gemelos-prensa':'Gemelos en Prensa',
+  'press-hombro-mancuernas':'Press Hombro Mancuernas',
+  'vuelos-laterales':'Vuelos Laterales',
+  'remo-en-t':'Remo en T',
+  'remo-unilateral':'Remo Unilateral',
+  'press-frances':'Press Francés',
+  'bicep-cable':'Bícep en Cable',
+  'bicep-martillo':'Bícep Martillo',
 };
 
 function getAllExKeys(){return Object.keys(EX_NAMES);}
@@ -1546,11 +1213,11 @@ function renderStats(){
 }
 
 function getNextRoutine(){
-  if(!sessionLog.length) return 'FB1';
+  if(!sessionLog.length) return 'Upper A';
   const last=[...sessionLog].sort((a,b)=>b.fecha.localeCompare(a.fecha))[0].rutina;
-  const rot=['Full Body 1','Pierna 1','Full Body 2','Tren Superior 1','Full Body 3'];
-  const idx=rot.indexOf(last);
-  return rot[(idx+1)%rot.length]||'Full Body 1';
+  const rot=['Upper A — Lunes','Lower — Miércoles','Upper B — Viernes'];
+  const idx=rot.findIndex(r=>last.includes(r.split(' ')[0]+' '+r.split(' ')[1]));
+  return rot[(idx+1)%rot.length]||'Upper A';
 }
 
 function renderExChart(){
