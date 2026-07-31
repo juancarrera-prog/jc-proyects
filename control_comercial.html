@@ -1958,7 +1958,7 @@ function toggleOH(tipo) {
     renderConsolidado(rows);
     renderRanking(rows);
     setTimeout(() => renderChart(rows), 60);
-  } else {
+  } else if (tipo === 'perf') {
     ohActivoPerf = !ohActivoPerf;
     const btn = document.getElementById('btnOHPerf');
     btn.style.background  = ohActivoPerf ? 'var(--purple)' : 'var(--surface2)';
@@ -1969,6 +1969,17 @@ function toggleOH(tipo) {
     renderPerfConsolidado(rows);
     renderRankingPerf(rows);
     setTimeout(() => renderChartPerf(rows), 60);
+  } else if (tipo === 'social') {
+    ohActivoSocial = !ohActivoSocial;
+    const btn = document.getElementById('btnOHSocial');
+    btn.style.background  = ohActivoSocial ? 'var(--purple)' : 'var(--surface2)';
+    btn.style.borderColor = ohActivoSocial ? 'var(--purple)' : 'var(--border)';
+    btn.style.color       = ohActivoSocial ? '#fff' : 'var(--text-muted)';
+    const rows = calcRentabilidadSocial(MES_ACTIVO_SOCIAL);
+    renderKPIsSocial(rows);
+    renderSocialConsolidado(rows);
+    renderRankingSocial(rows);
+    setTimeout(() => renderChartSocial(rows), 60);
   }
 }
 
