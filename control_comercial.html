@@ -1696,7 +1696,7 @@ function renderDetalleSocial(cliente) {
   const ingEl=document.getElementById('ingresosEditableSocial');
   if(ingEl) ingEl.value=ingActual||'';
   const puestos=Object.keys(TABLA_COSTOS_SOCIAL);
-  const totalCostoRaw=puestos.reduce((acc,p)=>{const fte=fteActual[p]||0;return acc+getCostoPuestoSocial(p,mes)*fte;},0);
+  const totalCostoRaw=puestos.reduce((acc,p)=>{const fte=fteActual[p]||0;return acc+getCostoPuestoSocial(p,mes)*(fte/100);},0);
   const totalCosto=totalCostoRaw/1000000;
   let html=puestos.map(puesto=>{
     const costoUnit=getCostoPuestoSocial(puesto,mes),fteVal=fteActual[puesto]||0,costoMes=(costoUnit*(fteVal/100))/1000000;
