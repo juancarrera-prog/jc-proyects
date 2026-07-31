@@ -1553,7 +1553,7 @@ function calcCostoEquipoSocial(cliente, mes) {
   if (mes==='Total') return MESES_2026.filter(m=>m!=='Total').reduce((a,m)=>a+calcCostoEquipoSocial(cliente,m),0);
   const puestos=(CLIENTES_FTE_SOCIAL[cliente]&&CLIENTES_FTE_SOCIAL[cliente][mes])||{};
   let total=0;
-  for (const [p,fte] of Object.entries(puestos)) total+=getCostoPuestoSocial(p,mes)*fte;
+  for (const [p,fte] of Object.entries(puestos)) total+=getCostoPuestoSocial(p,mes)*(fte/100);
   return total/1000000;
 }
 
@@ -1699,12 +1699,12 @@ function renderDetalleSocial(cliente) {
   const totalCostoRaw=puestos.reduce((acc,p)=>{const fte=fteActual[p]||0;return acc+getCostoPuestoSocial(p,mes)*fte;},0);
   const totalCosto=totalCostoRaw/1000000;
   let html=puestos.map(puesto=>{
-    const costoUnit=getCostoPuestoSocial(puesto,mes),fteVal=fteActual[puesto]||0,costoMes=(costoUnit*fteVal)/1000000;
+    const costoUnit=getCostoPuestoSocial(puesto,mes),fteVal=fteActual[puesto]||0,costoMes=(costoUnit*(fteVal/100))/1000000;
     const pct=totalCosto>0?(costoMes/totalCosto)*100:0;
     const barW=Math.min(pct,100).toFixed(0);
     return `<tr>
       <td style="color:${fteVal>0?'var(--text)':'#404040'}">${puesto}</td>
-      <td class="num"><input type="number" step="0.001" min="0" value="${fteVal||''}" placeholder="0"
+      <td class="num"><input type="number" step="0.01" min="0" value="${fteVal?(fteVal*100).toFixed(2):''}" placeholder="0"
         style="background:transparent;border:none;border-bottom:1px solid ${fteVal>0?'var(--purple)':'var(--border)'};color:var(--text);font-family:'Poppins',sans-serif;font-size:13px;width:80px;text-align:right;outline:none;padding:2px 4px"
         onchange="saveFTESocial('${cliente}','${mes}','${puesto}',this.value)"
         onfocus="this.style.borderBottomColor='var(--purple)'" onblur="this.style.borderBottomColor=this.value?'var(--purple)':'var(--border)'">
@@ -1722,7 +1722,9 @@ function renderDetalleSocial(cliente) {
 }
 
 function saveFTESocial(cliente,mes,puesto,valor) {
-  const v=parseFloat(valor)||0;
+  // Usuario ingresa en % absoluto (ej: 25.35) → guardar como decimal (0.2535)
+  const pct=parseFloat(valor)||0;
+  const v=pct/100;
   if(!CLIENTES_FTE_SOCIAL[cliente]) CLIENTES_FTE_SOCIAL[cliente]={};
   if(!CLIENTES_FTE_SOCIAL[cliente][mes]) CLIENTES_FTE_SOCIAL[cliente][mes]={};
   if(!isNaN(v)&&v>0){CLIENTES_FTE_SOCIAL[cliente][mes][puesto]=v;postSheet('fte_social',{cliente,mes,puesto,fte:v});}
