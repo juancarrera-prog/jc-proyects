@@ -903,7 +903,7 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
    DATOS & CONFIGURACIÓN
 ═══════════════════════════════════════════════════════════ */
 const API_URL    = 'https://script.google.com/macros/s/AKfycbyJ7ziLiqqBqpld84Rjybve2ZCMIasb2SRUFu2hLAKPHhoazEyLuD3Sq0SRMPffuX22yQ/exec'; // Script Control Comercial
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxsO0afw1YW55GkKAfA_6TxGFQvUmO5xYv6edvRpwLQRsZrlXd9q69nbccglQzcwXqmVg/exec'; // Script Rentabilidad (GET+POST)
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby1subVXT3HbZEx25TNpG-EB3AHrvmWFwS8bplZg_GBcctMFU2kqt5bOi97lJqi3esx4w/exec'; // Script Rentabilidad (GET+POST)
 const WEBHOOK_URL = '';
 
 const OH_EQUIPO = 1.23;   // Overhead Rentabilidad de Equipo (123%)
@@ -1877,6 +1877,28 @@ async function loadData() {
       Object.entries(json.costos_perf).forEach(([puesto, meses]) => {
         if (!TABLA_COSTOS_PERF[puesto]) TABLA_COSTOS_PERF[puesto] = {};
         Object.entries(meses).forEach(([mes, valor]) => { TABLA_COSTOS_PERF[puesto][mes] = valor; });
+      });
+    }
+    // Cargar datos Social desde Sheet
+    if (json.fte_social && Object.keys(json.fte_social).length > 0) {
+      Object.entries(json.fte_social).forEach(([cliente, meses]) => {
+        if (!CLIENTES_FTE_SOCIAL[cliente]) CLIENTES_FTE_SOCIAL[cliente] = {};
+        Object.entries(meses).forEach(([mes, puestos]) => {
+          CLIENTES_FTE_SOCIAL[cliente][mes] = Object.assign({}, CLIENTES_FTE_SOCIAL[cliente][mes], puestos);
+        });
+      });
+    }
+    if (json.ingresos_social && Object.keys(json.ingresos_social).length > 0) {
+      Object.entries(json.ingresos_social).forEach(([cliente, meses]) => {
+        if (!INGRESOS_SOCIAL[cliente]) INGRESOS_SOCIAL[cliente] = {};
+        // ingresos_social viene en miles del Sheet → convertir a millones
+        Object.entries(meses).forEach(([mes, valor]) => { INGRESOS_SOCIAL[cliente][mes] = valor / 1000; });
+      });
+    }
+    if (json.costos_social && Object.keys(json.costos_social).length > 0) {
+      Object.entries(json.costos_social).forEach(([puesto, meses]) => {
+        if (!TABLA_COSTOS_SOCIAL[puesto]) TABLA_COSTOS_SOCIAL[puesto] = {};
+        Object.entries(meses).forEach(([mes, valor]) => { TABLA_COSTOS_SOCIAL[puesto][mes] = valor; });
       });
     }
     console.log('Rentabilidad cargada desde Sheet');
