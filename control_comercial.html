@@ -705,6 +705,9 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
     </div>
   </div>
 
+
+  </div><!-- /perf-consolidado -->
+
   <div id="perf-detalle" class="rent-section" style="display:none">
     <div class="mes-selector-row">
       <span class="mes-label">MES DE ANÁLISIS</span>
@@ -717,12 +720,15 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
     </div>
     <div class="table-card" style="margin-top:12px">
 
-      <div style="display:flex;align-items:center;gap:16px;margin-bottom:8px;flex-wrap:wrap">
-        <span style="color:var(--text-muted);font-size:13px">Fee (millones $)</span>
-        <input id="ingresosEditablePerf" type="number" placeholder="0"
-          style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-size:13px;width:150px"
-          onchange="saveIngresosPerf(clienteDetalleActivoPerf, MES_ACTIVO_PERF, this.value)">
+      <div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:12px;align-items:flex-start">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="color:var(--text-muted);font-size:13px">Fee (millones $)</span>
+          <input id="ingresosEditablePerf" type="number" placeholder="0"
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-size:13px;width:140px"
+            onchange="saveIngresosPerf(clienteDetalleActivoPerf, MES_ACTIVO_PERF, this.value)">
+        </div>
       </div>
+
       <div style="display:flex;align-items:center;gap:16px;margin-bottom:14px;flex-wrap:wrap">
         <span style="color:var(--text-muted);font-size:13px">Diferencial Programmatic (miles $)</span>
         <input id="diferencialPerfInput" type="number" placeholder="0"
@@ -804,14 +810,21 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
         <div id="rankingSocialPct"></div>
       </div>
     </div>
-    <div class="chart-card">
-      <div class="chart-legend">
-        <span class="legend-item"><span class="legend-sq" style="background:#4488ff"></span>Fee</span>
-        <span class="legend-item"><span class="legend-sq" style="background:#f5c400"></span>Costo Equipo</span>
-        <span class="legend-item"><span class="legend-sq" style="background:#00c853"></span>CMO $</span>
+    <!-- FTE VENDIDO VS REAL -->
+    <div class="section-header" style="margin-top:16px">
+      <div>
+        <div class="section-title">FTE Vendido vs Real</div>
+        <div class="section-sub">Línea punteada = vendido · Línea sólida = real cargado</div>
       </div>
-      <div style="position:relative;width:100%;height:270px">
-        <canvas id="chartSocial"></canvas>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap" id="chartFTESocialSelector"></div>
+
+
+
+    <div class="chart-card">
+      <div class="chart-legend" id="chartFTESocialLegend"></div>
+      <div style="position:relative;width:100%;height:320px">
+        <canvas id="chartFTESocial"></canvas>
       </div>
     </div>
   </div>
@@ -827,13 +840,19 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
       <span>Costo Cía. aplicado: columna <strong id="vigenciaMesSocial">—</strong></span>
     </div>
     <div class="table-card" style="margin-top:12px">
-      <div style="display:flex;align-items:center;gap:16px;margin-bottom:8px;flex-wrap:wrap">
-        <span style="color:var(--text-muted);font-size:13px">Fee (millones $)</span>
-        <input id="ingresosEditableSocial" type="number" placeholder="0"
-          style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-size:13px;width:150px"
-          onchange="saveIngresosSocial(clienteDetalleActivoSocial, MES_ACTIVO_SOCIAL, this.value)">
+      <div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:12px;align-items:flex-start">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="color:var(--text-muted);font-size:13px">Fee (millones $)</span>
+          <input id="ingresosEditableSocial" type="number" placeholder="0"
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-size:13px;width:140px"
+            onchange="saveIngresosSocial(clienteDetalleActivoSocial, MES_ACTIVO_SOCIAL, this.value)">
+        </div>
       </div>
-      <p style="font-size:12px;color:var(--text-muted);margin-bottom:10px">Editá el FTE de cada puesto directamente en la tabla.</p>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:12px">
+        <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">FTE Vendido por puesto (fijo)</div>
+        <div id="fteVendidoSocialInputs" style="display:flex;flex-wrap:wrap;gap:10px"></div>
+      </div>
+      <p style="font-size:12px;color:var(--text-muted);margin-bottom:10px">Editá el FTE Real de cada puesto directamente en la tabla. El FTE Vendido es fijo y se usa para el gráfico.</p>
       <table class="data-table">
         <thead><tr><th>Puesto</th><th class="num">FTE %</th><th class="num">Costo Cía.</th><th class="num">Costo Mensual</th><th class="num">% del total</th></tr></thead>
         <tbody id="tbodySocialDetalle"></tbody>
@@ -938,6 +957,13 @@ let CLIENTES_FTE_PERF = {
   'Hendel': {},
 };
 
+// FTE Vendido por cliente/puesto (se carga una vez, linea punteada)
+let FTE_VENDIDO_PERF = {
+  'ITBA': {}, 'Parts Vu': {}, 'Bagó': {}, 'Banco Patagonia': {},
+  'Yamaha O.P.': {}, 'Violetta': {}, 'Belgrano Day School': {},
+  'TH Marine': {}, 'Hendel': {},
+};
+
 let INVERSION = {
   'Bagó': {}, 'Banco Patagonia': {}, 'La Paulina': {}, 'Pfizer': {},
   'McCain': {}, 'Escorial': {}, 'Universal Assistance': {},
@@ -979,6 +1005,11 @@ const TABLA_COSTOS_SOCIAL = {
 
 let CLIENTES_FTE_SOCIAL = {
   'Escorial': {}, 'CAAM': {}, 'Ignis M&C': {},
+};
+
+// FTE Vendido por cliente/puesto (se carga una vez, linea punteada)
+let FTE_VENDIDO_SOCIAL = {
+  'Escorial':  {}, 'CAAM': {}, 'Ignis M&C': {},
 };
 
 let INGRESOS_SOCIAL = {
@@ -1648,7 +1679,7 @@ function renderChartSocial(rows) {
 function renderSocialCompleto() {
   const rows=calcRentabilidadSocial(MES_ACTIVO_SOCIAL);
   renderKPIsSocial(rows); renderSocialConsolidado(rows); renderRankingSocial(rows);
-  setTimeout(()=>renderChartSocial(rows),80);
+  setTimeout(()=>renderChartFTESelector('social'),80);
   renderMesSelectorSocial();
   renderClienteSelectorSocial();
   renderDetalleSocial(clienteDetalleActivoSocial);
@@ -1669,7 +1700,7 @@ function setMesActivoSocial(mes,btn) {
   document.querySelectorAll(`#mesSelectorSocial .dir-btn, #mesSelectorSocialDetalle .dir-btn`).forEach(b=>{if(b.textContent===mes)b.classList.add('active');});
   const rows=calcRentabilidadSocial(mes);
   renderKPIsSocial(rows); renderSocialConsolidado(rows); renderRankingSocial(rows);
-  setTimeout(()=>renderChartSocial(rows),60);
+  setTimeout(()=>renderChartFTE(Object.keys(DIRECTORES_SOCIAL).find(c=>document.querySelector('#chartFTESocialSelector .dir-btn.active')?.textContent===c)||Object.keys(DIRECTORES_SOCIAL)[0],'social'),60);
   renderDetalleSocial(clienteDetalleActivoSocial);
 }
 
@@ -1695,6 +1726,7 @@ function renderDetalleSocial(cliente) {
   const ingActual=(INGRESOS_SOCIAL[cliente]&&INGRESOS_SOCIAL[cliente][mes])||0;
   const ingEl=document.getElementById('ingresosEditableSocial');
   if(ingEl) ingEl.value=ingActual||'';
+  renderFTEVendidoInputs(cliente,'social');
   const puestos=Object.keys(TABLA_COSTOS_SOCIAL);
   const totalCostoRaw=puestos.reduce((acc,p)=>{const fte=fteActual[p]||0;return acc+getCostoPuestoSocial(p,mes)*fte;},0);
   const totalCosto=totalCostoRaw/1000000;
@@ -1798,8 +1830,176 @@ function switchSocialTab(tab, btn) {
   document.querySelectorAll('#page-social .rent-tab').forEach(b=>b.classList.remove('active'));
   document.getElementById(tab).style.display='block';
   if(btn) btn.classList.add('active');
-  if(tab==='social-detalle') renderDetalleSocial(clienteDetalleActivoSocial);
+  if(tab==='social-consolidado') {
+    const rows=calcRentabilidadSocial(MES_ACTIVO_SOCIAL);
+    renderKPIsSocial(rows); renderSocialConsolidado(rows); renderRankingSocial(rows);
+    setTimeout(()=>renderChartFTESelector('social'),80);
+  }
+  if(tab==='social-detalle') {
+    renderClienteSelectorSocial();
+    renderDetalleSocial(clienteDetalleActivoSocial);
+  }
   if(tab==='social-costos') renderCostosCiaSocial();
+}
+
+
+/* ── FTE VENDIDO VS REAL ── */
+const COLORES_PUESTOS = ['#4488ff','#00c853','#f5c400','#ff4455','#aa44ff','#00bcd4','#ff9800'];
+
+let chartFTESocialInstance = null;
+let chartFTEPerfInstance   = null;
+
+function renderFTEVendidoInputs(cliente, tipo) {
+  const todosPuestos = tipo==='social' ? Object.keys(TABLA_COSTOS_SOCIAL) : Object.keys(TABLA_COSTOS_PERF);
+  const puestos = tipo==='perf'
+    ? todosPuestos.filter(p => p !== 'Performance MKT Manager')
+    : todosPuestos;
+  const vendido = tipo==='social' ? FTE_VENDIDO_SOCIAL : FTE_VENDIDO_PERF;
+  const containerId = tipo==='social' ? 'fteVendidoSocialInputs' : 'fteVendidoPerfInputs';
+  const cont = document.getElementById(containerId);
+  if (!cont) return;
+
+  cont.innerHTML = puestos.map(p => {
+    const val = (vendido[cliente]&&vendido[cliente][p]) || '';
+    return `<div style="display:flex;flex-direction:column;gap:4px;min-width:160px">
+      <span style="font-size:10px;color:var(--text-muted)">${p}</span>
+      <input type="number" step="0.01" placeholder="%" value="${val}"
+        style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:var(--text);font-size:12px;width:100%"
+        onchange="saveFTEVendido('${cliente}','${p}',this.value,'${tipo}')"
+        onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--border)'">
+    </div>`;
+  }).join('');
+}
+
+function saveFTEVendido(cliente, puesto, valor, tipo) {
+  const val = parseFloat(valor)||0;
+  const vendido = tipo==='social' ? FTE_VENDIDO_SOCIAL : FTE_VENDIDO_PERF;
+  if (!vendido[cliente]) vendido[cliente]={};
+  vendido[cliente][puesto] = val;
+  postSheet('fte_vendido_'+tipo, {cliente, puesto, valor:val});
+  renderChartFTE(cliente, tipo);
+}
+
+function renderChartFTESelector(tipo) {
+  const clientes = tipo==='social'
+    ? Object.keys(DIRECTORES_SOCIAL)
+    : Object.keys(DIRECTORES_PERF);
+  const selId = tipo==='social' ? 'chartFTESocialSelector' : 'chartFTEPerfSelector';
+  const cont = document.getElementById(selId);
+  if (!cont) return;
+  const first = clientes[0];
+  cont.innerHTML = clientes.map(c =>
+    `<button class="dir-btn${c===first?' active':''}" onclick="selectClienteFTEChart('${c}','${tipo}',this)">${c}</button>`
+  ).join('');
+  renderChartFTE(first, tipo);
+}
+
+function selectClienteFTEChart(cliente, tipo, btn) {
+  const selId = tipo==='social' ? 'chartFTESocialSelector' : 'chartFTEPerfSelector';
+  document.querySelectorAll(`#${selId} .dir-btn`).forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderChartFTE(cliente, tipo);
+}
+
+function renderChartFTE(cliente, tipo) {
+  const ftePorMes = tipo==='social' ? CLIENTES_FTE_SOCIAL[cliente] : CLIENTES_FTE_PERF[cliente];
+  const vendidoCliente = tipo==='social'
+    ? (FTE_VENDIDO_SOCIAL[cliente]||{})
+    : (FTE_VENDIDO_PERF[cliente]||{});
+  const todosPuestosChart = tipo==='social'
+    ? Object.keys(TABLA_COSTOS_SOCIAL)
+    : Object.keys(TABLA_COSTOS_PERF);
+  const puestos = tipo==='perf'
+    ? todosPuestosChart.filter(p => p !== 'Performance MKT Manager')
+    : todosPuestosChart;
+
+  // Meses con datos reales
+  const mesesConDatos = MESES_2026.filter(m => m!=='Total' &&
+    ftePorMes && ftePorMes[m] && Object.keys(ftePorMes[m]).length > 0
+  );
+
+  if (mesesConDatos.length === 0) {
+    const canvasId = tipo==='social' ? 'chartFTESocial' : 'chartFTEPerf';
+    const inst = tipo==='social' ? chartFTESocialInstance : chartFTEPerfInstance;
+    if(inst){inst.destroy();}
+    if(tipo==='social') chartFTESocialInstance=null; else chartFTEPerfInstance=null;
+    const legend = document.getElementById(tipo==='social'?'chartFTESocialLegend':'chartFTEPerfLegend');
+    if(legend) legend.innerHTML='<span style="color:var(--text-muted);font-size:12px">Sin datos reales cargados para este cliente.</span>';
+    return;
+  }
+
+  // Datasets: una línea real + una vendida por puesto
+  const datasets = [];
+  puestos.forEach((puesto, i) => {
+    const color = COLORES_PUESTOS[i % COLORES_PUESTOS.length];
+    // Real
+    datasets.push({
+      label: puesto + ' (Real)',
+      data: mesesConDatos.map(m => (ftePorMes[m]&&ftePorMes[m][puesto]) || 0),
+      borderColor: color,
+      backgroundColor: color+'22',
+      borderWidth: 2,
+      pointRadius: 4,
+      tension: 0.3,
+      fill: false,
+    });
+    // Vendido (punteado)
+    const vendidoVal = vendidoCliente[puesto] || 0;
+    datasets.push({
+      label: puesto + ' (Vendido)',
+      data: mesesConDatos.map(() => vendidoVal),
+      borderColor: color,
+      backgroundColor: 'transparent',
+      borderWidth: 2,
+      borderDash: [6,4],
+      pointRadius: 0,
+      tension: 0,
+      fill: false,
+    });
+  });
+
+  const canvasId = tipo==='social' ? 'chartFTESocial' : 'chartFTEPerf';
+  const ctx = document.getElementById(canvasId);
+  if(!ctx) return;
+
+  if(tipo==='social'){if(chartFTESocialInstance){chartFTESocialInstance.destroy();chartFTESocialInstance=null;}}
+  else {if(chartFTEPerfInstance){chartFTEPerfInstance.destroy();chartFTEPerfInstance=null;}}
+
+  const inst = new Chart(ctx, {
+    type: 'line',
+    data: { labels: mesesConDatos, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)}%`
+          }
+        }
+      },
+      scales: {
+        x: { ticks:{color:'#606060',font:{family:'Poppins',size:11}}, grid:{color:'rgba(255,255,255,0.03)'} },
+        y: { ticks:{color:'#606060',font:{family:'Poppins',size:11},callback:v=>v+'%'}, grid:{color:'rgba(255,255,255,0.05)'}, title:{display:true,text:'FTE %',color:'#555'} }
+      }
+    }
+  });
+
+  if(tipo==='social') chartFTESocialInstance=inst; else chartFTEPerfInstance=inst;
+
+  // Legend manual
+  const legendEl = document.getElementById(tipo==='social'?'chartFTESocialLegend':'chartFTEPerfLegend');
+  if(legendEl) {
+    legendEl.innerHTML = puestos.map((p,i) => {
+      const c = COLORES_PUESTOS[i%COLORES_PUESTOS.length];
+      return `<span class="legend-item">
+        <span style="display:inline-block;width:18px;height:2px;background:${c};vertical-align:middle;margin-right:4px"></span>${p} Real
+        &nbsp;<span style="display:inline-block;width:18px;height:2px;background:${c};opacity:.6;vertical-align:middle;margin-right:4px;border-top:2px dashed ${c};background:none"></span>${p} Vendido
+      </span>`;
+    }).join('');
+  }
 }
 
 async function loadData() {
@@ -1979,7 +2179,7 @@ function toggleOH(tipo) {
     renderKPIsSocial(rows);
     renderSocialConsolidado(rows);
     renderRankingSocial(rows);
-    setTimeout(() => renderChartSocial(rows), 60);
+    setTimeout(() => renderChartFTE(Object.keys(DIRECTORES_SOCIAL).find(c=>document.querySelector('#chartFTESocialSelector .dir-btn.active')?.textContent===c)||Object.keys(DIRECTORES_SOCIAL)[0],'social'), 60);
   }
 }
 
@@ -2191,6 +2391,7 @@ function renderDetallePerf(cliente) {
   const difActual=(DIFERENCIAL_PERF[cliente]&&DIFERENCIAL_PERF[cliente][mes])||0;
   const ingEl=document.getElementById('ingresosEditablePerf');
   if(ingEl) ingEl.value=ingActual||'';
+  renderFTEVendidoInputs(cliente,'perf');
   const difEl=document.getElementById('diferencialPerfInput');
   if(difEl) difEl.value=difActual||'';
   const totalIngLabel=document.getElementById('totalIngresosPerf');
