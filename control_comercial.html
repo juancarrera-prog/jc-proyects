@@ -1934,7 +1934,7 @@ function renderChartFTE(cliente, tipo) {
     // Real
     datasets.push({
       label: puesto + ' (Real)',
-      data: mesesConDatos.map(m => (ftePorMes[m]&&ftePorMes[m][puesto]) || 0),
+      data: mesesConDatos.map(m => ((ftePorMes[m]&&ftePorMes[m][puesto]) || 0) * 100),
       borderColor: color,
       backgroundColor: color+'22',
       borderWidth: 2,
