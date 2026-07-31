@@ -958,7 +958,7 @@ let DIFERENCIAL_PERF = {
   'Hendel': {},
 };
 
-let MES_VIGENTE_PERF = 'Febrero';
+let MES_VIGENTE_PERF = 'Julio';
 
 /* ═══════════════════════════════════════════════════════════
    SOCIAL
@@ -972,9 +972,9 @@ const DIRECTORES_SOCIAL = {
 };
 
 const TABLA_COSTOS_SOCIAL = {
-  'Digital Strategy Lead':  { 'Diciembre': 0, 'Febrero': 0 },
-  'Social Media Specialist':{ 'Diciembre': 0, 'Febrero': 0 },
-  'Social Media Analyst':   { 'Diciembre': 0, 'Febrero': 0 },
+  'Digital Strategy Lead':  { 'Diciembre': 0, 'Febrero': 0, 'Julio': 0 },
+  'Social Media Specialist':{ 'Diciembre': 0, 'Febrero': 0, 'Julio': 0 },
+  'Social Media Analyst':   { 'Diciembre': 0, 'Febrero': 0, 'Julio': 0 },
 };
 
 let CLIENTES_FTE_SOCIAL = {
@@ -986,19 +986,19 @@ let INGRESOS_SOCIAL = {
 };
 
 const MAPA_MES_COSTO_SOCIAL = {
-  'Total':'Febrero','Enero':'Diciembre','Febrero':'Febrero','Marzo':'Febrero','Abril':'Febrero',
-  'Mayo':'Febrero','Junio':'Febrero','Julio':'Febrero','Agosto':'Febrero','Septiembre':'Febrero',
-  'Octubre':'Febrero','Noviembre':'Febrero','Diciembre':'Febrero'
+  'Total':'Julio','Enero':'Diciembre','Febrero':'Febrero','Marzo':'Febrero','Abril':'Febrero',
+  'Mayo':'Febrero','Junio':'Febrero','Julio':'Julio','Agosto':'Julio','Septiembre':'Julio',
+  'Octubre':'Julio','Noviembre':'Julio','Diciembre':'Julio'
 };
-let MES_VIGENTE_SOCIAL = 'Febrero';
+let MES_VIGENTE_SOCIAL = 'Julio';
 let MES_ACTIVO_SOCIAL  = 'Total';
 let ohActivoSocial     = false;
 let clienteDetalleActivoSocial = 'Escorial';
 
 const MAPA_MES_COSTO_PERF = {
-  'Total':'Febrero','Enero':'Diciembre','Febrero':'Febrero','Marzo':'Febrero','Abril':'Febrero',
-  'Mayo':'Febrero','Junio':'Febrero','Julio':'Febrero','Agosto':'Febrero','Septiembre':'Febrero',
-  'Octubre':'Febrero','Noviembre':'Febrero','Diciembre':'Diciembre',
+  'Total':'Julio','Enero':'Diciembre','Febrero':'Febrero','Marzo':'Febrero','Abril':'Febrero',
+  'Mayo':'Febrero','Junio':'Febrero','Julio':'Julio','Agosto':'Julio','Septiembre':'Julio',
+  'Octubre':'Julio','Noviembre':'Julio','Diciembre':'Julio',
 };
 let clienteDetalleActivoPerf = 'ITBA';
 let MES_ACTIVO_PERF = 'Total';
@@ -1742,47 +1742,53 @@ function saveIngresosSocial(cliente,mes,valor) {
   renderKPIsSocial(rows);renderSocialConsolidado(rows);renderRankingSocial(rows);
 }
 
+function getColsRRHHSocial() {
+  const set=new Set(['Diciembre']);
+  Object.values(TABLA_COSTOS_SOCIAL).forEach(row=>Object.keys(row).forEach(k=>set.add(k)));
+  return [...set];
+}
 function renderCostosCiaSocial() {
-  const cols=Object.values(TABLA_COSTOS_SOCIAL).reduce((set,row)=>{Object.keys(row).forEach(k=>set.add(k));return set;},new Set());
-  const colArr=[...cols];
+  const cols=getColsRRHHSocial();
+  const vigEl=document.getElementById('colVigenteLabelSocial');
+  if(vigEl) vigEl.textContent=MES_VIGENTE_SOCIAL;
   const head=document.getElementById('headCostoCiaSocial');
   const body=document.getElementById('bodyCostoCiaSocial');
   if(!head||!body) return;
-  head.innerHTML=`<tr><th>Puesto</th>${colArr.map(c=>`<th class="num">${c}</th>`).join('')}</tr>`;
+  head.innerHTML=`<tr><th style="min-width:210px">Puesto</th>${cols.map(m=>`<th class="mes-header num${m===MES_VIGENTE_SOCIAL?' vigente-col':''}">${m}${m==='Diciembre'?' (base Ene)':''}${m===MES_VIGENTE_SOCIAL?' ⚡':''}</th>`).join('')}</tr>`;
   body.innerHTML=Object.entries(TABLA_COSTOS_SOCIAL).map(([puesto,costos])=>
-    `<tr><td style="color:var(--text)">${puesto}</td>${colArr.map(c=>`<td class="num">
-      <input type="number" value="${costos[c]||0}" step="1000"
-        style="background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:'Poppins',sans-serif;font-size:12px;width:110px;text-align:right;outline:none;padding:2px 4px"
-        onfocus="this.style.borderBottomColor='var(--purple)'"
-        onblur="this.style.borderBottomColor='var(--border)'"
-        data-puesto="${puesto}" data-col="${c}">
-    </td>`).join('')}</tr>`
+    `<tr><td class="puesto-col">${puesto}</td>${cols.map(m=>{const v=costos[m],isVig=m===MES_VIGENTE_SOCIAL;return`<td class="costo-cell${isVig?' vigente':''} editable" ondblclick="editCellSocial(this,'${puesto}','${m}')" title="Doble click para editar">${v?fmtCosto(v):'—'}</td>`;}).join('')}</tr>`
   ).join('');
-  const vigEl=document.getElementById('colVigenteLabelSocial');
-  if(vigEl) vigEl.textContent=getColCostoSocial(MES_ACTIVO_SOCIAL);
+}
+function editCellSocial(td,puesto,mes) {
+  const cur=TABLA_COSTOS_SOCIAL[puesto]?.[mes]||0;
+  td.innerHTML=`<input class="cell-input" type="number" value="${cur}" onblur="saveCellSocial(this,'${puesto}','${mes}')" onkeydown="if(event.key==='Enter')this.blur();">`;
+  td.querySelector('input').focus(); td.querySelector('input').select();
+}
+function saveCellSocial(input,puesto,mes) {
+  const v=parseFloat(String(input.value).replace(',','.'));
+  if(!isNaN(v)&&v>=0){if(!TABLA_COSTOS_SOCIAL[puesto]) TABLA_COSTOS_SOCIAL[puesto]={};TABLA_COSTOS_SOCIAL[puesto][mes]=v;postSheet('costos_social',{puesto,mes,valor:v});}
+  renderCostosCiaSocial();
 }
 
 function agregarMesSocial() {
-  const mes=prompt('Nombre del mes (ej: Marzo):');
-  if(!mes) return;
-  Object.keys(TABLA_COSTOS_SOCIAL).forEach(p=>{ if(!TABLA_COSTOS_SOCIAL[p][mes]) TABLA_COSTOS_SOCIAL[p][mes]=0; });
+  const nombre=prompt('Nombre del mes (ej: Mayo):');
+  if(!nombre||!nombre.trim()) return;
+  const mesKey=nombre.trim();
+  Object.keys(TABLA_COSTOS_SOCIAL).forEach(p=>{TABLA_COSTOS_SOCIAL[p][mesKey]=0;});
+  let found=false;
+  MESES_2026.forEach(m=>{if(m===mesKey)found=true;if(found)MAPA_MES_COSTO_SOCIAL[m]=mesKey;});
   renderCostosCiaSocial();
 }
 
 function guardarCostosSocial() {
-  const inputs=document.querySelectorAll('#bodyCostoCiaSocial input');
-  inputs.forEach(inp=>{
-    const puesto=inp.dataset.puesto;
-    const col=inp.dataset.col;
-    const val=parseFloat(inp.value)||0;
-    if(!puesto||!col) return;
-    if(!TABLA_COSTOS_SOCIAL[puesto]) TABLA_COSTOS_SOCIAL[puesto]={};
-    TABLA_COSTOS_SOCIAL[puesto][col]=val;
-    postSheet('costos_social',{puesto,col,valor:val});
-  });
-  MES_VIGENTE_SOCIAL=getColCostoSocial(MES_ACTIVO_SOCIAL);
+  const cols=getColsRRHHSocial().filter(m=>m!=='Diciembre');
+  for(let i=cols.length-1;i>=0;i--){if(Object.values(TABLA_COSTOS_SOCIAL).some(r=>(r[cols[i]]||0)>0)){MES_VIGENTE_SOCIAL=cols[i];break;}}
   renderSocialCompleto();
-  alert('✓ Costos Social actualizados.');
+  document.querySelectorAll('#page-social .rent-section').forEach(s=>s.style.display='none');
+  document.querySelectorAll('#page-social .rent-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('social-consolidado').style.display='block';
+  document.querySelector('#page-social .rent-tab').classList.add('active');
+  setTimeout(()=>renderChartSocial(calcRentabilidadSocial(MES_ACTIVO_SOCIAL)),80);
 }
 
 function switchSocialTab(tab, btn) {
