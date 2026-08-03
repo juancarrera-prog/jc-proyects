@@ -781,9 +781,16 @@
     <button class="nutri-pill" onclick="showNutri('cenas',this)" style="flex:1">🌙 Cenas</button>
   </div>
 
-  <!-- SECCIÓN DESAYUNOS -->
-  <div id="nutri-desayunos" class="nutri-section">
-    <div class="tip"><strong>Whey Platinum StarNutrition:</strong> 1 scoop (30g) = 127 kcal · 25g proteína. Activá el scoop para ver los macros actualizados.</div>
+  <!-- CONTENT CONTAINER -->
+  <div id="nutri-container"></div>
+
+  <div style="height:20px"></div>
+</div>
+
+<script>
+// NUTRICIÓN CONTENT - stored as strings to avoid HTML nesting issues
+const nutriContent = {
+  desayunos: `<div class="tip"><strong>Whey Platinum StarNutrition:</strong> 1 scoop (30g) = 127 kcal · 25g proteína. Activá el scoop para ver los macros actualizados.</div>
     <!-- TOGGLE SCOOP GLOBAL -->
   <div class="card" style="padding:14px 16px;margin-bottom:12px">
     <div style="display:flex;align-items:center;justify-content:space-between">
@@ -1023,14 +1030,8 @@
     <div style="font-size:12px;color:var(--text3);line-height:1.6">
       <strong style="color:var(--text2)">Cuándo tomarlo:</strong> días de gym mezclalo en el desayuno. Días sin gym, solo si el desayuno quedó corto en proteína. No es obligatorio todos los días.
     </div>
-  </div>
-
-  <div style="height:20px"></div>
-  </div>
-
-  <!-- SECCIÓN MERIENDAS -->
-  <div id="nutri-meriendas" class="nutri-section" style="display:none">
-    <!-- ===== MERIENDAS ===== -->
+  </div>`,
+  meriendas: `<!-- ===== MERIENDAS ===== -->
   <p class="section-title">Meriendas · 17-18hs · objetivo proteico</p>
 
   <div class="tip tip-blue"><strong>Meta diaria de proteína:</strong> 120-165g (1.6-2.2g × 75kg). Con un buen desayuno ya vas 25-50g. La merienda tiene que sumar otros 20-30g para llegar bien a la cena.</div>
@@ -1186,11 +1187,8 @@
         </div>
       </div>
     </div>
-  </div>
-
-  <!-- SECCIÓN ALMUERZOS -->
-  <div id="nutri-almuerzos" class="nutri-section" style="display:none">
-    <!-- ===== ALMUERZOS ===== -->
+  </div>`,
+  almuerzos: `<!-- ===== ALMUERZOS ===== -->
   <p class="section-title">Almuerzos · 5 opciones · hasta 45 min</p>
 
   <div class="tip"><strong>Con lo que tenés en casa.</strong> Todos aptos para toda la familia. Los días de gym priorizá más proteína y carbohidratos. Los días de descanso podés bajar los carbs.</div>
@@ -1404,11 +1402,8 @@
         </div>
       </div>
     </div>
-  </div>
-
-  <!-- SECCIÓN CENAS -->
-  <div id="nutri-cenas" class="nutri-section" style="display:none">
-    <!-- ===== CENAS ===== -->
+  </div>`,
+  cenas: `<!-- ===== CENAS ===== -->
   <p class="section-title">Cenas · 5 opciones · livianas pero proteicas</p>
 
   <div class="tip tip-blue"><strong>Regla para la cena:</strong> más proteína, menos carbohidratos que el almuerzo. La noche no necesitás tanta energía rápida.</div>
@@ -1624,9 +1619,24 @@
       </div>
     </div>
   </div>
+  </div>`,
+};
 
-  <div style="height:20px"></div>
-</div>
+function showNutri(id, el){
+  document.getElementById('nutri-container').innerHTML = nutriContent[id];
+  document.querySelectorAll('.nutri-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+  if(id === 'desayunos') { updateDesayunos(); }
+}
+
+function initDesayunos(){
+  document.getElementById('nutri-container').innerHTML = nutriContent['desayunos'];
+  document.querySelectorAll('.nutri-pill').forEach((p,i) => p.classList.toggle('active', i===0));
+  updateDesayunos();
+}
+</script>
+
 
 <div class="rest-timer-overlay" id="rest-overlay">
   <div class="rest-timer-exname" id="rt-exname"></div>
@@ -2131,21 +2141,7 @@ const desayunos = [
 ];
 let scoopOn = false;
 
-function initDesayunos(){
-  updateDesayunos();
-  // Show desayunos pill by default
-  document.querySelectorAll('.nutri-section').forEach(s => s.style.display='none');
-  const def = document.getElementById('nutri-desayunos');
-  if(def) def.style.display='block';
-  document.querySelectorAll('.nutri-pill').forEach((p,i) => p.classList.toggle('active', i===0));
-}
-
-function showNutri(id, el){
-  document.querySelectorAll('.nutri-section').forEach(s => s.style.display='none');
-  document.querySelectorAll('.nutri-pill').forEach(p => p.classList.remove('active'));
-  document.getElementById('nutri-'+id).style.display='block';
-  el.classList.add('active');
-}
+// initDesayunos and showNutri defined in nutrición script block
 
 function toggleScoop(){
   scoopOn = !scoopOn;
