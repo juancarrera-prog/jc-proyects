@@ -52,6 +52,7 @@
   .card-icon.blue{background:rgba(68,136,255,.12);}
   .card-icon.green{background:rgba(68,255,136,.12);}
   .card-icon.orange{background:rgba(255,136,68,.12);}
+  .card-icon.purple{background:rgba(187,68,255,.12);}
   .card-title{font-size:16px;font-weight:600;}
   .card-sub{font-size:13px;color:var(--text2);margin-top:2px;}
   .card-badge{margin-left:auto;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-size:11px;color:var(--text2);white-space:nowrap;}
@@ -206,6 +207,11 @@
   .stats-kpi-val{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;color:var(--accent);line-height:1;}
   .stats-kpi-sub{font-size:11px;color:var(--text2);margin-top:3px;}
 
+  /* PILLS NUTRICIÓN */
+  .nutri-pill{padding:10px 8px;border-radius:12px;border:1px solid var(--border2);background:var(--card);color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s;text-align:center;}
+  .nutri-pill.active{background:var(--accent);color:#0a0a0a;border-color:var(--accent);font-weight:700;}
+  .nutri-pill:not(.active):hover{border-color:var(--text2);color:var(--text);}
+
   @media(max-width:480px){
     .week-grid{grid-template-columns:repeat(2,1fr);}
     .ex-peso-input{width:56px;}
@@ -223,6 +229,7 @@
   <button class="nav-tab" onclick="showView('semana',this)">Semana</button>
   <button class="nav-tab" onclick="showView('peso',this)">Peso</button>
   <button class="nav-tab" onclick="showView('stats',this)">Stats</button>
+  <button class="nav-tab" onclick="showView('desayunos',this)">🥗 Nutrición</button>
 </div>
 
 <!-- ==================== RUTINAS ==================== -->
@@ -763,7 +770,864 @@
   <div style="height:20px"></div>
 </div>
 
-<!-- TIMER OVERLAY -->
+<!-- ==================== DESAYUNOS ==================== -->
+<div id="view-desayunos" class="view">
+
+  <!-- PILLS NAV -->
+  <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+    <button class="nutri-pill active" onclick="showNutri('desayunos',this)" style="flex:1">🍳 Desayunos</button>
+    <button class="nutri-pill" onclick="showNutri('meriendas',this)" style="flex:1">🧀 Meriendas</button>
+    <button class="nutri-pill" onclick="showNutri('almuerzos',this)" style="flex:1">🥩 Almuerzos</button>
+    <button class="nutri-pill" onclick="showNutri('cenas',this)" style="flex:1">🌙 Cenas</button>
+  </div>
+
+  <!-- SECCIÓN DESAYUNOS -->
+  <div id="nutri-desayunos" class="nutri-section">
+    <div class="tip"><strong>Whey Platinum StarNutrition:</strong> 1 scoop (30g) = 127 kcal · 25g proteína. Activá el scoop para ver los macros actualizados.</div>
+    <!-- TOGGLE SCOOP GLOBAL -->
+  <div class="card" style="padding:14px 16px;margin-bottom:12px">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-size:15px;font-weight:600">+ 1 Scoop Whey Platinum</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:2px">Sumá 127 kcal y 25g proteína a cualquier opción</div>
+      </div>
+      <button id="scoop-toggle" onclick="toggleScoop()" style="width:52px;height:28px;border-radius:14px;border:none;background:var(--border2);cursor:pointer;position:relative;transition:background .2s">
+        <div id="scoop-knob" style="width:22px;height:22px;border-radius:50%;background:white;position:absolute;top:3px;left:3px;transition:left .2s"></div>
+      </button>
+    </div>
+  </div>
+
+  <!-- OPCIÓN 1 -->
+  <div class="card" style="margin-bottom:10px">
+    <div class="card-header">
+      <div class="card-icon yellow">🍳</div>
+      <div><div class="card-title">Opción 1 — El de siempre mejorado</div><div class="card-sub">En casa · 5 minutos · ya lo tenés incorporado</div></div>
+    </div>
+    <div style="padding:12px 16px;border-bottom:1px solid var(--border)">
+      <div style="font-size:13px;color:var(--text2);line-height:1.8">
+        • 2 huevos enteros revueltos con fritolin<br>
+        • Yogur casero con chía<br>
+        • 25g semillas de zapallo<br>
+        • Café o mate
+      </div>
+    </div>
+    <div style="padding:12px 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:var(--accent)" id="o1-cal">370</div><div style="font-size:11px;color:var(--text3)">kcal</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#44ffcc" id="o1-prot">25</div><div style="font-size:11px;color:var(--text3)">g proteína</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#44bbff" id="o1-grasas">27</div><div style="font-size:11px;color:var(--text3)">g grasas</div></div>
+    </div>
+    <div style="padding:0 16px 14px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px">Proteína</div>
+          <div style="background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:3px">
+            <div id="o1-bar" style="height:100%;border-radius:4px;width:50%;background:linear-gradient(90deg,#44bbff,#44ffcc);transition:width .3s"></div>
+          </div>
+          <div style="font-size:11px;color:#44ffcc" id="o1-pct">50% de 50g</div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px">Calorías</div>
+          <div style="background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:3px">
+            <div style="height:100%;border-radius:4px;width:62%;background:linear-gradient(90deg,#e8ff47,#ff4444)"></div>
+          </div>
+          <div style="font-size:11px;color:#ff8844">62% de 600 kcal</div>
+        </div>
+      </div>
+    </div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px" id="o1-tip">⭐ Tu desayuno actual — cero fricción</div>
+      <div style="font-size:11px;color:#44ffcc;margin-top:3px" id="o1-pct">Cubre el 21% de tu meta proteica diaria</div>
+    </div>
+  </div>
+
+  <!-- OPCIÓN 2 -->
+  <div class="card" style="margin-bottom:10px">
+    <div class="card-header">
+      <div class="card-icon blue">🌙</div>
+      <div><div class="card-title">Opción 2 — El overnight</div><div class="card-sub">En casa · se prepara la noche anterior en 3 min</div></div>
+    </div>
+    <div style="padding:12px 16px;border-bottom:1px solid var(--border)">
+      <div style="font-size:13px;color:var(--text2);line-height:1.8">
+        • 50g avena<br>
+        • Yogur casero<br>
+        • Leche (100ml)<br>
+        • Chía (10g)<br>
+        • Frutos rojos congelados (80g)
+      </div>
+    </div>
+    <div style="padding:12px 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:var(--accent)" id="o2-cal">420</div><div style="font-size:11px;color:var(--text3)">kcal</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#44ffcc" id="o2-prot">22</div><div style="font-size:11px;color:var(--text3)">g proteína</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#44bbff" id="o2-grasas">10</div><div style="font-size:11px;color:var(--text3)">g grasas</div></div>
+    </div>
+    <div style="padding:0 16px 14px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px">Proteína</div>
+          <div style="background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:3px">
+            <div id="o2-bar" style="height:100%;border-radius:4px;width:44%;background:linear-gradient(90deg,#44bbff,#44ffcc);transition:width .3s"></div>
+          </div>
+          <div style="font-size:11px;color:#44ffcc" id="o2-pct">44% de 50g</div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px">Calorías</div>
+          <div style="background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:3px">
+            <div style="height:100%;border-radius:4px;width:70%;background:linear-gradient(90deg,#e8ff47,#ff4444)"></div>
+          </div>
+          <div style="font-size:11px;color:#ff8844">70% de 600 kcal</div>
+        </div>
+      </div>
+    </div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px" id="o2-tip">Más fibra y carbohidratos complejos — ideal días de gym</div>
+      <div style="font-size:11px;color:#44ffcc;margin-top:3px" id="o2-pct">Cubre el 18% de tu meta proteica diaria</div>
+    </div>
+  </div>
+
+  <!-- OPCIÓN 3 -->
+  <div class="card" style="margin-bottom:10px">
+    <div class="card-header">
+      <div class="card-icon green">🍳</div>
+      <div><div class="card-title">Opción 3 — El del finde</div><div class="card-sub">En casa · 8 minutos · el más abundante</div></div>
+    </div>
+    <div style="padding:12px 16px;border-bottom:1px solid var(--border)">
+      <div style="font-size:13px;color:var(--text2);line-height:1.8">
+        • 2 rebanadas pan integral<br>
+        • 3 huevos revueltos con fritolin<br>
+        • 1 feta queso port salut<br>
+        • Café
+      </div>
+    </div>
+    <div style="padding:12px 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:var(--accent)" id="o3-cal">500</div><div style="font-size:11px;color:var(--text3)">kcal</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#44ffcc" id="o3-prot">31</div><div style="font-size:11px;color:var(--text3)">g proteína</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#44bbff" id="o3-grasas">24</div><div style="font-size:11px;color:var(--text3)">g grasas</div></div>
+    </div>
+    <div style="padding:0 16px 14px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px">Proteína</div>
+          <div style="background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:3px">
+            <div id="o3-bar" style="height:100%;border-radius:4px;width:62%;background:linear-gradient(90deg,#44bbff,#44ffcc);transition:width .3s"></div>
+          </div>
+          <div style="font-size:11px;color:#44ffcc" id="o3-pct">62% de 50g</div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px">Calorías</div>
+          <div style="background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:3px">
+            <div style="height:100%;border-radius:4px;width:83%;background:linear-gradient(90deg,#e8ff47,#ff4444)"></div>
+          </div>
+          <div style="font-size:11px;color:#ff8844">83% de 600 kcal</div>
+        </div>
+      </div>
+    </div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px" id="o3-tip">El más proteico — para sábado o domingo con tiempo</div>
+      <div style="font-size:11px;color:#44ffcc;margin-top:3px" id="o3-pct">Cubre el 26% de tu meta proteica diaria</div>
+    </div>
+  </div>
+
+  <!-- OPCIÓN 4 OFICINA -->
+  <div class="card" style="margin-bottom:10px">
+    <div class="card-header">
+      <div class="card-icon orange">⚡</div>
+      <div><div class="card-title">Opción 4 — El de la oficina</div><div class="card-sub">Sin cocina · sin heladera · lo agarrás y te vas</div></div>
+    </div>
+    <div style="padding:12px 16px;border-bottom:1px solid var(--border)">
+      <div style="font-size:13px;color:var(--text2);line-height:1.8">
+        • Yogur bebible Ser proteico<br>
+        • 1 barrita ENA<br>
+        • 1 banana
+      </div>
+    </div>
+    <div style="padding:12px 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:var(--accent)" id="o4-cal">380</div><div style="font-size:11px;color:var(--text3)">kcal</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#44ffcc" id="o4-prot">28</div><div style="font-size:11px;color:var(--text3)">g proteína</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#44bbff" id="o4-grasas">8</div><div style="font-size:11px;color:var(--text3)">g grasas</div></div>
+    </div>
+    <div style="padding:0 16px 14px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px">Proteína</div>
+          <div style="background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:3px">
+            <div id="o4-bar" style="height:100%;border-radius:4px;width:56%;background:linear-gradient(90deg,#44bbff,#44ffcc);transition:width .3s"></div>
+          </div>
+          <div style="font-size:11px;color:#44ffcc" id="o4-pct">56% de 50g</div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px">Calorías</div>
+          <div style="background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:3px">
+            <div style="height:100%;border-radius:4px;width:63%;background:linear-gradient(90deg,#e8ff47,#ff4444)"></div>
+          </div>
+          <div style="font-size:11px;color:#ff8844">63% de 600 kcal</div>
+        </div>
+      </div>
+    </div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px" id="o4-tip">Días que salís corriendo o tu hija no te deja respirar</div>
+      <div style="font-size:11px;color:#44ffcc;margin-top:3px" id="o4-pct">Cubre el 23% de tu meta proteica diaria</div>
+    </div>
+  </div>
+
+  <!-- OPCIÓN 5 TIRAMISÚ FIT -->
+  <div class="card" style="margin-bottom:10px">
+    <div class="card-header">
+      <div class="card-icon purple">☕</div>
+      <div><div class="card-title">Opción 5 — El Tiramisú Fit</div><div class="card-sub">En casa · se prepara la noche anterior · 3 minutos</div></div>
+    </div>
+    <div style="padding:12px 16px;border-bottom:1px solid var(--border)">
+      <div style="font-size:13px;color:var(--text2);line-height:1.9">
+        • Yogur casero — <strong style="color:var(--text)">200g</strong> (medio pote)<br>
+        • Chía — <strong style="color:var(--text)">1 cda sopera al ras (10g)</strong><br>
+        • Whey Platinum — <strong style="color:var(--text)">1 scoop al ras (30g)</strong><br>
+        • Avena — <strong style="color:var(--text)">3 cdas soperas al ras (30g)</strong><br>
+        • Shot espresso frío — <strong style="color:var(--text)">1 solo (30ml)</strong><br>
+        • Frutillas — <strong style="color:var(--text)">6-8 medianas (80g)</strong> · al momento<br>
+        • Semillas de zapallo — <strong style="color:var(--text)">1 cda colmada (20g)</strong> · al momento
+      </div>
+      <div style="margin-top:10px;background:rgba(187,68,255,.08);border:1px solid rgba(187,68,255,.2);border-radius:var(--radius-sm);padding:8px 10px;font-size:12px;color:var(--text2);line-height:1.6">
+        ☕ <strong style="color:#bb44ff">Cómo armarlo:</strong> Mezclá yogur + chía + avena + scoop en el frasco. Agregá el espresso frío y revolvé. Heladera toda la noche. A la mañana ponés frutillas y semillas encima.
+      </div>
+    </div>
+    <div style="padding:12px 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:var(--accent)" id="o5-cal">552</div><div style="font-size:11px;color:var(--text3)">kcal</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#44ffcc" id="o5-prot">46</div><div style="font-size:11px;color:var(--text3)">g proteína</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#44bbff" id="o5-grasas">22</div><div style="font-size:11px;color:var(--text3)">g grasas</div></div>
+    </div>
+    <div style="padding:0 16px 14px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px">Proteína</div>
+          <div style="background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:3px">
+            <div id="o5-bar" style="height:100%;border-radius:4px;width:92%;background:linear-gradient(90deg,#44bbff,#44ffcc);transition:width .3s"></div>
+          </div>
+          <div style="font-size:11px;color:#44ffcc" id="o5-pct">92% de 50g</div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px">Calorías</div>
+          <div style="background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:3px">
+            <div style="height:100%;border-radius:4px;width:92%;background:linear-gradient(90deg,#e8ff47,#ff4444)"></div>
+          </div>
+          <div style="font-size:11px;color:#ff8844">92% de 600 kcal</div>
+        </div>
+      </div>
+    </div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px">⭐ El más completo · ideal días de gym por la mañana</div>
+      <div style="font-size:11px;color:#44ffcc;margin-top:3px" id="o5-pct">Cubre el 38% de tu meta proteica diaria</div>
+    </div>
+  </div>
+  <p class="section-title">Tu Whey Platinum StarNutrition</p>
+  <div class="card" style="padding:14px 16px;margin-bottom:20px">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center;margin-bottom:12px">
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:var(--accent)">127</div><div style="font-size:11px;color:var(--text3)">kcal</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:#44ffcc">25g</div><div style="font-size:11px;color:var(--text3)">proteína</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:#44bbff">2.6g</div><div style="font-size:11px;color:var(--text3)">carbs</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:var(--orange)">1.8g</div><div style="font-size:11px;color:var(--text3)">grasas</div></div>
+    </div>
+    <div style="font-size:12px;color:var(--text3);line-height:1.6">
+      <strong style="color:var(--text2)">Cuándo tomarlo:</strong> días de gym mezclalo en el desayuno. Días sin gym, solo si el desayuno quedó corto en proteína. No es obligatorio todos los días.
+    </div>
+  </div>
+
+  <div style="height:20px"></div>
+  </div>
+
+  <!-- SECCIÓN MERIENDAS -->
+  <div id="nutri-meriendas" class="nutri-section" style="display:none">
+    <!-- ===== MERIENDAS ===== -->
+  <p class="section-title">Meriendas · 17-18hs · objetivo proteico</p>
+
+  <div class="tip tip-blue"><strong>Meta diaria de proteína:</strong> 120-165g (1.6-2.2g × 75kg). Con un buen desayuno ya vas 25-50g. La merienda tiene que sumar otros 20-30g para llegar bien a la cena.</div>
+
+  <!-- MERIENDA 1 -->
+  <div class="card" style="margin-bottom:10px">
+    <div class="card-header">
+      <div class="card-icon yellow">🏠</div>
+      <div><div class="card-title">Merienda 1 — Yogur proteico + semillas</div><div class="card-sub">En casa · 2 minutos · sin cocinar</div></div>
+    </div>
+    <div style="padding:12px 16px;border-bottom:1px solid var(--border)">
+      <div style="font-size:13px;color:var(--text2);line-height:1.8">
+        • Yogur casero (200g)<br>
+        • 25g semillas de zapallo<br>
+        • Chía (10g)<br>
+        • 1 fruta (manzana o banana)
+      </div>
+    </div>
+    <div style="padding:12px 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:var(--accent)">280</div><div style="font-size:11px;color:var(--text3)">kcal</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#44ffcc">18</div><div style="font-size:11px;color:var(--text3)">g proteína</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#44bbff">14</div><div style="font-size:11px;color:var(--text3)">g grasas</div></div>
+    </div>
+    <div style="padding:0 16px 14px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px">Proteína</div>
+          <div style="background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:3px">
+            <div style="height:100%;border-radius:4px;width:36%;background:linear-gradient(90deg,#44bbff,#44ffcc)"></div>
+          </div>
+          <div style="font-size:11px;color:#44ffcc">36% de 50g</div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px">Calorías</div>
+          <div style="background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:3px">
+            <div style="height:100%;border-radius:4px;width:47%;background:linear-gradient(90deg,#e8ff47,#ff4444)"></div>
+          </div>
+          <div style="font-size:11px;color:#ff8844">47% de 600 kcal</div>
+        </div>
+      </div>
+    </div>
+
+  <!-- MERIENDA 2 -->
+  <div class="card" style="margin-bottom:10px">
+    <div class="card-header">
+      <div class="card-icon green">🏠</div>
+      <div><div class="card-title">Merienda 2 — Shake + fruta</div><div class="card-sub">En casa · 1 minuto · ideal post-gym tardío</div></div>
+    </div>
+    <div style="padding:12px 16px;border-bottom:1px solid var(--border)">
+      <div style="font-size:13px;color:var(--text2);line-height:1.8">
+        • 1 scoop Whey Platinum (30g)<br>
+        • 250ml leche descremada<br>
+        • 1 banana<br>
+        • Hielo opcional
+      </div>
+    </div>
+    <div style="padding:12px 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:var(--accent)">330</div><div style="font-size:11px;color:var(--text3)">kcal</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#44ffcc">37</div><div style="font-size:11px;color:var(--text3)">g proteína</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#44bbff">5</div><div style="font-size:11px;color:var(--text3)">g grasas</div></div>
+    </div>
+    <div style="padding:0 16px 14px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px">Proteína</div>
+          <div style="background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:3px">
+            <div style="height:100%;border-radius:4px;width:74%;background:linear-gradient(90deg,#44bbff,#44ffcc)"></div>
+          </div>
+          <div style="font-size:11px;color:#44ffcc">74% de 50g</div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px">Calorías</div>
+          <div style="background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:3px">
+            <div style="height:100%;border-radius:4px;width:55%;background:linear-gradient(90deg,#e8ff47,#ff4444)"></div>
+          </div>
+          <div style="font-size:11px;color:#ff8844">55% de 600 kcal</div>
+        </div>
+      </div>
+    </div>
+
+  <!-- MERIENDA 3 OFICINA -->
+  <div class="card" style="margin-bottom:10px">
+    <div class="card-header">
+      <div class="card-icon orange">💼</div>
+      <div><div class="card-title">Merienda 3 — Oficina rápida</div><div class="card-sub">Sin heladera · sin cocina · kiosco o súper</div></div>
+    </div>
+    <div style="padding:12px 16px;border-bottom:1px solid var(--border)">
+      <div style="font-size:13px;color:var(--text2);line-height:1.8">
+        • Yogur bebible Ser proteico<br>
+        • 1 barrita ENA<br>
+        • Mate o café
+      </div>
+    </div>
+    <div style="padding:12px 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:var(--accent)">260</div><div style="font-size:11px;color:var(--text3)">kcal</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#44ffcc">28</div><div style="font-size:11px;color:var(--text3)">g proteína</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#44bbff">6</div><div style="font-size:11px;color:var(--text3)">g grasas</div></div>
+    </div>
+    <div style="padding:0 16px 14px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px">Proteína</div>
+          <div style="background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:3px">
+            <div style="height:100%;border-radius:4px;width:56%;background:linear-gradient(90deg,#44bbff,#44ffcc)"></div>
+          </div>
+          <div style="font-size:11px;color:#44ffcc">56% de 50g</div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px">Calorías</div>
+          <div style="background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:3px">
+            <div style="height:100%;border-radius:4px;width:43%;background:linear-gradient(90deg,#e8ff47,#ff4444)"></div>
+          </div>
+          <div style="font-size:11px;color:#ff8844">43% de 600 kcal</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MERIENDA 4 OFICINA SIN HELADERA -->
+  <div class="card" style="margin-bottom:10px">
+    <div class="card-header">
+      <div class="card-icon blue">💼</div>
+      <div><div class="card-title">Merienda 4 — Oficina con más sustancia</div><div class="card-sub">Súper cerca de la oficina · sin heladera · consumí al momento</div></div>
+    </div>
+    <div style="padding:12px 16px;border-bottom:1px solid var(--border)">
+      <div style="font-size:13px;color:var(--text2);line-height:1.8">
+        • Yogur bebible Ser proteico<br>
+        • 1 barrita ENA<br>
+        • 1 banana<br>
+        • Mate o café
+      </div>
+    </div>
+    <div style="padding:12px 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:var(--accent)">380</div><div style="font-size:11px;color:var(--text3)">kcal</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#44ffcc">30</div><div style="font-size:11px;color:var(--text3)">g proteína</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#44bbff">7</div><div style="font-size:11px;color:var(--text3)">g grasas</div></div>
+    </div>
+    <div style="padding:0 16px 14px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px">Proteína</div>
+          <div style="background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:3px">
+            <div style="height:100%;border-radius:4px;width:60%;background:linear-gradient(90deg,#44bbff,#44ffcc)"></div>
+          </div>
+          <div style="font-size:11px;color:#44ffcc">60% de 50g</div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px">Calorías</div>
+          <div style="background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:3px">
+            <div style="height:100%;border-radius:4px;width:63%;background:linear-gradient(90deg,#e8ff47,#ff4444)"></div>
+          </div>
+          <div style="font-size:11px;color:#ff8844">63% de 600 kcal</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN ALMUERZOS -->
+  <div id="nutri-almuerzos" class="nutri-section" style="display:none">
+    <!-- ===== ALMUERZOS ===== -->
+  <p class="section-title">Almuerzos · 5 opciones · hasta 45 min</p>
+
+  <div class="tip"><strong>Con lo que tenés en casa.</strong> Todos aptos para toda la familia. Los días de gym priorizá más proteína y carbohidratos. Los días de descanso podés bajar los carbs.</div>
+
+  <!-- ALMUERZO 1 -->
+  <div class="card" style="margin-bottom:10px">
+    <div class="card-header">
+      <div class="card-icon yellow">🍗</div>
+      <div><div class="card-title">Almuerzo 1 — Pollo al horno con batata y zapallitos</div><div class="card-sub">30 min · una sola asadera · ideal días de gym</div></div>
+    </div>
+    <div style="padding:12px 16px;border-bottom:1px solid var(--border)">
+      <div style="font-size:13px;color:var(--text2);line-height:1.9">
+        • Pechuga de pollo — <strong style="color:var(--text)">200g</strong><br>
+        • Batata — <strong style="color:var(--text)">150g</strong> (media mediana en cubos)<br>
+        • Zapallitos verdes — <strong style="color:var(--text)">2 unidades</strong> en rodajas<br>
+        • Aceite de oliva — <strong style="color:var(--text)">1 cda sopera</strong><br>
+        • Ajo, sal, pimentón a gusto
+      </div>
+      <div style="margin-top:10px;background:rgba(232,255,71,.06);border:1px solid rgba(232,255,71,.15);border-radius:var(--radius-sm);padding:8px 10px;font-size:12px;color:var(--text2)">
+        🔥 Cubos de batata + zapallitos + pollo condimentado. Todo a la asadera. 200° por 25-30 min.
+      </div>
+    </div>
+    <div style="padding:12px 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:var(--accent)">480</div><div style="font-size:11px;color:var(--text3)">kcal</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#44ffcc">45</div><div style="font-size:11px;color:var(--text3)">g proteína</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#44bbff">35</div><div style="font-size:11px;color:var(--text3)">g carbs</div></div>
+    </div>
+    <div style="padding:0 16px 14px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px">Proteína</div>
+          <div style="background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:3px">
+            <div style="height:100%;border-radius:4px;width:90%;background:linear-gradient(90deg,#44bbff,#44ffcc)"></div>
+          </div>
+          <div style="font-size:11px;color:#44ffcc">90% de 50g</div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px">Calorías</div>
+          <div style="background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:3px">
+            <div style="height:100%;border-radius:4px;width:80%;background:linear-gradient(90deg,#e8ff47,#ff4444)"></div>
+          </div>
+          <div style="font-size:11px;color:#ff8844">80% de 600 kcal</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALMUERZO 2 -->
+  <div class="card" style="margin-bottom:10px">
+    <div class="card-header">
+      <div class="card-icon orange">⚡</div>
+      <div><div class="card-title">Almuerzo 2 — Milanesa de pollo con ensalada</div><div class="card-sub">20 min · el más rápido · la nena lo va a amar</div></div>
+    </div>
+    <div style="padding:12px 16px;border-bottom:1px solid var(--border)">
+      <div style="font-size:13px;color:var(--text2);line-height:1.9">
+        • Milanesa de pollo — <strong style="color:var(--text)">180g</strong> (1-2 milanesas)<br>
+        • Tomate — <strong style="color:var(--text)">1 unidad</strong><br>
+        • Zanahoria rallada — <strong style="color:var(--text)">1 mediana</strong><br>
+        • Aceite de oliva + limón — <strong style="color:var(--text)">1 cda cada uno</strong>
+      </div>
+      <div style="margin-top:10px;background:rgba(255,136,68,.06);border:1px solid rgba(255,136,68,.15);border-radius:var(--radius-sm);padding:8px 10px;font-size:12px;color:var(--text2)">
+        ⚡ Milanesa al horno con fritolin. Ensalada al costado con oliva y limón.
+      </div>
+    </div>
+    <div style="padding:12px 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:var(--accent)">420</div><div style="font-size:11px;color:var(--text3)">kcal</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#44ffcc">38</div><div style="font-size:11px;color:var(--text3)">g proteína</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#44bbff">20</div><div style="font-size:11px;color:var(--text3)">g carbs</div></div>
+    </div>
+    <div style="padding:0 16px 14px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px">Proteína</div>
+          <div style="background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:3px">
+            <div style="height:100%;border-radius:4px;width:76%;background:linear-gradient(90deg,#44bbff,#44ffcc)"></div>
+          </div>
+          <div style="font-size:11px;color:#44ffcc">76% de 50g</div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px">Calorías</div>
+          <div style="background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:3px">
+            <div style="height:100%;border-radius:4px;width:70%;background:linear-gradient(90deg,#e8ff47,#ff4444)"></div>
+          </div>
+          <div style="font-size:11px;color:#ff8844">70% de 600 kcal</div>
+        </div>
+      </div>
+    </div>
+
+  <!-- ALMUERZO 3 -->
+  <div class="card" style="margin-bottom:10px">
+    <div class="card-header">
+      <div class="card-icon green">🫘</div>
+      <div><div class="card-title">Almuerzo 3 — Lentejas con verduras</div><div class="card-sub">40 min · batch cooking · rinde 3-4 días</div></div>
+    </div>
+    <div style="padding:12px 16px;border-bottom:1px solid var(--border)">
+      <div style="font-size:13px;color:var(--text2);line-height:1.9">
+        • Lentejas secas — <strong style="color:var(--text)">80g</strong> (media taza)<br>
+        • Zanahoria — <strong style="color:var(--text)">1 mediana</strong> en cubos<br>
+        • Papa — <strong style="color:var(--text)">1 chica</strong> en cubos<br>
+        • Tomate — <strong style="color:var(--text)">1 unidad</strong> picado<br>
+        • Cebolla — <strong style="color:var(--text)">media</strong> · ajo, comino, pimentón a gusto
+      </div>
+      <div style="margin-top:10px;background:rgba(68,255,136,.06);border:1px solid rgba(68,255,136,.15);border-radius:var(--radius-sm);padding:8px 10px;font-size:12px;color:var(--text2)">
+        🫘 Sofreís cebolla y ajo → agregás zanahoria y papa → lentejas lavadas → cubrís con agua → 30 min. Hacé el doble y congelá.
+      </div>
+    </div>
+    <div style="padding:12px 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:var(--accent)">420</div><div style="font-size:11px;color:var(--text3)">kcal</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#44ffcc">22</div><div style="font-size:11px;color:var(--text3)">g proteína</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#44bbff">65</div><div style="font-size:11px;color:var(--text3)">g carbs</div></div>
+    </div>
+    <div style="padding:0 16px 14px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px">Proteína</div>
+          <div style="background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:3px">
+            <div style="height:100%;border-radius:4px;width:44%;background:linear-gradient(90deg,#44bbff,#44ffcc)"></div>
+          </div>
+          <div style="font-size:11px;color:#44ffcc">44% de 50g</div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px">Calorías</div>
+          <div style="background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:3px">
+            <div style="height:100%;border-radius:4px;width:70%;background:linear-gradient(90deg,#e8ff47,#ff4444)"></div>
+          </div>
+          <div style="font-size:11px;color:#ff8844">70% de 600 kcal</div>
+        </div>
+      </div>
+    </div>
+
+  <!-- ALMUERZO 4 -->
+  <div class="card" style="margin-bottom:10px">
+    <div class="card-header">
+      <div class="card-icon blue">🐟</div>
+      <div><div class="card-title">Almuerzo 4 — Atún con arroz y morrón salteado</div><div class="card-sub">25 min · alto en proteína · sin complicaciones</div></div>
+    </div>
+    <div style="padding:12px 16px;border-bottom:1px solid var(--border)">
+      <div style="font-size:13px;color:var(--text2);line-height:1.9">
+        • Atún en lata al natural — <strong style="color:var(--text)">1 lata (150g)</strong><br>
+        • Arroz cocido — <strong style="color:var(--text)">150g</strong> (3/4 taza cocido)<br>
+        • Morrón — <strong style="color:var(--text)">1 unidad</strong> en tiras<br>
+        • Cebolla — <strong style="color:var(--text)">media</strong><br>
+        • Aceite de oliva — <strong style="color:var(--text)">1 cda</strong> · limón a gusto
+      </div>
+      <div style="margin-top:10px;background:rgba(68,136,255,.06);border:1px solid rgba(68,136,255,.15);border-radius:var(--radius-sm);padding:8px 10px;font-size:12px;color:var(--text2)">
+        🐟 Salteás morrón y cebolla 5 min → mezclás con arroz y atún escurrido → limón encima.
+      </div>
+    </div>
+    <div style="padding:12px 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:var(--accent)">450</div><div style="font-size:11px;color:var(--text3)">kcal</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#44ffcc">40</div><div style="font-size:11px;color:var(--text3)">g proteína</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#44bbff">45</div><div style="font-size:11px;color:var(--text3)">g carbs</div></div>
+    </div>
+    <div style="padding:0 16px 14px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px">Proteína</div>
+          <div style="background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:3px">
+            <div style="height:100%;border-radius:4px;width:80%;background:linear-gradient(90deg,#44bbff,#44ffcc)"></div>
+          </div>
+          <div style="font-size:11px;color:#44ffcc">80% de 50g</div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px">Calorías</div>
+          <div style="background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:3px">
+            <div style="height:100%;border-radius:4px;width:75%;background:linear-gradient(90deg,#e8ff47,#ff4444)"></div>
+          </div>
+          <div style="font-size:11px;color:#ff8844">75% de 600 kcal</div>
+        </div>
+      </div>
+    </div>
+
+  <!-- ALMUERZO 5 -->
+  <div class="card" style="margin-bottom:10px">
+    <div class="card-header">
+      <div class="card-icon blue">🐠</div>
+      <div><div class="card-title">Almuerzo 5 — Merluza al horno con papas y tomate</div><div class="card-sub">35 min · liviano · ideal días sin gym</div></div>
+    </div>
+    <div style="padding:12px 16px;border-bottom:1px solid var(--border)">
+      <div style="font-size:13px;color:var(--text2);line-height:1.9">
+        • Merluza — <strong style="color:var(--text)">200g</strong> (un filet generoso)<br>
+        • Papa — <strong style="color:var(--text)">150g</strong> en rodajas finas<br>
+        • Tomate — <strong style="color:var(--text)">1 unidad</strong> en rodajas<br>
+        • Aceite de oliva — <strong style="color:var(--text)">1 cda</strong><br>
+        • Ajo, limón, perejil a gusto
+      </div>
+      <div style="margin-top:10px;background:rgba(68,136,255,.06);border:1px solid rgba(68,136,255,.15);border-radius:var(--radius-sm);padding:8px 10px;font-size:12px;color:var(--text2)">
+        🐠 Papas en rodajas en la base → tomate encima → merluza arriba con oliva y ajo. 30 min a 200°.
+      </div>
+    </div>
+    <div style="padding:12px 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:var(--accent)">380</div><div style="font-size:11px;color:var(--text3)">kcal</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#44ffcc">35</div><div style="font-size:11px;color:var(--text3)">g proteína</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#44bbff">30</div><div style="font-size:11px;color:var(--text3)">g carbs</div></div>
+    </div>
+    <div style="padding:0 16px 14px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px">Proteína</div>
+          <div style="background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:3px">
+            <div style="height:100%;border-radius:4px;width:70%;background:linear-gradient(90deg,#44bbff,#44ffcc)"></div>
+          </div>
+          <div style="font-size:11px;color:#44ffcc">70% de 50g</div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px">Calorías</div>
+          <div style="background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:3px">
+            <div style="height:100%;border-radius:4px;width:63%;background:linear-gradient(90deg,#e8ff47,#ff4444)"></div>
+          </div>
+          <div style="font-size:11px;color:#ff8844">63% de 600 kcal</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN CENAS -->
+  <div id="nutri-cenas" class="nutri-section" style="display:none">
+    <!-- ===== CENAS ===== -->
+  <p class="section-title">Cenas · 5 opciones · livianas pero proteicas</p>
+
+  <div class="tip tip-blue"><strong>Regla para la cena:</strong> más proteína, menos carbohidratos que el almuerzo. La noche no necesitás tanta energía rápida.</div>
+
+  <!-- CENA 1 -->
+  <div class="card" style="margin-bottom:10px">
+    <div class="card-header">
+      <div class="card-icon yellow">🥚</div>
+      <div><div class="card-title">Cena 1 — Huevos revueltos con zapallitos y tomate</div><div class="card-sub">10 min · la más rápida · liviana para la noche</div></div>
+    </div>
+    <div style="padding:12px 16px;border-bottom:1px solid var(--border)">
+      <div style="font-size:13px;color:var(--text2);line-height:1.9">
+        • Huevos enteros — <strong style="color:var(--text)">3 unidades</strong><br>
+        • Zapallito verde — <strong style="color:var(--text)">1 unidad</strong> en cubos<br>
+        • Tomate — <strong style="color:var(--text)">1 unidad</strong> en cubos<br>
+        • Fritolin — spray<br>
+        • Queso por salud — <strong style="color:var(--text)">1 feta</strong> (opcional, suma proteína)
+      </div>
+      <div style="margin-top:10px;background:rgba(232,255,71,.06);border:1px solid rgba(232,255,71,.15);border-radius:var(--radius-sm);padding:8px 10px;font-size:12px;color:var(--text2)">
+        🥚 Salteás los vegetales 3 min → tirás los huevos y revolvés. Queso encima si querés más proteína.
+      </div>
+    </div>
+    <div style="padding:12px 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:var(--accent)">320</div><div style="font-size:11px;color:var(--text3)">kcal</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#44ffcc">24</div><div style="font-size:11px;color:var(--text3)">g proteína</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#44bbff">8</div><div style="font-size:11px;color:var(--text3)">g carbs</div></div>
+    </div>
+    <div style="padding:0 16px 14px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px">Proteína</div>
+          <div style="background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:3px">
+            <div style="height:100%;border-radius:4px;width:48%;background:linear-gradient(90deg,#44bbff,#44ffcc)"></div>
+          </div>
+          <div style="font-size:11px;color:#44ffcc">48% de 50g</div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px">Calorías</div>
+          <div style="background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:3px">
+            <div style="height:100%;border-radius:4px;width:53%;background:linear-gradient(90deg,#e8ff47,#ff4444)"></div>
+          </div>
+          <div style="font-size:11px;color:#ff8844">53% de 600 kcal</div>
+        </div>
+      </div>
+    </div>
+
+  <!-- CENA 2 -->
+  <div class="card" style="margin-bottom:10px">
+    <div class="card-header">
+      <div class="card-icon orange">🫕</div>
+      <div><div class="card-title">Cena 2 — Polenta con pollo desmenuzado</div><div class="card-sub">25 min · contundente · la nena la pide todos los días</div></div>
+    </div>
+    <div style="padding:12px 16px;border-bottom:1px solid var(--border)">
+      <div style="font-size:13px;color:var(--text2);line-height:1.9">
+        • Polenta — <strong style="color:var(--text)">80g seca</strong><br>
+        • Pechuga de pollo cocida y desmenuzada — <strong style="color:var(--text)">150g</strong><br>
+        • Tomate triturado — <strong style="color:var(--text)">1 taza</strong><br>
+        • Cebolla — <strong style="color:var(--text)">media</strong><br>
+        • Queso por salud rallado — <strong style="color:var(--text)">20g</strong>
+      </div>
+      <div style="margin-top:10px;background:rgba(255,136,68,.06);border:1px solid rgba(255,136,68,.15);border-radius:var(--radius-sm);padding:8px 10px;font-size:12px;color:var(--text2)">
+        🫕 Polenta según paquete. Sofreís cebolla → agregás tomate y pollo desmenuzado. Servís con la salsa encima y queso.
+      </div>
+    </div>
+    <div style="padding:12px 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:var(--accent)">480</div><div style="font-size:11px;color:var(--text3)">kcal</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#44ffcc">42</div><div style="font-size:11px;color:var(--text3)">g proteína</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#44bbff">55</div><div style="font-size:11px;color:var(--text3)">g carbs</div></div>
+    </div>
+    <div style="padding:0 16px 14px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px">Proteína</div>
+          <div style="background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:3px">
+            <div style="height:100%;border-radius:4px;width:84%;background:linear-gradient(90deg,#44bbff,#44ffcc)"></div>
+          </div>
+          <div style="font-size:11px;color:#44ffcc">84% de 50g</div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px">Calorías</div>
+          <div style="background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:3px">
+            <div style="height:100%;border-radius:4px;width:80%;background:linear-gradient(90deg,#e8ff47,#ff4444)"></div>
+          </div>
+          <div style="font-size:11px;color:#ff8844">80% de 600 kcal</div>
+        </div>
+      </div>
+    </div>
+
+  <!-- CENA 3 -->
+  <div class="card" style="margin-bottom:10px">
+    <div class="card-header">
+      <div class="card-icon blue">🍝</div>
+      <div><div class="card-title">Cena 3 — Fideos con atún, tomate y morrón</div><div class="card-sub">20 min · clásico reconvertido · toda la familia feliz</div></div>
+    </div>
+    <div style="padding:12px 16px;border-bottom:1px solid var(--border)">
+      <div style="font-size:13px;color:var(--text2);line-height:1.9">
+        • Fideos — <strong style="color:var(--text)">80g secos</strong> (integrales si tenés)<br>
+        • Atún en lata al natural — <strong style="color:var(--text)">1 lata (150g)</strong><br>
+        • Tomate perita — <strong style="color:var(--text)">2 unidades</strong><br>
+        • Morrón — <strong style="color:var(--text)">medio</strong><br>
+        • Ajo + aceite de oliva a gusto
+      </div>
+      <div style="margin-top:10px;background:rgba(68,136,255,.06);border:1px solid rgba(68,136,255,.15);border-radius:var(--radius-sm);padding:8px 10px;font-size:12px;color:var(--text2)">
+        🍝 Mientras cocinan los fideos sofreís ajo y morrón → agregás tomate 5 min → mezclás con atún escurrido. Fideos al dente, mezcla encima.
+      </div>
+    </div>
+    <div style="padding:12px 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:var(--accent)">460</div><div style="font-size:11px;color:var(--text3)">kcal</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#44ffcc">38</div><div style="font-size:11px;color:var(--text3)">g proteína</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#44bbff">55</div><div style="font-size:11px;color:var(--text3)">g carbs</div></div>
+    </div>
+    <div style="padding:0 16px 14px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px">Proteína</div>
+          <div style="background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:3px">
+            <div style="height:100%;border-radius:4px;width:76%;background:linear-gradient(90deg,#44bbff,#44ffcc)"></div>
+          </div>
+          <div style="font-size:11px;color:#44ffcc">76% de 50g</div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px">Calorías</div>
+          <div style="background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:3px">
+            <div style="height:100%;border-radius:4px;width:77%;background:linear-gradient(90deg,#e8ff47,#ff4444)"></div>
+          </div>
+          <div style="font-size:11px;color:#ff8844">77% de 600 kcal</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CENA 4 -->
+  <div class="card" style="margin-bottom:10px">
+    <div class="card-header">
+      <div class="card-icon red">🥩</div>
+      <div><div class="card-title">Cena 4 — Milanesa de carne con ensalada</div><div class="card-sub">20 min · alta proteína · baja en carbs</div></div>
+    </div>
+    <div style="padding:12px 16px;border-bottom:1px solid var(--border)">
+      <div style="font-size:13px;color:var(--text2);line-height:1.9">
+        • Milanesa de carne — <strong style="color:var(--text)">180g</strong><br>
+        • Zanahoria rallada — <strong style="color:var(--text)">1 mediana</strong><br>
+        • Tomate — <strong style="color:var(--text)">1 unidad</strong><br>
+        • Limón + aceite de oliva a gusto<br>
+        • Papa hervida — <strong style="color:var(--text)">1 chica</strong> (opcional si querés carbs)
+      </div>
+      <div style="margin-top:10px;background:rgba(255,68,68,.06);border:1px solid rgba(255,68,68,.15);border-radius:var(--radius-sm);padding:8px 10px;font-size:12px;color:var(--text2)">
+        🥩 Milanesa al horno con fritolin. Ensalada simple al costado. Papa hervida si entrenaste ese día.
+      </div>
+    </div>
+    <div style="padding:12px 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:var(--accent)">430</div><div style="font-size:11px;color:var(--text3)">kcal</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#44ffcc">36</div><div style="font-size:11px;color:var(--text3)">g proteína</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#44bbff">15</div><div style="font-size:11px;color:var(--text3)">g carbs</div></div>
+    </div>
+    <div style="padding:0 16px 14px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px">Proteína</div>
+          <div style="background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:3px">
+            <div style="height:100%;border-radius:4px;width:72%;background:linear-gradient(90deg,#44bbff,#44ffcc)"></div>
+          </div>
+          <div style="font-size:11px;color:#44ffcc">72% de 50g</div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px">Calorías</div>
+          <div style="background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:3px">
+            <div style="height:100%;border-radius:4px;width:72%;background:linear-gradient(90deg,#e8ff47,#ff4444)"></div>
+          </div>
+          <div style="font-size:11px;color:#ff8844">72% de 600 kcal</div>
+        </div>
+      </div>
+    </div>
+
+  <!-- CENA 5 -->
+  <div class="card" style="margin-bottom:10px">
+    <div class="card-header">
+      <div class="card-icon green">🍗</div>
+      <div><div class="card-title">Cena 5 — Pollo salteado con arroz y vegetales</div><div class="card-sub">30 min · completo · el batch cooking ideal</div></div>
+    </div>
+    <div style="padding:12px 16px;border-bottom:1px solid var(--border)">
+      <div style="font-size:13px;color:var(--text2);line-height:1.9">
+        • Pechuga de pollo en cubos — <strong style="color:var(--text)">180g</strong><br>
+        • Arroz cocido — <strong style="color:var(--text)">100g</strong> cocido<br>
+        • Zapallito verde — <strong style="color:var(--text)">1 unidad</strong><br>
+        • Zanahoria — <strong style="color:var(--text)">1 mediana</strong><br>
+        • Ajo + aceite de oliva + limón a gusto
+      </div>
+      <div style="margin-top:10px;background:rgba(68,255,136,.06);border:1px solid rgba(68,255,136,.15);border-radius:var(--radius-sm);padding:8px 10px;font-size:12px;color:var(--text2)">
+        🍗 Salteás pollo en cubos 5 min → agregás vegetales en juliana → sofreís todo junto → mezclás con arroz al final. Estilo wok simple.
+      </div>
+    </div>
+    <div style="padding:12px 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:var(--accent)">420</div><div style="font-size:11px;color:var(--text3)">kcal</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#44ffcc">40</div><div style="font-size:11px;color:var(--text3)">g proteína</div></div>
+      <div><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#44bbff">35</div><div style="font-size:11px;color:var(--text3)">g carbs</div></div>
+    </div>
+    <div style="padding:0 16px 14px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px">Proteína</div>
+          <div style="background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:3px">
+            <div style="height:100%;border-radius:4px;width:80%;background:linear-gradient(90deg,#44bbff,#44ffcc)"></div>
+          </div>
+          <div style="font-size:11px;color:#44ffcc">80% de 50g</div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px">Calorías</div>
+          <div style="background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:3px">
+            <div style="height:100%;border-radius:4px;width:70%;background:linear-gradient(90deg,#e8ff47,#ff4444)"></div>
+          </div>
+          <div style="font-size:11px;color:#ff8844">70% de 600 kcal</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="height:20px"></div>
+</div>
+
 <div class="rest-timer-overlay" id="rest-overlay">
   <div class="rest-timer-exname" id="rt-exname"></div>
   <div class="rest-timer-clock" id="rt-clock">00:00</div>
@@ -795,6 +1659,7 @@ function showView(id,el){
   if(id==='peso') setTimeout(renderChart,50);
   if(id==='semana') setTimeout(renderRacha,50);
   if(id==='stats') setTimeout(renderStats,50);
+  if(id==='desayunos') setTimeout(initDesayunos,50);
 }
 
 // RUTINA SELECTOR
@@ -1254,6 +2119,61 @@ function renderExChart(){
 
 // Init timers on load
 setTimeout(injectTimerTriggers, 300);
+
+// ====== DESAYUNOS ======
+const SCOOP = { cal:127, prot:25, grasas:1.8 };
+const desayunos = [
+  { id:'o1', cal:370, prot:25, grasas:27 },
+  { id:'o2', cal:420, prot:22, grasas:10 },
+  { id:'o3', cal:500, prot:31, grasas:24 },
+  { id:'o4', cal:380, prot:28, grasas:8  },
+  { id:'o5', cal:552, prot:46, grasas:22, note:'Ya incluye 1 scoop' },
+];
+let scoopOn = false;
+
+function initDesayunos(){
+  updateDesayunos();
+  // Show desayunos pill by default
+  document.querySelectorAll('.nutri-section').forEach(s => s.style.display='none');
+  const def = document.getElementById('nutri-desayunos');
+  if(def) def.style.display='block';
+  document.querySelectorAll('.nutri-pill').forEach((p,i) => p.classList.toggle('active', i===0));
+}
+
+function showNutri(id, el){
+  document.querySelectorAll('.nutri-section').forEach(s => s.style.display='none');
+  document.querySelectorAll('.nutri-pill').forEach(p => p.classList.remove('active'));
+  document.getElementById('nutri-'+id).style.display='block';
+  el.classList.add('active');
+}
+
+function toggleScoop(){
+  scoopOn = !scoopOn;
+  const toggle = document.getElementById('scoop-toggle');
+  const knob = document.getElementById('scoop-knob');
+  toggle.style.background = scoopOn ? 'var(--accent)' : 'var(--border2)';
+  knob.style.left = scoopOn ? '27px' : '3px';
+  updateDesayunos();
+}
+
+const META_PROT = 50; // g protein per meal = 100%
+const META_CAL_BAR = 600; // kcal = 100%
+
+function updateDesayunos(){
+  desayunos.forEach(d => {
+    const cal   = d.cal  + (scoopOn ? SCOOP.cal   : 0);
+    const prot  = d.prot + (scoopOn ? SCOOP.prot   : 0);
+    const grasas = d.grasas + (scoopOn ? SCOOP.grasas : 0);
+    const prot_pct = Math.min(Math.round((prot/META_PROT)*100), 100);
+    document.getElementById(d.id+'-cal').textContent    = cal;
+    document.getElementById(d.id+'-prot').textContent   = prot;
+    document.getElementById(d.id+'-grasas').textContent = Math.round(grasas);
+    const bar = document.getElementById(d.id+'-bar');
+    if(bar) bar.style.width = prot_pct+'%';
+    const pctEl = document.getElementById(d.id+'-pct');
+    if(pctEl) pctEl.textContent = prot_pct+'% de 50g';
+  });
+}
 </script>
 </body>
 </html>
