@@ -259,6 +259,11 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
       <button class="dir-btn" onclick="filtrarDirector('jp', this)">🟢 JP · McCain / Escorial / UA</button>
     </div>
 
+    <div class="director-filter">
+      <span class="filter-label">Meses (suman)</span>
+      <div id="mesesCCSelector" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+    </div>
+
     <div class="alert-panel" id="alertPanel">
       <div class="alert-panel-title">⚠️ Clientes con desvío mayor al -10%</div>
       <div class="alert-items" id="alertItems"></div>
@@ -1010,6 +1015,13 @@ let CLIENTES_FTE_SOCIAL = {
 let FTE_VENDIDO_SOCIAL = {
   'Escorial':  {}, 'CAAM': {}, 'Ignis M&C': {},
 };
+
+/* ===== CONTROL COMERCIAL — datos reales desde Tabla_Plana_Comercial ===== */
+let CONTROL_RAW    = {}; // { cliente: { 'anio-mes': {inv, cmb, ingresos} } }
+let PRESUP_VENTA   = {}; // { cliente: { Enero: valor, ..., TOTAL: valor } }
+let PRESUP_CMB     = {}; // { cliente: { Enero: valor, ..., TOTAL: valor } }
+const MES_NUM = { Enero:1, Febrero:2, Marzo:3, Abril:4, Mayo:5, Junio:6, Julio:7, Agosto:8, Septiembre:9, Octubre:10, Noviembre:11, Diciembre:12 };
+let MESES_CC_SELECCIONADOS = ['Junio']; // default — se ajusta en initMesesCC() al mes más reciente con datos
 
 let INGRESOS_SOCIAL = {
   'Escorial': {}, 'CAAM': {}, 'Ignis M&C': {},
@@ -2001,6 +2013,84 @@ function renderChartFTE(cliente, tipo) {
   }
 }
 
+/* ===== CONTROL COMERCIAL — construir Big 7 + Total Agencia desde CONTROL_RAW ===== */
+function initMesesCC() {
+  const agRaw = CONTROL_RAW['Total Agencia'] || {};
+  const conDatos = MESES_COMERCIAL.filter(m => {
+    const k = '2026-' + MES_NUM[m];
+    return agRaw[k] && agRaw[k].inv > 0;
+  });
+  if (conDatos.length > 0) MESES_CC_SELECCIONADOS = [conDatos[conDatos.length - 1]];
+  renderPillsMesesCC();
+}
+
+function toggleMesCC(mes) {
+  const i = MESES_CC_SELECCIONADOS.indexOf(mes);
+  if (i >= 0) {
+    if (MESES_CC_SELECCIONADOS.length > 1) MESES_CC_SELECCIONADOS.splice(i, 1);
+  } else {
+    MESES_CC_SELECCIONADOS.push(mes);
+  }
+  renderPillsMesesCC();
+  aplicarControlComercialReal();
+  renderTablas(DATA);
+  if (DATA.agencia) renderKPIsAgencia(DATA.agencia);
+}
+
+function renderPillsMesesCC() {
+  const cont = document.getElementById('mesesCCSelector');
+  if (!cont) return;
+  cont.innerHTML = MESES_COMERCIAL.map(m => {
+    const activo = MESES_CC_SELECCIONADOS.includes(m);
+    return `<button class="rent-tab${activo ? ' active' : ''}" onclick="toggleMesCC('${m}')">${m.slice(0,3)}</button>`;
+  }).join('');
+}
+
+function _sumarPeriodoCliente(clave) {
+  const raw = CONTROL_RAW[clave] || {};
+  let inv = 0, cmb = 0, ingresos = 0;
+  MESES_CC_SELECCIONADOS.forEach(m => {
+    const k = '2026-' + MES_NUM[m];
+    if (raw[k]) { inv += raw[k].inv || 0; cmb += raw[k].cmb || 0; ingresos += raw[k].ingresos || 0; }
+  });
+  const pv = PRESUP_VENTA[clave] || {};
+  const pc = PRESUP_CMB[clave] || {};
+  let presup = 0, cmbPresup = 0;
+  MESES_CC_SELECCIONADOS.forEach(m => { presup += pv[m] || 0; cmbPresup += pc[m] || 0; });
+  const presupAnual = pv['TOTAL'] || 0;
+
+  // Unidades: Tabla_Plana_Comercial está en pesos → /1000 = miles
+  inv = inv / 1000; cmb = cmb / 1000; ingresos = ingresos / 1000;
+
+  const vs = presup !== 0 ? ((inv - presup) / presup) * 100 : null;
+  const vsCmb = cmbPresup !== 0 ? ((cmb - cmbPresup) / cmbPresup) * 100 : null;
+  const consumidoAnual = presupAnual !== 0 ? (inv / presupAnual) * 100 : 0;
+  const cmbPct = ingresos !== 0 ? (cmb / ingresos) * 100 : 0;
+
+  // cmbPct se guarda como string con "%" — así lo esperan renderTablas/renderKPIsGauge/renderChart, igual que el resto del dashboard
+  return { inv, presup, vs, consumidoAnual, presupAnual, cmb, cmbPresup, vsCmb, cmbPct: cmbPct.toFixed(1) + '%' };
+}
+
+function aplicarControlComercialReal() {
+  if (!CONTROL_RAW || Object.keys(CONTROL_RAW).length === 0) return; // todavía no llegó el Sheet nuevo
+  if (!DATA) DATA = { clientes: [], bago: [] };
+
+  Object.keys(DIRECTORES).forEach(nombre => {
+    const calc = _sumarPeriodoCliente(nombre);
+    let row = (DATA.clientes || []).find(c => c.nombre === nombre);
+    if (!row) { row = { nombre }; DATA.clientes.push(row); }
+    Object.assign(row, calc);
+  });
+
+  DATA.agencia = _sumarPeriodoCliente('Total Agencia');
+  if (MESES_CC_SELECCIONADOS.length === 1) {
+    DATA.periodo = MESES_CC_SELECCIONADOS[0] + ' 2026';
+  } else {
+    DATA.periodo = MESES_CC_SELECCIONADOS.map(m => m.slice(0,3)).join('+') + ' 2026';
+  }
+  if (document.getElementById('periodoLabel')) document.getElementById('periodoLabel').textContent = DATA.periodo;
+}
+
 async function loadData() {
   // Control Comercial
   try {
@@ -2112,12 +2202,21 @@ async function loadData() {
         Object.entries(meses).forEach(([mes, valor]) => { TABLA_COSTOS_SOCIAL[puesto][mes] = valor; });
       });
     }
+    if (json.control_raw)       CONTROL_RAW  = json.control_raw;
+    if (json.presupuesto_venta) PRESUP_VENTA = json.presupuesto_venta;
+    if (json.presupuesto_cmb)   PRESUP_CMB   = json.presupuesto_cmb;
+    initMesesCC();
+    aplicarControlComercialReal();
+
     console.log('Rentabilidad cargada desde Sheet');
     cargarDatosComercialDesdeSheet(json);
     window._rentDataReady = true;
     window._perfDataReady = true;
     // Re-renderizar si alguno de los tabs ya está activo
     setTimeout(() => {
+      if (document.getElementById('page-comercial').classList.contains('active')) {
+        renderTablas(DATA); if (DATA.agencia) renderKPIsAgencia(DATA.agencia);
+      }
       if (document.getElementById('page-rentabilidad').classList.contains('active')) {
         renderRentabilidadCompleto();
       }
