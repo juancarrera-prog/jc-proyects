@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IGNIS Executive Circle 2027</title>
+<style>
+  :root{
+    --bg:#0a0a0a;
+    --card:#161616;
+    --card2:#1c1c1c;
+    --border:#2a2a2a;
+    --accent:#eb3123;
+    --accent-dim:rgba(235,49,35,0.14);
+    --text:#f5f5f5;
+    --muted:#a0a0a0;
+    --dim:#6a6a6a;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{
+    background:#000;
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,Helvetica,sans-serif;
+    height:100%;
+    overflow:hidden;
+  }
+  .stage{
+    width:100vw; height:100vh;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .deck{
+    position:relative;
+    width:min(96vw, 177.78vh);
+    height:min(54vw, 100vh);
+    background:var(--bg);
+    border-radius:6px;
+    overflow:hidden;
+    box-shadow:0 30px 80px rgba(0,0,0,0.6);
+  }
+  .slide{
+    position:absolute; inset:0;
+    padding:5.5% 6%;
+    display:none;
+    flex-direction:column;
+    opacity:0;
+    transition:opacity .25s ease;
+  }
+  .slide.active{ display:flex; opacity:1; }
+
+  .eyebrow{
+    display:flex; align-items:center; gap:9px;
+    color:var(--accent);
+    font-weight:700;
+    font-size:clamp(11px,1.05vw,14px);
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    margin-bottom:1.4%;
+  }
+  .eyebrow .dot{ width:9px; height:9px; border-radius:50%; background:var(--accent); flex:none; }
+
+  h1.title{
+    font-size:clamp(26px,3.4vw,46px);
+    font-weight:800;
+    line-height:1.08;
+    margin-bottom:.9%;
+    letter-spacing:-0.01em;
+  }
+  p.subtitle{
+    color:var(--muted);
+    font-size:clamp(13px,1.25vw,17px);
+    max-width:78%;
+    line-height:1.45;
+    margin-bottom:2.2%;
+  }
+
+  .footer{
+    position:absolute; bottom:3.2%; right:6%;
+    color:var(--dim);
+    font-size:clamp(9px,0.85vw,12px);
+  }
+  .pagenum{
+    position:absolute; bottom:3.2%; left:6%;
+    color:var(--dim);
+    font-size:clamp(9px,0.85vw,12px);
+    font-weight:600;
+  }
+
+  /* cards */
+  .cards{ display:flex; gap:1.4%; flex:1; min-height:0; }
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:2.2%;
+    flex:1;
+    display:flex; flex-direction:column;
+  }
+  .badge{
+    width:clamp(26px,2.6vw,38px); height:clamp(26px,2.6vw,38px);
+    border-radius:6px;
+    background:var(--accent-dim);
+    color:var(--accent);
+    font-weight:800;
+    font-size:clamp(12px,1.2vw,16px);
+    display:flex; align-items:center; justify-content:center;
+    margin-bottom:6%;
+  }
+  .card h3{
+    font-size:clamp(14px,1.5vw,20px);
+    font-weight:700;
+    margin-bottom:4%;
+  }
+  .card p{
+    color:var(--muted);
+    font-size:clamp(11px,1.05vw,14.5px);
+    line-height:1.5;
+  }
+  .card ul{ list-style:none; margin-top:2%; }
+  .card li{
+    color:var(--muted);
+    font-size:clamp(11px,1.02vw,14px);
+    line-height:1.6;
+    padding-left:16px;
+    position:relative;
+  }
+  .card li::before{
+    content:"";
+    position:absolute; left:0; top:9px;
+    width:5px; height:5px; border-radius:50%;
+    background:var(--accent);
+  }
+
+  /* portada */
+  .cover{ justify-content:center; }
+  .cover-logo{
+    display:flex; align-items:center; gap:14px;
+    margin-bottom:1.6%;
+  }
+  .cover-logo svg{ width:clamp(30px,3vw,42px); height:clamp(30px,3vw,42px); }
+  .cover h1{
+    font-size:clamp(34px,6vw,72px);
+    font-weight:800;
+    line-height:1.03;
+    letter-spacing:-0.015em;
+  }
+  .cover .rule{
+    color:var(--accent);
+  }
+  .cover p.sub{
+    color:var(--muted);
+    font-size:clamp(14px,1.6vw,22px);
+    margin-top:1.6%;
+    max-width:75%;
+  }
+  .cover .meta{
+    position:absolute; bottom:6%; left:6%;
+    color:var(--dim);
+    font-size:clamp(10px,1vw,14px);
+  }
+  .cover .tagright{
+    position:absolute; top:6%; right:6%;
+    color:var(--accent);
+    font-weight:700;
+    font-size:clamp(10px,1vw,13px);
+    letter-spacing:.08em;
+    display:flex; align-items:center; gap:8px;
+  }
+
+  /* stat row */
+  .stats{ display:flex; gap:1.4%; margin-top:1%; }
+  .stat{
+    flex:1;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:2% 2.2%;
+  }
+  .stat .num{ font-size:clamp(20px,2.4vw,32px); font-weight:800; color:var(--accent); }
+  .stat .label{ font-size:clamp(10px,0.95vw,13px); color:var(--muted); margin-top:2%; }
+
+  /* comparison table */
+  .comp-table{
+    flex:1;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:10px;
+    overflow:hidden;
+    display:flex; flex-direction:column;
+  }
+  .comp-row{ display:flex; border-bottom:1px solid var(--border); flex:1; min-height:0; }
+  .comp-row:last-child{ border-bottom:none; }
+  .comp-row.head .comp-cell{ font-weight:800; color:var(--text); font-size:clamp(11px,1.1vw,15px); }
+  .comp-row.head{ background:#1e1e1e; flex:0.85; }
+  .comp-cell{
+    flex:1; padding:0 2%;
+    font-size:clamp(10.5px,1vw,14px);
+    color:var(--muted);
+    display:flex; align-items:center;
+  }
+  .comp-cell:first-child{ flex:1.3; color:var(--text); font-weight:600; }
+  .comp-cell.accent{ color:var(--accent); font-weight:700; }
+  .comp-cell.f1{ border-left:1px solid var(--border); }
+  .comp-cell.pat{ border-left:1px solid var(--border); }
+
+  /* propuesta hero image */
+  .hero{
+    display:flex; gap:2%; flex:1; min-height:0;
+  }
+  .hero-img{
+    flex:1.05;
+    border-radius:10px;
+    overflow:hidden;
+    position:relative;
+    background:#111;
+  }
+  .hero-img img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .hero-img img.fallback-active{ display:none; }
+  .hero-img .fallback-bg{
+    display:none;
+    position:absolute; inset:0;
+    background:linear-gradient(135deg, #1a1a1a, #0a0a0a 60%, rgba(235,49,35,0.18));
+  }
+  .hero-img.no-img .fallback-bg{ display:block; }
+  .hero-img .caption{
+    position:absolute; bottom:0; left:0; right:0;
+    padding:5% 6% 5%;
+    background:linear-gradient(to top, rgba(0,0,0,0.85), transparent);
+    font-size:clamp(11px,1.05vw,14px);
+    color:#e5e5e5;
+    font-weight:600;
+  }
+  .hero-info{
+    flex:1;
+    display:flex; flex-direction:column; gap:3%;
+  }
+  .info-block{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:5%;
+    flex:1;
+    display:flex; flex-direction:column;
+    justify-content:center;
+  }
+  .info-block .k{ color:var(--dim); font-size:clamp(9.5px,0.9vw,12px); text-transform:uppercase; letter-spacing:.06em; font-weight:700; margin-bottom:3%;}
+  .info-block .v{ font-size:clamp(14px,1.5vw,20px); font-weight:700; }
+  .info-block .v small{ color:var(--muted); font-weight:500; font-size:.65em; display:block; margin-top:2%; }
+
+  /* timeline */
+  .timeline{ display:flex; gap:1.2%; flex:1; min-height:0; }
+  .day{
+    flex:1;
+    display:flex; flex-direction:column;
+  }
+  .day-head{
+    display:flex; align-items:center; gap:8px;
+    margin-bottom:5%;
+  }
+  .day-num{
+    width:clamp(22px,2.2vw,30px); height:clamp(22px,2.2vw,30px);
+    border-radius:50%;
+    background:var(--accent);
+    color:#fff;
+    font-weight:800;
+    font-size:clamp(10px,1vw,13px);
+    display:flex; align-items:center; justify-content:center;
+    flex:none;
+  }
+  .day-title{ font-weight:700; font-size:clamp(11px,1.1vw,15px); }
+  .day-line{
+    flex:1;
+    border-left:2px solid var(--border);
+    margin-left:calc(clamp(22px,2.2vw,30px) / 2 - 1px);
+    padding-left:5%;
+    display:flex; flex-direction:column; gap:6%;
+    padding-bottom:2%;
+  }
+  .ev{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:6% 8%;
+  }
+  .ev .t{ font-size:clamp(9px,0.85vw,11.5px); color:var(--accent); font-weight:700; margin-bottom:3%; }
+  .ev .d{ font-size:clamp(10px,0.95vw,13px); color:var(--text); font-weight:600; line-height:1.3; }
+
+  /* budget table */
+  .budget{
+    flex:1;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:10px;
+    overflow:hidden;
+    display:flex; flex-direction:column;
+  }
+  .brow{ display:flex; border-bottom:1px solid var(--border); align-items:center; flex:1; min-height:0; }
+  .brow:last-child{ border-bottom:none; }
+  .brow.head{ background:#1e1e1e; flex:0.85; }
+  .brow.total{ background:var(--accent-dim); }
+  .bcell{ padding:0 2.2%; font-size:clamp(11px,1.05vw,14.5px); color:var(--muted); flex:1;}
+  .bcell:first-child{ color:var(--text); font-weight:600; flex:2; }
+  .bcell:last-child{ text-align:right; color:var(--text); font-weight:600; }
+  .brow.head .bcell{ font-weight:800; color:var(--text); font-size:clamp(10px,0.95vw,13px); text-transform:uppercase; letter-spacing:.04em;}
+  .brow.total .bcell{ color:var(--accent); font-weight:800; font-size:clamp(13px,1.25vw,17px); }
+
+  .budget-note{ color:var(--dim); font-size:clamp(9.5px,0.9vw,12px); margin-top:1.6%; font-style:italic; }
+
+  /* recomendacion */
+  .reco-wrap{ display:flex; gap:2%; flex:1; min-height:0; }
+  .reco-main{
+    flex:1.3;
+    background:linear-gradient(135deg, rgba(235,49,35,0.12), rgba(235,49,35,0.02));
+    border:1px solid rgba(235,49,35,0.35);
+    border-radius:10px;
+    padding:2.8%;
+    display:flex; flex-direction:column; justify-content:center;
+    min-height:0;
+  }
+  .reco-main .tag{ color:var(--accent); font-weight:800; font-size:clamp(10px,1vw,13px); letter-spacing:.06em; text-transform:uppercase; margin-bottom:3%;}
+  .reco-main h3{ font-size:clamp(18px,2vw,26px); font-weight:800; margin-bottom:3%; }
+  .reco-main p{ color:var(--muted); font-size:clamp(11.5px,1.1vw,15px); line-height:1.55; }
+  .reco-side{ flex:1; display:flex; flex-direction:column; gap:3%; }
+
+  /* nav */
+  .nav{
+    position:absolute; bottom:0; left:0; right:0;
+    display:flex; align-items:center; justify-content:center;
+    gap:14px;
+    padding:14px 0;
+    z-index:20;
+  }
+  .navdot{
+    width:7px; height:7px; border-radius:50%;
+    background:#3a3a3a;
+    cursor:pointer;
+    transition:.2s;
+  }
+  .navdot.active{ background:var(--accent); width:20px; border-radius:4px; }
+  .arrow{
+    position:fixed; top:50%; transform:translateY(-50%);
+    width:46px; height:46px; border-radius:50%;
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.12);
+    color:#fff; font-size:20px;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; z-index:30; user-select:none;
+    transition:.15s;
+  }
+  .arrow:hover{ background:rgba(235,49,35,0.25); border-color:var(--accent); }
+  .arrow.left{ left:2%; }
+  .arrow.right{ right:2%; }
+  .counter{
+    position:fixed; top:20px; right:24px;
+    color:var(--dim); font-size:12px; z-index:30;
+    font-weight:600;
+  }
+
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:1.4%; flex:0 0 60%; min-height:0; }
+  .card.vcenter{ justify-content:center; }
+  .card.vcenter ul{ margin-top:5%; }
+  .card.vcenter li{ font-size:clamp(12px,1.15vw,15.5px); line-height:1.9; padding-left:20px; }
+  .card.vcenter li::before{ top:12px; width:6px; height:6px; }
+  .stats-row-wrap{ flex:1; display:flex; align-items:center; }
+  .stats-row-wrap .stats{ width:100%; margin-top:0; }  .pillrow{ display:flex; gap:10px; margin-top:1.8%; flex-wrap:wrap; }
+  .pill{
+    background:var(--card); border:1px solid var(--border); border-radius:999px;
+    padding:1.1% 2.2%; font-size:clamp(10px,0.95vw,13px); color:var(--muted); font-weight:600;
+  }
+  .pill-note{ color:var(--dim); font-size:clamp(10px,0.9vw,12.5px); margin-top:1.4%; font-style:italic; }
+
+  .reasons{ flex:1; display:flex; flex-direction:column; gap:1.3%; min-height:0; }
+  .reason{
+    display:flex; align-items:center; gap:16px;
+    background:var(--card); border:1px solid var(--border); border-radius:10px;
+    padding:0 2.4%; flex:1;
+  }
+  .reason .rnum{
+    width:clamp(26px,2.4vw,34px); height:clamp(26px,2.4vw,34px);
+    border-radius:50%; background:var(--accent-dim); color:var(--accent);
+    font-weight:800; display:flex; align-items:center; justify-content:center;
+    flex:none; font-size:clamp(12px,1.1vw,15px);
+  }
+  .reason p{ color:var(--muted); font-size:clamp(12px,1.1vw,15px); line-height:1.45; margin:0; }
+  .reason strong{ color:var(--text); }
+</style>
+</head>
+<body>
+
+<div class="counter"><span id="curpage">1</span> / <span id="totalpage">12</span></div>
+<div class="arrow left" onclick="go(-1)">&#8249;</div>
+<div class="arrow right" onclick="go(1)">&#8250;</div>
+
+<div class="stage">
+<div class="deck" id="deck">
+
+  <!-- 1. PORTADA -->
+  <section class="slide active cover">
+    <div class="tagright"><span class="dot" style="width:8px;height:8px;border-radius:50%;background:var(--accent);"></span> IGNIS · COMMERCIAL</div>
+    <div class="cover-logo">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M12 2L13.8 9.2L21 11L13.8 12.8L12 20L10.2 12.8L3 11L10.2 9.2L12 2Z" fill="#eb3123"/></svg>
+    </div>
+    <h1>IGNIS <span class="rule">Executive</span><br>Circle 2027</h1>
+    <p class="sub">Un programa anual de relacionamiento con nuestros clientes más estratégicos — pensado para transformarse en uno de los activos comerciales más importantes de la agencia.</p>
+    <div class="meta">Equipo Commercial · Agosto 2026</div>
+  </section>
+
+  <!-- 2. CONTEXTO / OBJETIVO -->
+  <section class="slide">
+    <div class="eyebrow"><span class="dot"></span>EL CONCEPTO</div>
+    <h1 class="title">Un Consejo de Clientes VIP, disfrazado de experiencia premium</h1>
+    <p class="subtitle">Un programa anual de relacionamiento con nuestros clientes más estratégicos. La clave no es que parezca un viaje de premio — es que sea, en esencia, un Client Advisory Board.</p>
+    <div class="reco-main" style="flex:1;">
+      <div class="tag">La idea central</div>
+      <h3 style="font-size:clamp(20px,2.3vw,30px);">No es un premio. Es pertenencia.</h3>
+      <p style="font-size:clamp(13px,1.2vw,16px);">Los programas de fidelización B2B más efectivos — de consultoras a bancos de inversión, agencias y compañías tecnológicas — no premian la facturación. Construyen una comunidad exclusiva alrededor de sus clientes más importantes, con contenido real y acceso genuino al equipo directivo. Eso cambia por completo cómo se percibe la inversión — y cómo la recibe cada cliente invitado.</p>
+    </div>
+    <div class="pillrow">
+      <div class="pill">Consultoras</div>
+      <div class="pill">Bancos de inversión</div>
+      <div class="pill">Agencias</div>
+      <div class="pill">Compañías tecnológicas</div>
+    </div>
+    <div class="pill-note">Así ya fidelizan a sus clientes más estratégicos las compañías B2B más sofisticadas del mundo.</div>
+  </section>
+
+  <!-- 2b. OBJETIVOS -->
+  <section class="slide">
+    <div class="eyebrow"><span class="dot"></span>TRES OBJETIVOS</div>
+    <h1 class="title">Qué buscamos con este programa</h1>
+    <p class="subtitle">Los mismos tres objetivos que persiguen los mejores programas de relacionamiento entre empresas.</p>
+    <div class="cards">
+      <div class="card">
+        <div class="badge">1</div>
+        <h3>Vínculo personal</h3>
+        <p>Fortalecer el vínculo personal entre quienes toman las decisiones — el CEO, el CMO, el Director de Marketing de cada cuenta — y el equipo directivo de Ignis.</p>
+      </div>
+      <div class="card">
+        <div class="badge">2</div>
+        <h3>Networking entre clientes</h3>
+        <p>Generar networking entre los propios clientes — algo que normalmente valoran muchísimo y que ninguna reunión comercial de agencia puede replicar.</p>
+      </div>
+      <div class="card">
+        <div class="badge">3</div>
+        <h3>Conversaciones estratégicas</h3>
+        <p>Crear conversaciones estratégicas fuera del día a día operativo — el espacio informal donde surgen los mejores insights de negocio.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. FORMATO -->
+  <section class="slide">
+    <div class="eyebrow"><span class="dot"></span>FORMATO DEL PROGRAMA</div>
+    <h1 class="title">6 clientes + 6 de Ignis — encuentro cercano, no masivo</h1>
+    <p class="subtitle">No más de 6 personas de la agencia. La idea es que cada cliente tenga tiempo de calidad real con el equipo directivo.</p>
+    <div class="grid2">
+      <div class="card vcenter">
+        <div class="badge">C</div>
+        <h3>Clientes — 6</h3>
+        <ul>
+          <li>CMO / Director de Marketing</li>
+          <li>CEO / Country Manager (según cuenta)</li>
+          <li>Mix: 3 por inversión + 2 por potencial de crecimiento + 1 estratégico</li>
+          <li>No debe leerse como premio por facturación</li>
+        </ul>
+      </div>
+      <div class="card vcenter">
+        <div class="badge">I</div>
+        <h3>Ignis — 6</h3>
+        <ul>
+          <li>CEO</li>
+          <li>VP Comercial</li>
+          <li>Director General</li>
+          <li>Director de Estrategia / Director de Cuentas</li>
+          <li>Head de Data o Innovación</li>
+        </ul>
+      </div>
+    </div>
+    <div class="stats-row-wrap">
+      <div class="stats">
+        <div class="stat"><div class="num">12</div><div class="label">Personas totales</div></div>
+        <div class="stat"><div class="num">4</div><div class="label">Días por edición</div></div>
+        <div class="stat"><div class="num">1x</div><div class="label">Al año — se vuelve tradición</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. COMPARACION -->
+  <section class="slide">
+    <div class="eyebrow"><span class="dot"></span>DOS PROPUESTAS</div>
+    <h1 class="title">F1 São Paulo vs. Patagonia Executive Retreat</h1>
+    <p class="subtitle">Dos lógicas distintas y complementarias: una experiencia aspiracional de alto impacto, y una experiencia íntima orientada a la conversación profunda.</p>
+    <div class="comp-table">
+      <div class="comp-row head">
+        <div class="comp-cell">Criterio</div>
+        <div class="comp-cell f1">F1 São Paulo</div>
+        <div class="comp-cell pat">Patagonia</div>
+      </div>
+      <div class="comp-row"><div class="comp-cell">Concepto</div><div class="comp-cell f1">Aspiracional</div><div class="comp-cell pat">Íntimo / profundo</div></div>
+      <div class="comp-row"><div class="comp-cell">Impacto emocional</div><div class="comp-cell f1 accent">★★★★★</div><div class="comp-cell pat">★★★★</div></div>
+      <div class="comp-row"><div class="comp-cell">Conversaciones estratégicas</div><div class="comp-cell f1">★★★★</div><div class="comp-cell pat accent">★★★★★</div></div>
+      <div class="comp-row"><div class="comp-cell">Logística desde Buenos Aires</div><div class="comp-cell f1 accent">Fácil — vuelo corto</div><div class="comp-cell pat accent">Muy fácil</div></div>
+      <div class="comp-row"><div class="comp-cell">Riesgo logístico</div><div class="comp-cell f1">Medio</div><div class="comp-cell pat accent">Bajo</div></div>
+      <div class="comp-row"><div class="comp-cell">Presupuesto estimado</div><div class="comp-cell f1">USD 58.000–65.000</div><div class="comp-cell pat">USD 34.000–38.000</div></div>
+    </div>
+  </section>
+
+  <!-- 4b. POR QUÉ F1 -->
+  <section class="slide">
+    <div class="eyebrow"><span class="dot"></span>POR QUÉ FÓRMULA 1</div>
+    <h1 class="title">No hace falta ser fanático</h1>
+    <p class="subtitle">La F1 conversa con directores de marketing como pocos eventos en el mundo — y el nivel de hospitality corporativo no tiene comparación.</p>
+    <div class="cards" style="flex:0 0 26%;">
+      <div class="card" style="align-items:center; text-align:center; justify-content:center;"><h3 style="margin:0;">Tecnología</h3></div>
+      <div class="card" style="align-items:center; text-align:center; justify-content:center;"><h3 style="margin:0;">Innovación</h3></div>
+      <div class="card" style="align-items:center; text-align:center; justify-content:center;"><h3 style="margin:0;">Estrategia</h3></div>
+      <div class="card" style="align-items:center; text-align:center; justify-content:center;"><h3 style="margin:0;">Liderazgo</h3></div>
+      <div class="card" style="align-items:center; text-align:center; justify-content:center;"><h3 style="margin:0;">Management</h3></div>
+    </div>
+    <div class="reco-main" style="flex:1; margin-top:1.8%;">
+      <div class="tag">El efecto aspiracional</div>
+      <h3>"El año que viene quiero estar en ese grupo"</h3>
+      <p>Cuando un cliente queda afuera de la edición de un año, es eso lo que piensa. Un poderoso efecto de pertenencia — sin necesidad de plantearlo nunca como una competencia entre clientes.</p>
+    </div>
+  </section>
+
+  <!-- 5. F1 OVERVIEW -->
+  <section class="slide">
+    <div class="eyebrow"><span class="dot"></span>PROPUESTA A · RECOMENDADA</div>
+    <h1 class="title">IGNIS Executive Circle — Fórmula 1 São Paulo</h1>
+    <div class="hero">
+      <div class="hero-img">
+        <div class="fallback-bg"></div><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Sao%20Paulo%20Brazil%20Skyline%20Aerial%2C%20December%202024.jpg" alt="São Paulo skyline" onerror="this.closest('.hero-img').classList.add('no-img'); this.style.display='none';">
+        <div class="caption">São Paulo, Brasil — sede del Gran Premio de F1</div>
+      </div>
+      <div class="hero-info">
+        <div class="info-block">
+          <div class="k">Objetivo</div>
+          <div class="v" style="font-size:clamp(12px,1.15vw,15px); font-weight:600; color:var(--muted);">Generar un espacio exclusivo de relacionamiento combinando networking, contenido ejecutivo y hospitality de primer nivel — sin necesidad de ser fanático del deporte.</div>
+        </div>
+        <div class="info-block">
+          <div class="k">Duración</div>
+          <div class="v">4 días / 3 noches</div>
+        </div>
+        <div class="info-block">
+          <div class="k">Fecha estimada</div>
+          <div class="v">Noviembre 2027 <small>Calendario F1 2027 aún no confirmado oficialmente</small></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. F1 TIMELINE -->
+  <section class="slide">
+    <div class="eyebrow"><span class="dot"></span>PROPUESTA A · AGENDA</div>
+    <h1 class="title">Día por día — São Paulo</h1>
+    <div class="timeline" style="flex:0 0 52%;">
+      <div class="day">
+        <div class="day-head"><div class="day-num">1</div><div class="day-title">Jueves</div></div>
+        <div class="day-line">
+          <div class="ev"><div class="t">TARDE</div><div class="d">Llegada y check-in</div></div>
+          <div class="ev"><div class="t">NOCHE</div><div class="d">Cena de bienvenida</div></div>
+        </div>
+      </div>
+      <div class="day">
+        <div class="day-head"><div class="day-num">2</div><div class="day-title">Viernes</div></div>
+        <div class="day-line">
+          <div class="ev"><div class="t">MAÑANA</div><div class="d">Mesa redonda: "El futuro del marketing y los medios en LatAm"</div></div>
+          <div class="ev"><div class="t">TARDE</div><div class="d">Hospitality F1 — Prácticas</div></div>
+          <div class="ev"><div class="t">NOCHE</div><div class="d">Cena</div></div>
+        </div>
+      </div>
+      <div class="day">
+        <div class="day-head"><div class="day-num">3</div><div class="day-title">Sábado</div></div>
+        <div class="day-line">
+          <div class="ev"><div class="t">MAÑANA</div><div class="d">Clasificación</div></div>
+          <div class="ev"><div class="t">TARDE</div><div class="d">Almuerzo hospitality</div></div>
+          <div class="ev"><div class="t">NOCHE</div><div class="d">Cena exclusiva</div></div>
+        </div>
+      </div>
+      <div class="day">
+        <div class="day-head"><div class="day-num">4</div><div class="day-title">Domingo</div></div>
+        <div class="day-line">
+          <div class="ev"><div class="t">MEDIODÍA</div><div class="d">Carrera</div></div>
+          <div class="ev"><div class="t">TARDE</div><div class="d">Regreso</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="reco-main" style="flex:1; margin-top:1.6%;">
+      <div class="tag">La mesa del viernes, en la práctica</div>
+      <h3 style="font-size:clamp(16px,1.7vw,22px);">Un focus group con los mejores clientes de la agencia</h3>
+      <p>Cada cliente comparte qué lo preocupa y hacia dónde ve que va su industria — IA, Retail Media, Data, Medición. Ignis obtiene, en una mañana, el insight que le llevaría meses juntar reunión por reunión.</p>
+    </div>
+  </section>
+
+  <!-- 7. F1 PRESUPUESTO -->
+  <section class="slide">
+    <div class="eyebrow"><span class="dot"></span>PROPUESTA A · PRESUPUESTO</div>
+    <h1 class="title">Costos estimados — 12 personas</h1>
+    <div class="budget">
+      <div class="brow head"><div class="bcell">Concepto</div><div class="bcell">Valor aproximado (USD)</div></div>
+      <div class="brow"><div class="bcell">Pasajes Buenos Aires – São Paulo</div><div class="bcell">8.000 – 8.500</div></div>
+      <div class="brow"><div class="bcell">Hotel 5★ (3 noches, tarifa de evento)</div><div class="bcell">9.000 – 9.500</div></div>
+      <div class="brow"><div class="bcell">Entradas Hospitality F1</div><div class="bcell">30.000</div></div>
+      <div class="brow"><div class="bcell">Traslados privados</div><div class="bcell">2.500</div></div>
+      <div class="brow"><div class="bcell">Cenas y actividades</div><div class="bcell">5.000</div></div>
+      <div class="brow"><div class="bcell">Contingencias</div><div class="bcell">3.000 – 4.000</div></div>
+      <div class="brow total"><div class="bcell">TOTAL</div><div class="bcell">58.000 – 65.000</div></div>
+    </div>
+    <div class="budget-note">≈ USD 5.000 por invitado · ≈ USD 10.000 por cliente invitado (considerando 6 clientes). Estimación sujeta a confirmación de fechas y disponibilidad de hospitality.</div>
+  </section>
+
+  <!-- 8. PATAGONIA OVERVIEW -->
+  <section class="slide">
+    <div class="eyebrow"><span class="dot"></span>PROPUESTA B · ALTERNATIVA</div>
+    <h1 class="title">Patagonia Executive Retreat</h1>
+    <div class="hero">
+      <div class="hero-img">
+        <div class="fallback-bg"></div><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Lago%20Nahuel%20Huapi.jpg" alt="Lago Nahuel Huapi, Bariloche" onerror="this.closest('.hero-img').classList.add('no-img'); this.style.display='none';">
+        <div class="caption">Lago Nahuel Huapi, Bariloche — Patagonia Argentina</div>
+      </div>
+      <div class="hero-info">
+        <div class="info-block">
+          <div class="k">Objetivo</div>
+          <div class="v" style="font-size:clamp(12px,1.15vw,15px); font-weight:600; color:var(--muted);">No busca impacto por el evento — busca generar conversación. Los mejores negocios se hacen caminando, pescando o compartiendo una cena.</div>
+        </div>
+        <div class="info-block">
+          <div class="k">Duración</div>
+          <div class="v">4 días</div>
+        </div>
+        <div class="info-block">
+          <div class="k">Sede sugerida</div>
+          <div class="v">Bariloche <small>Hotel Llao Llao o equivalente</small></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. PATAGONIA TIMELINE -->
+  <section class="slide">
+    <div class="eyebrow"><span class="dot"></span>PROPUESTA B · AGENDA</div>
+    <h1 class="title">Día por día — Bariloche</h1>
+    <div class="hero" style="margin-bottom:1.5%;">
+      <div class="hero-img" style="flex:none; width:22%;">
+        <div class="fallback-bg"></div><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Hotel%20Llao%20Llao%2C%20Bariloche%2C%20Argentina.jpg" alt="Hotel Llao Llao" onerror="this.closest('.hero-img').classList.add('no-img'); this.style.display='none';">
+        <div class="caption" style="font-size:10px; padding:8% 8% 6%;">Hotel Llao Llao</div>
+      </div>
+      <div class="timeline" style="flex:1;">
+        <div class="day">
+          <div class="day-head"><div class="day-num">1</div><div class="day-title">Recepción</div></div>
+          <div class="day-line"><div class="ev"><div class="t">NOCHE</div><div class="d">Cena de bienvenida</div></div></div>
+        </div>
+        <div class="day">
+          <div class="day-head"><div class="day-num">2</div><div class="day-title">Estrategia</div></div>
+          <div class="day-line">
+            <div class="ev"><div class="t">MAÑANA</div><div class="d">Mesa: "Evolución del marketing en Argentina"</div></div>
+            <div class="ev"><div class="t">TARDE</div><div class="d">Navegación privada + fogón</div></div>
+          </div>
+        </div>
+        <div class="day">
+          <div class="day-head"><div class="day-num">3</div><div class="day-title">Actividades</div></div>
+          <div class="day-line"><div class="ev"><div class="t">DÍA</div><div class="d">Golf, pesca con mosca, trekking o navegación (a elección)</div></div><div class="ev"><div class="t">NOCHE</div><div class="d">Cena de cierre</div></div></div>
+        </div>
+        <div class="day">
+          <div class="day-head"><div class="day-num">4</div><div class="day-title">Cierre</div></div>
+          <div class="day-line"><div class="ev"><div class="t">MAÑANA</div><div class="d">Workshop de conclusiones</div></div><div class="ev"><div class="t">TARDE</div><div class="d">Regreso</div></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. PATAGONIA PRESUPUESTO -->
+  <section class="slide">
+    <div class="eyebrow"><span class="dot"></span>PROPUESTA B · PRESUPUESTO</div>
+    <h1 class="title">Costos estimados — 12 personas</h1>
+    <div class="budget">
+      <div class="brow head"><div class="bcell">Concepto</div><div class="bcell">Valor aproximado (USD)</div></div>
+      <div class="brow"><div class="bcell">Pasajes internos</div><div class="bcell">4.500</div></div>
+      <div class="brow"><div class="bcell">Hotel 5★ (3 noches)</div><div class="bcell">8.500</div></div>
+      <div class="brow"><div class="bcell">Gastronomía premium</div><div class="bcell">6.500</div></div>
+      <div class="brow"><div class="bcell">Actividades privadas</div><div class="bcell">7.000</div></div>
+      <div class="brow"><div class="bcell">Salón + workshop</div><div class="bcell">2.500</div></div>
+      <div class="brow"><div class="bcell">Traslados</div><div class="bcell">2.000</div></div>
+      <div class="brow"><div class="bcell">Contingencias</div><div class="bcell">3.000</div></div>
+      <div class="brow total"><div class="bcell">TOTAL</div><div class="bcell">34.000 – 38.000</div></div>
+    </div>
+    <div class="budget-note">≈ 40% más económico que la opción F1 — logística íntegramente doméstica, sin riesgo cambiario ni de disponibilidad internacional.</div>
+  </section>
+
+  <!-- 11a. 5 RAZONES -->
+  <section class="slide">
+    <div class="eyebrow"><span class="dot"></span>LA RECOMENDACIÓN</div>
+    <h1 class="title">Por qué Fórmula 1 São Paulo</h1>
+    <p class="subtitle">Cinco razones concretas para elegirla como propuesta principal.</p>
+    <div class="reasons">
+      <div class="reason"><div class="rnum">1</div><p><strong>Logística simple desde Buenos Aires</strong> — vuelo corto y sin gran diferencia horaria.</p></div>
+      <div class="reason"><div class="rnum">2</div><p><strong>Duración ideal de 3 a 4 días</strong> — mínima interrupción de la agenda laboral.</p></div>
+      <div class="reason"><div class="rnum">3</div><p><strong>Alto impacto percibido</strong> — muy superior a su costo relativo frente a destinos más lejanos.</p></div>
+      <div class="reason"><div class="rnum">4</div><p><strong>Gran equilibrio entre entretenimiento y negocios</strong> — espacios naturales para conversaciones informales de alto valor.</p></div>
+      <div class="reason"><div class="rnum">5</div><p><strong>Potencial de programa anual</strong> — cambiando destino o temática cada año, manteniendo la marca del programa.</p></div>
+    </div>
+  </section>
+
+  <!-- 11b. RECOMENDACION FINAL -->
+  <section class="slide">
+    <div class="eyebrow"><span class="dot"></span>LA RECOMENDACIÓN</div>
+    <h1 class="title">Un beneficio adicional, más allá del vínculo</h1>
+    <div class="reco-wrap">
+      <div class="reco-main">
+        <div class="tag">Para el área Comercial</div>
+        <h3>Un focus group de los principales decisores, cuatro días seguidos</h3>
+        <p>Concentrar durante cuatro días a los principales decisores de las cuentas más importantes, en un contexto donde las conversaciones estratégicas surgen mucho más naturalmente que en una reunión de una hora. Ese tipo de interacción suele traducirse en mayor confianza, oportunidades de negocio y relaciones de largo plazo.</p>
+      </div>
+      <div class="reco-side">
+        <div class="info-block">
+          <div class="k">Patagonia queda como</div>
+          <div class="v" style="font-size:clamp(12px,1.1vw,15px);">Alternativa de menor presupuesto, para un perfil más conversacional o si se busca ajustar el gasto</div>
+        </div>
+        <div class="info-block">
+          <div class="k">KPIs de éxito sugeridos</div>
+          <div class="v" style="font-size:clamp(12px,1.1vw,15px);">Retención · Share of wallet · NPS · Nuevos proyectos generados</div>
+        </div>
+        <div class="info-block">
+          <div class="k">Nombre del programa</div>
+          <div class="v" style="font-size:clamp(13px,1.2vw,16px);">IGNIS Executive Circle</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12. CIERRE -->
+  <section class="slide cover">
+    <div class="cover-logo">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M12 2L13.8 9.2L21 11L13.8 12.8L12 20L10.2 12.8L3 11L10.2 9.2L12 2Z" fill="#eb3123"/></svg>
+    </div>
+    <h1 style="font-size:clamp(30px,5vw,56px);">Gracias</h1>
+    <p class="sub">Equipo Commercial</p>
+  </section>
+
+  <div class="nav" id="nav"></div>
+</div>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let idx = 0;
+  const navEl = document.getElementById('nav');
+  slides.forEach((s,i)=>{
+    const d = document.createElement('div');
+    d.className = 'navdot' + (i===0 ? ' active' : '');
+    d.onclick = ()=> setSlide(i);
+    navEl.appendChild(d);
+  });
+  document.getElementById('totalpage').textContent = total;
+
+  function setSlide(i){
+    slides[idx].classList.remove('active');
+    navEl.children[idx].classList.remove('active');
+    idx = (i+total)%total;
+    slides[idx].classList.add('active');
+    navEl.children[idx].classList.add('active');
+    document.getElementById('curpage').textContent = idx+1;
+  }
+  function go(dir){ setSlide(idx+dir); }
+  document.addEventListener('keydown', (e)=>{
+    if(e.key==='ArrowRight' || e.key===' ') go(1);
+    if(e.key==='ArrowLeft') go(-1);
+  });
+</script>
+
+</body>
+</html>
