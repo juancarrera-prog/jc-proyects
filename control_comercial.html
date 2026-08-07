@@ -481,6 +481,11 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
     <div class="section-header" id="bagoSection">
       <div><div class="section-title">Unidades de Negocio · Bagó</div><div class="section-sub">Detalle por marca</div></div>
     </div>
+
+    <div class="director-filter">
+      <span class="filter-label">Meses · Bagó (suman)</span>
+      <div id="mesesBagoSelector" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+    </div>
     <div class="table-card" id="bagoCard">
       <table>
         <thead><tr>
@@ -1021,7 +1026,8 @@ let CONTROL_RAW    = {}; // { cliente: { 'anio-mes': {inv, cmb, ingresos} } }
 let PRESUP_VENTA   = {}; // { cliente: { Enero: valor, ..., TOTAL: valor } }
 let PRESUP_CMB     = {}; // { cliente: { Enero: valor, ..., TOTAL: valor } }
 const MES_NUM = { Enero:1, Febrero:2, Marzo:3, Abril:4, Mayo:5, Junio:6, Julio:7, Agosto:8, Septiembre:9, Octubre:10, Noviembre:11, Diciembre:12 };
-let MESES_CC_SELECCIONADOS = ['Junio']; // default — se ajusta en initMesesCC() al mes más reciente con datos
+let MESES_CC_SELECCIONADOS = ['Junio']; // default — se ajusta en initMesesCC() a Enero→mes anterior al actual
+let MESES_BAGO_SELECCIONADOS = ['Junio']; // idem, independiente — se ajusta en initMesesBago()
 let BAGO_MARCAS_INV    = {}; // { PRODUCTO: { 'anio-mes': inv } }
 let BAGO_MARCAS_PRESUP = {}; // { PRODUCTO: { Enero: valor, ..., TOTAL: valor } }
 
@@ -2016,14 +2022,21 @@ function renderChartFTE(cliente, tipo) {
 }
 
 /* ===== CONTROL COMERCIAL — construir Big 7 + Total Agencia desde CONTROL_RAW ===== */
+// Devuelve ['Enero', ..., mes anterior al actual] (ej: si hoy es Agosto -> Enero..Julio). Si estamos en Enero, devuelve solo ['Enero'].
+function _mesesPorDefecto() {
+  const mesActual = new Date().getMonth() + 1; // 1-12
+  const hasta = Math.max(1, mesActual - 1);
+  return MESES_COMERCIAL.slice(0, hasta);
+}
+
 function initMesesCC() {
-  const agRaw = CONTROL_RAW['Total Agencia'] || {};
-  const conDatos = MESES_COMERCIAL.filter(m => {
-    const k = '2026-' + MES_NUM[m];
-    return agRaw[k] && agRaw[k].inv > 0;
-  });
-  if (conDatos.length > 0) MESES_CC_SELECCIONADOS = [conDatos[conDatos.length - 1]];
+  MESES_CC_SELECCIONADOS = _mesesPorDefecto();
   renderPillsMesesCC();
+}
+
+function initMesesBago() {
+  MESES_BAGO_SELECCIONADOS = _mesesPorDefecto();
+  renderPillsMesesBago();
 }
 
 function toggleMesCC(mes) {
@@ -2045,6 +2058,27 @@ function renderPillsMesesCC() {
   cont.innerHTML = MESES_COMERCIAL.map(m => {
     const activo = MESES_CC_SELECCIONADOS.includes(m);
     return `<button class="rent-tab${activo ? ' active' : ''}" onclick="toggleMesCC('${m}')">${m.slice(0,3)}</button>`;
+  }).join('');
+}
+
+function toggleMesBago(mes) {
+  const i = MESES_BAGO_SELECCIONADOS.indexOf(mes);
+  if (i >= 0) {
+    if (MESES_BAGO_SELECCIONADOS.length > 1) MESES_BAGO_SELECCIONADOS.splice(i, 1);
+  } else {
+    MESES_BAGO_SELECCIONADOS.push(mes);
+  }
+  renderPillsMesesBago();
+  aplicarBagoMarcasReal();
+  renderTablas(DATA);
+}
+
+function renderPillsMesesBago() {
+  const cont = document.getElementById('mesesBagoSelector');
+  if (!cont) return;
+  cont.innerHTML = MESES_COMERCIAL.map(m => {
+    const activo = MESES_BAGO_SELECCIONADOS.includes(m);
+    return `<button class="rent-tab${activo ? ' active' : ''}" onclick="toggleMesBago('${m}')">${m.slice(0,3)}</button>`;
   }).join('');
 }
 
@@ -2105,7 +2139,7 @@ const MARCAS_BAGO_DISPLAY = {
 function _sumarPeriodoMarca(producto) {
   const raw = BAGO_MARCAS_INV[producto] || {};
   let inv = 0;
-  MESES_CC_SELECCIONADOS.forEach(m => {
+  MESES_BAGO_SELECCIONADOS.forEach(m => {
     const k = '2026-' + MES_NUM[m];
     inv += raw[k] || 0;
   });
@@ -2113,7 +2147,7 @@ function _sumarPeriodoMarca(producto) {
 
   const pv = BAGO_MARCAS_PRESUP[producto] || {};
   let presup = 0;
-  MESES_CC_SELECCIONADOS.forEach(m => { presup += pv[m] || 0; });
+  MESES_BAGO_SELECCIONADOS.forEach(m => { presup += pv[m] || 0; });
   const presupAnual = pv['TOTAL'] || 0;
 
   const vs = presup !== 0 ? ((inv - presup) / presup) * 100 : null;
@@ -2253,6 +2287,7 @@ async function loadData() {
     if (json.bago_marcas_inv)    BAGO_MARCAS_INV    = json.bago_marcas_inv;
     if (json.bago_marcas_presup) BAGO_MARCAS_PRESUP = json.bago_marcas_presup;
     initMesesCC();
+    initMesesBago();
     aplicarControlComercialReal();
 
     console.log('Rentabilidad cargada desde Sheet');
