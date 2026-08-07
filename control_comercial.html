@@ -931,7 +931,7 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
    DATOS & CONFIGURACIÓN
 ═══════════════════════════════════════════════════════════ */
 const API_URL    = 'https://script.google.com/macros/s/AKfycbyJ7ziLiqqBqpld84Rjybve2ZCMIasb2SRUFu2hLAKPHhoazEyLuD3Sq0SRMPffuX22yQ/exec'; // Script Control Comercial
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyhR_jdgb_G6JZ26yrNSnky0stQTbfvn2ICWQ0gVk5pbe-jx_0W7AGupq8ooG2G7Suf7g/exec'; // Script Rentabilidad (GET+POST)
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxPrLGILlUdf0xeARJf9WFWutOsHklB6nS7uvjqu6IbYC6DHEbuZsR5ekapRwqk1JelEQ/exec'; // Script Rentabilidad (GET+POST)
 const WEBHOOK_URL = '';
 
 const OH_EQUIPO = 1.23;   // Overhead Rentabilidad de Equipo (123%)
@@ -1236,7 +1236,7 @@ function switchRentTab(tab, btn) {
   btn.classList.add('active');
   if (tab === 'costos') renderTablaCostoCia();
   if (tab === 'detalle') { renderDetalle(clienteDetalleActivo); }
-  if (tab === 'consolidado') { const rows = calcRentabilidad(MES_ACTIVO); renderKPIsRent(rows); renderConsolidado(rows); renderRanking(rows); setTimeout(() => renderChart(rows), 50); }
+  if (tab === 'consolidado') { const rows = calcRentabilidad(); renderKPIsRent(rows); renderConsolidado(rows); renderRanking(rows); setTimeout(() => renderChart(rows), 50); }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -1500,7 +1500,7 @@ function enviarResumenEjecutivo() {
   const agCons   = parseFloat(ag.consumidoAnual||0);
 
   // ── BIG 7 ──
-  const rowsB7 = calcRentabilidad('Total');
+  const rowsB7 = calcRentabilidad();
 
   // Facturación
   const facLines = clientes.map(c => {
@@ -2348,7 +2348,7 @@ function toggleOH(tipo) {
     btn.style.background  = ohActivoEquipo ? 'var(--purple)' : 'var(--surface2)';
     btn.style.borderColor = ohActivoEquipo ? 'var(--purple)' : 'var(--border)';
     btn.style.color       = ohActivoEquipo ? '#fff' : 'var(--text-muted)';
-    const rows = calcRentabilidad(MES_ACTIVO);
+    const rows = calcRentabilidad();
     renderKPIsRent(rows);
     renderConsolidado(rows);
     renderRanking(rows);
@@ -2705,31 +2705,65 @@ function calcCostoEquipoCliente(cliente, mes) {
   for (const [p, fte] of Object.entries(puestos)) total += getCostoPuesto(p, mes) * fte;
   return total / 1000000;
 }
-function calcRentabilidad(mes) {
-  if (mes === 'Total') {
-    return Object.keys(DIRECTORES).map(nombre => {
-      let totalCosto = 0, totalFte = 0;
-      MESES_2026.filter(m => m !== 'Total').forEach(m => {
-        totalCosto += calcCostoEquipoCliente(nombre, m);
-        const puestos = (CLIENTES_FTE[nombre] && CLIENTES_FTE[nombre][m]) || {};
-        totalFte += Object.values(puestos).reduce((a,b) => a+b, 0);
-      });
-      const cmb = getCmbEquipoCliente(nombre);
-      const inv = getInvEquipoCliente(nombre);
-      const cm = cmb - totalCosto;
-      const cmPct = inv > 0 ? (cm / inv) * 100 : 0;
-      return { nombre, cmb, costoEq: totalCosto, cm, cmPct, fte: totalFte, inv };
-    });
+let MESES_RENT_SELECCIONADOS = []; // independiente de MESES_CC_SELECCIONADOS — se inicializa en initMesesRent()
+
+function initMesesRent() {
+  MESES_RENT_SELECCIONADOS = _mesesPorDefecto();
+  renderPillsMesesRent();
+}
+
+function toggleMesRent(mes) {
+  const i = MESES_RENT_SELECCIONADOS.indexOf(mes);
+  if (i >= 0) {
+    if (MESES_RENT_SELECCIONADOS.length > 1) MESES_RENT_SELECCIONADOS.splice(i, 1);
+  } else {
+    MESES_RENT_SELECCIONADOS.push(mes);
   }
+  renderPillsMesesRent();
+  const rows = calcRentabilidad();
+  renderKPIsRent(rows); renderConsolidado(rows); renderRanking(rows);
+  setTimeout(() => renderChart(rows), 50);
+}
+
+function renderPillsMesesRent() {
+  const cont = document.getElementById('mesSelectorRent');
+  if (!cont) return;
+  cont.style.display = 'flex';
+  cont.style.flexWrap = 'wrap';
+  cont.style.gap = '6px';
+  cont.innerHTML = MESES_COMERCIAL.map(m => {
+    const activo = MESES_RENT_SELECCIONADOS.includes(m);
+    return `<button class="rent-tab${activo ? ' active' : ''}" onclick="toggleMesRent('${m}')">${m.slice(0,3)}</button>`;
+  }).join('');
+}
+
+// cmb/inv independientes de DATA.clientes (que está atado a las pills de Control Comercial) — se calculan
+// directo desde CONTROL_RAW sumando los meses seleccionados acá, en Clientes Big 7.
+function _cmbInvSobreMeses(nombre, meses) {
+  const raw = CONTROL_RAW[nombre] || {};
+  let inv = 0, cmb = 0;
+  meses.forEach(m => {
+    const k = '2026-' + MES_NUM[m];
+    if (raw[k]) { inv += raw[k].inv || 0; cmb += raw[k].cmb || 0; }
+  });
+  return { inv: inv / 1000, cmb: cmb / 1000 };
+}
+
+function calcRentabilidad() {
+  const meses = MESES_RENT_SELECCIONADOS.length ? MESES_RENT_SELECCIONADOS : _mesesPorDefecto();
   return Object.keys(DIRECTORES).map(nombre => {
-    const cmb     = getCmbEquipoCliente(nombre);
-    const inv     = getInvEquipoCliente(nombre);
-    const costoEq = calcCostoEquipoCliente(nombre, mes);
-    const cm      = cmb - costoEq;
-    const cmPct   = inv > 0 ? (cm / inv) * 100 : 0;
-    const puestos = (CLIENTES_FTE[nombre] && CLIENTES_FTE[nombre][mes]) || {};
-    const fte     = Object.values(puestos).reduce((a,b) => a+b, 0);
-    return { nombre, cmb, costoEq, cm, cmPct, fte, inv };
+    let totalCosto = 0, totalFte = 0;
+    meses.forEach(m => {
+      totalCosto += calcCostoEquipoCliente(nombre, m);
+      const puestos = (CLIENTES_FTE[nombre] && CLIENTES_FTE[nombre][m]) || {};
+      totalFte += Object.values(puestos).reduce((a,b) => a+b, 0);
+    });
+    const { inv, cmb } = (CONTROL_RAW && Object.keys(CONTROL_RAW).length)
+      ? _cmbInvSobreMeses(nombre, meses)
+      : { inv: getInvEquipoCliente(nombre), cmb: getCmbEquipoCliente(nombre) }; // fallback si todavía no llegó el Sheet nuevo
+    const cm    = cmb - totalCosto;
+    const cmPct = inv > 0 ? (cm / inv) * 100 : 0;
+    return { nombre, cmb, costoEq: totalCosto, cm, cmPct, fte: totalFte, inv };
   });
 }
 
@@ -2758,8 +2792,8 @@ function actualizarBannerVigencia() {
   if (el2) el2.textContent = MES_VIGENTE;
 }
 function renderRentabilidadCompleto() {
-  renderMesSelector();
-  const rows = calcRentabilidad(MES_ACTIVO);
+  if (!MESES_RENT_SELECCIONADOS.length) initMesesRent(); else renderPillsMesesRent();
+  const rows = calcRentabilidad();
   renderKPIsRent(rows); renderConsolidado(rows); renderRanking(rows);
   setTimeout(() => renderChart(rows), 80);
   renderClienteSelector();
@@ -2821,7 +2855,7 @@ function renderRanking(rows) {
   document.getElementById('rankingPct').innerHTML = byPct.map((r,i)=>`<div class="rank-item"><div class="rank-num">${medals[i]||(i+1)}</div><div class="rank-name">${r.nombre}</div><div class="rank-val" style="color:${r.pctD>35?'#00c853':r.pctD>=30?'#f5c400':'#ff4455'}">${r.pctD.toFixed(1)}%</div></div>`).join('');
 }
 function renderChart(rows) {
-  if (!rows) rows = calcRentabilidad(MES_ACTIVO);
+  if (!rows) rows = calcRentabilidad();
   if (chartRentInstance) { chartRentInstance.destroy(); chartRentInstance = null; }
   const labels=rows.map(r=>r.nombre.length>9?r.nombre.substring(0,9)+'...':r.nombre);
   chartRentInstance = new Chart(document.getElementById('chartRent'), {
@@ -2901,7 +2935,7 @@ function saveFTE(cliente, mes, puesto, valor) {
   if(!isNaN(v)&&v>0){CLIENTES_FTE[cliente][mes][puesto]=v; postSheet('fte',{cliente,mes,puesto,fte:v});}
   else {delete CLIENTES_FTE[cliente][mes][puesto]; postSheet('fte',{cliente,mes,puesto,fte:0});}
   renderDetalle(cliente);
-  if(document.getElementById('rent-consolidado').style.display!=='none'){const rows=calcRentabilidad(MES_ACTIVO);renderKPIsRent(rows);renderConsolidado(rows);renderRanking(rows);}
+  if(document.getElementById('rent-consolidado').style.display!=='none'){const rows=calcRentabilidad();renderKPIsRent(rows);renderConsolidado(rows);renderRanking(rows);}
 }
 function saveInversion(cliente, mes, valor) {
   const val=(parseFloat(valor)||0)/1000;
@@ -2916,7 +2950,7 @@ function saveIngresos(cliente, mes, valor) {
   INGRESOS[cliente][mes]=val;
   postSheet('ingresos',{cliente,mes,valor:val});
   renderDetalle(cliente);
-  if(document.getElementById('rent-consolidado').style.display!=='none'){const rows=calcRentabilidad(MES_ACTIVO);renderKPIsRent(rows);renderConsolidado(rows);renderRanking(rows);}
+  if(document.getElementById('rent-consolidado').style.display!=='none'){const rows=calcRentabilidad();renderKPIsRent(rows);renderConsolidado(rows);renderRanking(rows);}
 }
 
 /* Tabla Costo Compania */
