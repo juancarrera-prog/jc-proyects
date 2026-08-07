@@ -1022,6 +1022,8 @@ let PRESUP_VENTA   = {}; // { cliente: { Enero: valor, ..., TOTAL: valor } }
 let PRESUP_CMB     = {}; // { cliente: { Enero: valor, ..., TOTAL: valor } }
 const MES_NUM = { Enero:1, Febrero:2, Marzo:3, Abril:4, Mayo:5, Junio:6, Julio:7, Agosto:8, Septiembre:9, Octubre:10, Noviembre:11, Diciembre:12 };
 let MESES_CC_SELECCIONADOS = ['Junio']; // default — se ajusta en initMesesCC() al mes más reciente con datos
+let BAGO_MARCAS_INV    = {}; // { PRODUCTO: { 'anio-mes': inv } }
+let BAGO_MARCAS_PRESUP = {}; // { PRODUCTO: { Enero: valor, ..., TOTAL: valor } }
 
 let INGRESOS_SOCIAL = {
   'Escorial': {}, 'CAAM': {}, 'Ignis M&C': {},
@@ -2089,6 +2091,49 @@ function aplicarControlComercialReal() {
     DATA.periodo = MESES_CC_SELECCIONADOS.map(m => m.slice(0,3)).join('+') + ' 2026';
   }
   if (document.getElementById('periodoLabel')) document.getElementById('periodoLabel').textContent = DATA.periodo;
+
+  aplicarBagoMarcasReal();
+}
+
+/* ===== Unidades de Negocio · Bagó — construir desde BAGO_MARCAS_INV/PRESUP ===== */
+const MARCAS_BAGO_DISPLAY = {
+  'ESOPRAZOL': 'Esoprazol', 'ANAFLEX': 'Anaflex', 'FACIALES': 'Faciales',
+  'CORPORALES': 'Corporales', 'CAPILARES': 'Capilares', 'SOLARES': 'Solares',
+  'BAGO+': 'Bagó+', 'DIOXAFLEX': 'Dioxaflex', 'INSTITUCIONAL': 'Institucional',
+};
+
+function _sumarPeriodoMarca(producto) {
+  const raw = BAGO_MARCAS_INV[producto] || {};
+  let inv = 0;
+  MESES_CC_SELECCIONADOS.forEach(m => {
+    const k = '2026-' + MES_NUM[m];
+    inv += raw[k] || 0;
+  });
+  inv = inv / 1000; // pesos → miles
+
+  const pv = BAGO_MARCAS_PRESUP[producto] || {};
+  let presup = 0;
+  MESES_CC_SELECCIONADOS.forEach(m => { presup += pv[m] || 0; });
+  const presupAnual = pv['TOTAL'] || 0;
+
+  const vs = presup !== 0 ? ((inv - presup) / presup) * 100 : null;
+  const consumidoAnual = presupAnual !== 0 ? (inv / presupAnual) * 100 : 0;
+
+  return { inv, presup, vs, consumidoAnual, presupAnual, soi: fmt(inv) };
+}
+
+function aplicarBagoMarcasReal() {
+  if (!BAGO_MARCAS_INV || Object.keys(BAGO_MARCAS_INV).length === 0) return; // todavía no llegó el Sheet nuevo
+  if (!DATA.bago) DATA.bago = [];
+
+  Object.keys(MARCAS_BAGO_DISPLAY).forEach(producto => {
+    const nombreDisplay = MARCAS_BAGO_DISPLAY[producto];
+    const calc = _sumarPeriodoMarca(producto);
+    if (calc.inv === 0 && calc.presup === 0) return; // sin datos en ningún lado, no mostrar (ej: Institucional sin presup y sin inv en el período)
+    let row = DATA.bago.find(r => r.nombre === nombreDisplay);
+    if (!row) { row = { nombre: nombreDisplay }; DATA.bago.push(row); }
+    Object.assign(row, calc);
+  });
 }
 
 async function loadData() {
@@ -2205,6 +2250,8 @@ async function loadData() {
     if (json.control_raw)       CONTROL_RAW  = json.control_raw;
     if (json.presupuesto_venta) PRESUP_VENTA = json.presupuesto_venta;
     if (json.presupuesto_cmb)   PRESUP_CMB   = json.presupuesto_cmb;
+    if (json.bago_marcas_inv)    BAGO_MARCAS_INV    = json.bago_marcas_inv;
+    if (json.bago_marcas_presup) BAGO_MARCAS_PRESUP = json.bago_marcas_presup;
     initMesesCC();
     aplicarControlComercialReal();
 
