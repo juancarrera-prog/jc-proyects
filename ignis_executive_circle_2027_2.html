@@ -177,6 +177,10 @@
   }
   .stat .num{ font-size:clamp(20px,2.4vw,32px); font-weight:800; color:var(--accent); }
   .stat .label{ font-size:clamp(10px,0.95vw,13px); color:var(--muted); margin-top:2%; }
+  .stats-big{ flex:1; }
+  .stats-big .stat{ display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:4% 2%; }
+  .stats-big .num{ font-size:clamp(34px,4.4vw,58px); }
+  .stats-big .label{ font-size:clamp(12px,1.15vw,15.5px); margin-top:5%; }
 
   /* comparison table */
   .comp-table{
@@ -382,6 +386,29 @@
   }
   .reason p{ color:var(--muted); font-size:clamp(12px,1.1vw,15px); line-height:1.45; margin:0; }
   .reason strong{ color:var(--text); }
+
+  .split-slide{ flex-direction:row !important; }
+  .split-half{
+    flex:1; position:relative; background-size:cover; background-position:center;
+    display:flex; align-items:flex-end;
+  }
+  .split-half::after{
+    content:""; position:absolute; inset:0;
+    background:linear-gradient(to top, rgba(0,0,0,0.88), rgba(0,0,0,0.15) 55%, rgba(0,0,0,0.45));
+  }
+  .split-divider{ width:2px; background:rgba(255,255,255,0.12); flex:none; z-index:2; }
+  .split-overlay{ position:relative; z-index:2; padding:10% 10%; }
+  .split-eyebrow{ color:var(--accent); font-weight:800; letter-spacing:.08em; font-size:clamp(10px,1vw,13px); margin-bottom:4%; }
+  .split-overlay h2{ font-size:clamp(24px,3vw,40px); font-weight:800; line-height:1.08; margin-bottom:5%; color:#fff; }
+  .split-tag{ color:#e8e8e8; font-size:clamp(12px,1.2vw,16px); font-weight:600; letter-spacing:.03em; }
+  .split-center-label{
+    position:absolute; top:5%; left:50%; transform:translateX(-50%);
+    z-index:3; display:flex; align-items:center; gap:8px;
+    color:var(--accent); font-weight:800; font-size:clamp(10px,1vw,13px); letter-spacing:.06em;
+    background:rgba(0,0,0,0.55); padding:1.2% 2%; border-radius:999px;
+    white-space:nowrap;
+  }
+  .split-center-label .dot{ width:7px; height:7px; border-radius:50%; background:var(--accent); }
 </style>
 </head>
 <body>
@@ -400,7 +427,7 @@
       <svg viewBox="0 0 24 24" fill="none"><path d="M12 2L13.8 9.2L21 11L13.8 12.8L12 20L10.2 12.8L3 11L10.2 9.2L12 2Z" fill="#eb3123"/></svg>
     </div>
     <h1>IGNIS <span class="rule">Executive</span><br>Circle 2027</h1>
-    <p class="sub">Un programa anual de relacionamiento con nuestros clientes más estratégicos — pensado para transformarse en uno de los activos comerciales más importantes de la agencia.</p>
+    <p class="sub">Un programa anual de relacionamiento con nuestros clientes más estratégicos.</p>
     <div class="meta">Equipo Commercial · Agosto 2026</div>
   </section>
 
@@ -408,19 +435,12 @@
   <section class="slide">
     <div class="eyebrow"><span class="dot"></span>EL CONCEPTO</div>
     <h1 class="title">Un Consejo de Clientes VIP, disfrazado de experiencia premium</h1>
-    <p class="subtitle">Un programa anual de relacionamiento con nuestros clientes más estratégicos. La clave no es que parezca un viaje de premio — es que sea, en esencia, un Client Advisory Board.</p>
+    <p class="subtitle">Invitamos a los principales referentes de nuestros clientes más estratégicos a vivir una experiencia distinta. Es relacionamiento y fidelización de cliente.</p>
     <div class="reco-main" style="flex:1;">
       <div class="tag">La idea central</div>
-      <h3 style="font-size:clamp(20px,2.3vw,30px);">No es un premio. Es pertenencia.</h3>
-      <p style="font-size:clamp(13px,1.2vw,16px);">Los programas de fidelización B2B más efectivos — de consultoras a bancos de inversión, agencias y compañías tecnológicas — no premian la facturación. Construyen una comunidad exclusiva alrededor de sus clientes más importantes, con contenido real y acceso genuino al equipo directivo. Eso cambia por completo cómo se percibe la inversión — y cómo la recibe cada cliente invitado.</p>
+      <h3 style="font-size:clamp(20px,2.3vw,30px);">Comunidad exclusiva, acceso genuino</h3>
+      <p style="font-size:clamp(13px,1.2vw,16px);">Los programas de fidelización B2B más efectivos construyen una comunidad exclusiva alrededor de sus clientes más importantes, con contenido real y acceso genuino al equipo directivo. Eso cambia por completo cómo se percibe la inversión — y cómo la recibe cada cliente invitado.</p>
     </div>
-    <div class="pillrow">
-      <div class="pill">Consultoras</div>
-      <div class="pill">Bancos de inversión</div>
-      <div class="pill">Agencias</div>
-      <div class="pill">Compañías tecnológicas</div>
-    </div>
-    <div class="pill-note">Así ya fidelizan a sus clientes más estratégicos las compañías B2B más sofisticadas del mundo.</div>
   </section>
 
   <!-- 2b. OBJETIVOS -->
@@ -432,7 +452,7 @@
       <div class="card">
         <div class="badge">1</div>
         <h3>Vínculo personal</h3>
-        <p>Fortalecer el vínculo personal entre quienes toman las decisiones — el CEO, el CMO, el Director de Marketing de cada cuenta — y el equipo directivo de Ignis.</p>
+        <p>Fortalecer el vínculo personal entre quienes toman las decisiones — el CEO, el CMO, el Director de Marketing — y el equipo directivo de Ignis.</p>
       </div>
       <div class="card">
         <div class="badge">2</div>
@@ -450,33 +470,10 @@
   <!-- 3. FORMATO -->
   <section class="slide">
     <div class="eyebrow"><span class="dot"></span>FORMATO DEL PROGRAMA</div>
-    <h1 class="title">6 clientes + 6 de Ignis — encuentro cercano, no masivo</h1>
-    <p class="subtitle">No más de 6 personas de la agencia. La idea es que cada cliente tenga tiempo de calidad real con el equipo directivo.</p>
-    <div class="grid2">
-      <div class="card vcenter">
-        <div class="badge">C</div>
-        <h3>Clientes — 6</h3>
-        <ul>
-          <li>CMO / Director de Marketing</li>
-          <li>CEO / Country Manager (según cuenta)</li>
-          <li>Mix: 3 por inversión + 2 por potencial de crecimiento + 1 estratégico</li>
-          <li>No debe leerse como premio por facturación</li>
-        </ul>
-      </div>
-      <div class="card vcenter">
-        <div class="badge">I</div>
-        <h3>Ignis — 6</h3>
-        <ul>
-          <li>CEO</li>
-          <li>VP Comercial</li>
-          <li>Director General</li>
-          <li>Director de Estrategia / Director de Cuentas</li>
-          <li>Head de Data o Innovación</li>
-        </ul>
-      </div>
-    </div>
-    <div class="stats-row-wrap">
-      <div class="stats">
+    <h1 class="title">Un encuentro cercano, no masivo</h1>
+    <p class="subtitle">La idea es que cada cliente tenga tiempo de calidad real con el equipo directivo.</p>
+    <div class="stats-row-wrap" style="flex:1;">
+      <div class="stats stats-big">
         <div class="stat"><div class="num">12</div><div class="label">Personas totales</div></div>
         <div class="stat"><div class="num">4</div><div class="label">Días por edición</div></div>
         <div class="stat"><div class="num">1x</div><div class="label">Al año — se vuelve tradición</div></div>
@@ -484,23 +481,23 @@
     </div>
   </section>
 
-  <!-- 4. COMPARACION -->
-  <section class="slide">
-    <div class="eyebrow"><span class="dot"></span>DOS PROPUESTAS</div>
-    <h1 class="title">F1 São Paulo vs. Patagonia Executive Retreat</h1>
-    <p class="subtitle">Dos lógicas distintas y complementarias: una experiencia aspiracional de alto impacto, y una experiencia íntima orientada a la conversación profunda.</p>
-    <div class="comp-table">
-      <div class="comp-row head">
-        <div class="comp-cell">Criterio</div>
-        <div class="comp-cell f1">F1 São Paulo</div>
-        <div class="comp-cell pat">Patagonia</div>
+  <!-- 4. DOS PROPUESTAS TEASER -->
+  <section class="slide split-slide" style="padding:0;">
+    <div class="split-center-label"><span class="dot"></span>DOS PROPUESTAS</div>
+    <div class="split-half" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/Aut%C3%B3dromo%20Jos%C3%A9%20Carlos%20Pace%2C%20July%203%2C%202018%20SkySat%20%28cropped%29.jpg');">
+      <div class="split-overlay">
+        <div class="split-eyebrow">PROPUESTA A</div>
+        <h2>Fórmula 1<br>São Paulo</h2>
+        <div class="split-tag">Exclusividad · Adrenalina</div>
       </div>
-      <div class="comp-row"><div class="comp-cell">Concepto</div><div class="comp-cell f1">Aspiracional</div><div class="comp-cell pat">Íntimo / profundo</div></div>
-      <div class="comp-row"><div class="comp-cell">Impacto emocional</div><div class="comp-cell f1 accent">★★★★★</div><div class="comp-cell pat">★★★★</div></div>
-      <div class="comp-row"><div class="comp-cell">Conversaciones estratégicas</div><div class="comp-cell f1">★★★★</div><div class="comp-cell pat accent">★★★★★</div></div>
-      <div class="comp-row"><div class="comp-cell">Logística desde Buenos Aires</div><div class="comp-cell f1 accent">Fácil — vuelo corto</div><div class="comp-cell pat accent">Muy fácil</div></div>
-      <div class="comp-row"><div class="comp-cell">Riesgo logístico</div><div class="comp-cell f1">Medio</div><div class="comp-cell pat accent">Bajo</div></div>
-      <div class="comp-row"><div class="comp-cell">Presupuesto estimado</div><div class="comp-cell f1">USD 58.000–65.000</div><div class="comp-cell pat">USD 34.000–38.000</div></div>
+    </div>
+    <div class="split-divider"></div>
+    <div class="split-half" style="background-image:url('https://commons.wikimedia.org/wiki/Special:FilePath/Lago%20Nahuel%20Huapi.jpg');">
+      <div class="split-overlay">
+        <div class="split-eyebrow">PROPUESTA B</div>
+        <h2>Patagonia<br>Executive Retreat</h2>
+        <div class="split-tag">Calma · Conexión</div>
+      </div>
     </div>
   </section>
 
@@ -509,17 +506,14 @@
     <div class="eyebrow"><span class="dot"></span>POR QUÉ FÓRMULA 1</div>
     <h1 class="title">No hace falta ser fanático</h1>
     <p class="subtitle">La F1 conversa con directores de marketing como pocos eventos en el mundo — y el nivel de hospitality corporativo no tiene comparación.</p>
-    <div class="cards" style="flex:0 0 26%;">
-      <div class="card" style="align-items:center; text-align:center; justify-content:center;"><h3 style="margin:0;">Tecnología</h3></div>
-      <div class="card" style="align-items:center; text-align:center; justify-content:center;"><h3 style="margin:0;">Innovación</h3></div>
-      <div class="card" style="align-items:center; text-align:center; justify-content:center;"><h3 style="margin:0;">Estrategia</h3></div>
-      <div class="card" style="align-items:center; text-align:center; justify-content:center;"><h3 style="margin:0;">Liderazgo</h3></div>
-      <div class="card" style="align-items:center; text-align:center; justify-content:center;"><h3 style="margin:0;">Management</h3></div>
-    </div>
-    <div class="reco-main" style="flex:1; margin-top:1.8%;">
-      <div class="tag">El efecto aspiracional</div>
-      <h3>"El año que viene quiero estar en ese grupo"</h3>
-      <p>Cuando un cliente queda afuera de la edición de un año, es eso lo que piensa. Un poderoso efecto de pertenencia — sin necesidad de plantearlo nunca como una competencia entre clientes.</p>
+    <div style="flex:1; display:flex; align-items:center;">
+      <div class="cards" style="width:100%;">
+        <div class="card" style="align-items:center; text-align:center; justify-content:center; padding:5% 2%;"><h3 style="margin:0; font-size:clamp(15px,1.6vw,20px);">Tecnología</h3></div>
+        <div class="card" style="align-items:center; text-align:center; justify-content:center; padding:5% 2%;"><h3 style="margin:0; font-size:clamp(15px,1.6vw,20px);">Innovación</h3></div>
+        <div class="card" style="align-items:center; text-align:center; justify-content:center; padding:5% 2%;"><h3 style="margin:0; font-size:clamp(15px,1.6vw,20px);">Estrategia</h3></div>
+        <div class="card" style="align-items:center; text-align:center; justify-content:center; padding:5% 2%;"><h3 style="margin:0; font-size:clamp(15px,1.6vw,20px);">Liderazgo</h3></div>
+        <div class="card" style="align-items:center; text-align:center; justify-content:center; padding:5% 2%;"><h3 style="margin:0; font-size:clamp(15px,1.6vw,20px);">Management</h3></div>
+      </div>
     </div>
   </section>
 
@@ -529,8 +523,8 @@
     <h1 class="title">IGNIS Executive Circle — Fórmula 1 São Paulo</h1>
     <div class="hero">
       <div class="hero-img">
-        <div class="fallback-bg"></div><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Sao%20Paulo%20Brazil%20Skyline%20Aerial%2C%20December%202024.jpg" alt="São Paulo skyline" onerror="this.closest('.hero-img').classList.add('no-img'); this.style.display='none';">
-        <div class="caption">São Paulo, Brasil — sede del Gran Premio de F1</div>
+        <div class="fallback-bg"></div><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Aut%C3%B3dromo%20Jos%C3%A9%20Carlos%20Pace%2C%20July%203%2C%202018%20SkySat%20%28cropped%29.jpg" alt="Circuito de Interlagos, São Paulo" onerror="this.closest('.hero-img').classList.add('no-img'); this.style.display='none';">
+        <div class="caption">Autódromo José Carlos Pace (Interlagos) — sede del Gran Premio de F1</div>
       </div>
       <div class="hero-info">
         <div class="info-block">
@@ -564,7 +558,7 @@
       <div class="day">
         <div class="day-head"><div class="day-num">2</div><div class="day-title">Viernes</div></div>
         <div class="day-line">
-          <div class="ev"><div class="t">MAÑANA</div><div class="d">Mesa redonda: "El futuro del marketing y los medios en LatAm"</div></div>
+          <div class="ev"><div class="t">MAÑANA</div><div class="d">Brunch + informe Ignis: "El futuro del marketing y los medios en LatAm"</div></div>
           <div class="ev"><div class="t">TARDE</div><div class="d">Hospitality F1 — Prácticas</div></div>
           <div class="ev"><div class="t">NOCHE</div><div class="d">Cena</div></div>
         </div>
@@ -586,9 +580,9 @@
       </div>
     </div>
     <div class="reco-main" style="flex:1; margin-top:1.6%;">
-      <div class="tag">La mesa del viernes, en la práctica</div>
-      <h3 style="font-size:clamp(16px,1.7vw,22px);">Un focus group con los mejores clientes de la agencia</h3>
-      <p>Cada cliente comparte qué lo preocupa y hacia dónde ve que va su industria — IA, Retail Media, Data, Medición. Ignis obtiene, en una mañana, el insight que le llevaría meses juntar reunión por reunión.</p>
+      <div class="tag">La mañana del viernes, en la práctica</div>
+      <h3 style="font-size:clamp(16px,1.7vw,22px);">Networking</h3>
+      <p>Ignis presenta un informe propio de tendencias — hacia dónde va la industria, IA, Retail Media, Data, Medición — y abre la conversación entre todos. Nada de exposiciones ni paneles obligatorios: el objetivo es que fluya la charla entre clientes y equipo directivo.</p>
     </div>
   </section>
 
@@ -621,7 +615,7 @@
       <div class="hero-info">
         <div class="info-block">
           <div class="k">Objetivo</div>
-          <div class="v" style="font-size:clamp(12px,1.15vw,15px); font-weight:600; color:var(--muted);">No busca impacto por el evento — busca generar conversación. Los mejores negocios se hacen caminando, pescando o compartiendo una cena.</div>
+          <div class="v" style="font-size:clamp(12px,1.15vw,15px); font-weight:600; color:var(--muted);">No busca impacto por el evento — busca generar conversación real. Los mejores negocios se cierran en momentos de distensión, en un entorno natural y relajado — no en una sala de reuniones.</div>
         </div>
         <div class="info-block">
           <div class="k">Duración</div>
@@ -662,7 +656,7 @@
         </div>
         <div class="day">
           <div class="day-head"><div class="day-num">4</div><div class="day-title">Cierre</div></div>
-          <div class="day-line"><div class="ev"><div class="t">MAÑANA</div><div class="d">Workshop de conclusiones</div></div><div class="ev"><div class="t">TARDE</div><div class="d">Regreso</div></div></div>
+          <div class="day-line"><div class="ev"><div class="t">MAÑANA</div><div class="d">Check out y regreso</div></div></div>
         </div>
       </div>
     </div>
@@ -686,6 +680,26 @@
     <div class="budget-note">≈ 40% más económico que la opción F1 — logística íntegramente doméstica, sin riesgo cambiario ni de disponibilidad internacional.</div>
   </section>
 
+  <!-- 10b. COMPARACION -->
+  <section class="slide">
+    <div class="eyebrow"><span class="dot"></span>DOS PROPUESTAS</div>
+    <h1 class="title">F1 São Paulo vs. Patagonia Executive Retreat</h1>
+    <p class="subtitle">Dos lógicas distintas y complementarias: una experiencia aspiracional de alto impacto, y una experiencia íntima orientada a la conversación profunda.</p>
+    <div class="comp-table">
+      <div class="comp-row head">
+        <div class="comp-cell">Criterio</div>
+        <div class="comp-cell f1">F1 São Paulo</div>
+        <div class="comp-cell pat">Patagonia</div>
+      </div>
+      <div class="comp-row"><div class="comp-cell">Concepto</div><div class="comp-cell f1">Aspiracional</div><div class="comp-cell pat">Íntimo / profundo</div></div>
+      <div class="comp-row"><div class="comp-cell">Impacto emocional</div><div class="comp-cell f1 accent">★★★★★</div><div class="comp-cell pat">★★★★</div></div>
+      <div class="comp-row"><div class="comp-cell">Conversaciones estratégicas</div><div class="comp-cell f1">★★★★</div><div class="comp-cell pat accent">★★★★★</div></div>
+      <div class="comp-row"><div class="comp-cell">Logística desde Buenos Aires</div><div class="comp-cell f1 accent">Fácil — vuelo corto</div><div class="comp-cell pat accent">Muy fácil</div></div>
+      <div class="comp-row"><div class="comp-cell">Riesgo logístico</div><div class="comp-cell f1">Medio</div><div class="comp-cell pat accent">Bajo</div></div>
+      <div class="comp-row"><div class="comp-cell">Presupuesto estimado</div><div class="comp-cell f1">USD 58.000–65.000</div><div class="comp-cell pat">USD 34.000–38.000</div></div>
+    </div>
+  </section>
+
   <!-- 11a. 5 RAZONES -->
   <section class="slide">
     <div class="eyebrow"><span class="dot"></span>LA RECOMENDACIÓN</div>
@@ -706,8 +720,8 @@
     <h1 class="title">Un beneficio adicional, más allá del vínculo</h1>
     <div class="reco-wrap">
       <div class="reco-main">
-        <div class="tag">Para el área Comercial</div>
-        <h3>Un focus group de los principales decisores, cuatro días seguidos</h3>
+        <div class="tag">Para Ignis</div>
+        <h3>Los principales decisores, cuatro días seguidos</h3>
         <p>Concentrar durante cuatro días a los principales decisores de las cuentas más importantes, en un contexto donde las conversaciones estratégicas surgen mucho más naturalmente que en una reunión de una hora. Ese tipo de interacción suele traducirse en mayor confianza, oportunidades de negocio y relaciones de largo plazo.</p>
       </div>
       <div class="reco-side">
@@ -716,8 +730,8 @@
           <div class="v" style="font-size:clamp(12px,1.1vw,15px);">Alternativa de menor presupuesto, para un perfil más conversacional o si se busca ajustar el gasto</div>
         </div>
         <div class="info-block">
-          <div class="k">KPIs de éxito sugeridos</div>
-          <div class="v" style="font-size:clamp(12px,1.1vw,15px);">Retención · Share of wallet · NPS · Nuevos proyectos generados</div>
+          <div class="k">KPIs de experiencia</div>
+          <div class="v" style="font-size:clamp(12px,1.1vw,15px);">Fidelización/Retención · NPS · Nuevos proyectos generados</div>
         </div>
         <div class="info-block">
           <div class="k">Nombre del programa</div>
