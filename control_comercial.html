@@ -1107,8 +1107,8 @@ const MESES_2026 = ['Total', 'Enero','Febrero','Marzo','Abril','Mayo','Junio','J
 // columna RRHH asignada a cada mes de 2026 (se actualiza al agregar nuevas columnas RRHH)
 let MAPA_MES_COSTO = {
   'Enero':'Diciembre', 'Febrero':'Febrero', 'Marzo':'Febrero', 'Abril':'Febrero',
-  'Mayo':'Febrero', 'Junio':'Febrero', 'Julio':'Febrero', 'Agosto':'Febrero',
-  'Septiembre':'Febrero', 'Octubre':'Febrero', 'Noviembre':'Febrero', 'Diciembre':'Febrero',
+  'Mayo':'Febrero', 'Junio':'Febrero', 'Julio':'Julio', 'Agosto':'Julio',
+  'Septiembre':'Julio', 'Octubre':'Julio', 'Noviembre':'Julio', 'Diciembre':'Julio',
 };
 
 let MES_ACTIVO = 'Enero'; // mes de análisis seleccionado actualmente
@@ -2286,6 +2286,8 @@ async function loadData() {
     if (json.presupuesto_cmb)   PRESUP_CMB   = json.presupuesto_cmb;
     if (json.bago_marcas_inv)    BAGO_MARCAS_INV    = json.bago_marcas_inv;
     if (json.bago_marcas_presup) BAGO_MARCAS_PRESUP = json.bago_marcas_presup;
+    if (json.fte_big7_auto)    CLIENTES_FTE  = json.fte_big7_auto;
+    if (json.costos_big7_auto) TABLA_COSTOS  = json.costos_big7_auto;
     initMesesCC();
     initMesesBago();
     aplicarControlComercialReal();
