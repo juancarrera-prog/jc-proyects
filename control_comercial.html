@@ -524,13 +524,6 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
   <!-- ══════════════════════════════════════════ -->
   <div class="page" id="page-rentabilidad">
 
-    <!-- Sub-tabs -->
-    <div class="rent-tabs">
-      <button class="rent-tab active" onclick="switchRentTab('consolidado', this)">📊 Consolidado por Cliente</button>
-      <button class="rent-tab" onclick="switchRentTab('detalle', this)">🔍 Detalle por Cliente</button>
-      <button class="rent-tab" onclick="switchRentTab('costos', this)">💼 Tabla Costo Compañía</button>
-    </div>
-
     <!-- ── SUB-TAB: CONSOLIDADO ── -->
     <div id="rent-consolidado" class="rent-section">
 
@@ -590,64 +583,6 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
         <div style="position:relative;width:100%;height:270px">
           <canvas id="chartRent" role="img" aria-label="Gráfico comparativo ingresos, costo equipo y CM por cliente"></canvas>
         </div>
-      </div>
-    </div>
-
-    <!-- ── SUB-TAB: DETALLE ── -->
-    <div id="rent-detalle" class="rent-section" style="display:none">
-      <div class="cliente-selector" id="clienteSelector"></div>
-
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
-        <span class="filter-label">Mes</span>
-        <div id="mesSelectorDetalle" style="display:flex;gap:6px;flex-wrap:wrap"></div>
-      </div>
-
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
-        <div class="vigencia-banner" style="flex:1;min-width:240px;margin-bottom:0">
-          <span>⚡</span>
-          <span>Costo Cía. aplicado: columna <strong id="vigenciaMes">—</strong></span>
-        </div>
-
-      </div>
-
-      <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px">
-        Editá el FTE de cada puesto directamente en la tabla. Cero o vacío = no asignado a este cliente.
-      </div>
-      <div class="table-card">
-        <table>
-          <thead><tr>
-            <th>Puesto</th>
-            <th class="num">FTE</th>
-            <th class="num">Costo Cía.</th>
-            <th class="num">Costo Mensual</th>
-            <th class="num">% del total</th>
-          </tr></thead>
-          <tbody id="tbodyDetalle"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ── SUB-TAB: TABLA COSTO CIA ── -->
-    <div id="rent-costos" class="rent-section" style="display:none">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
-        <div>
-          <div class="section-title" style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px">Tabla Maestra · Costo Compañía</div>
-          <div style="font-size:11px;color:var(--text-muted);margin-top:3px">Actualizá los valores cuando RRHH te pase el nuevo print · Hacé click en cualquier celda para editar</div>
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn-action" onclick="agregarMes()">+ Nuevo mes RRHH</button>
-          <button class="btn-action primary" onclick="guardarCostos()">✓ Guardar y recalcular</button>
-        </div>
-      </div>
-      <div class="vigencia-banner">
-        <span>⚡</span>
-        <span>Columna activa: <strong id="colVigenteLabel">—</strong> · Es la última con datos cargados y se usa para el cálculo actual</span>
-      </div>
-      <div class="table-card costo-cia-wrap">
-        <table id="tablaCostoCia">
-          <thead id="headCostoCia"></thead>
-          <tbody id="bodyCostoCia"></tbody>
-        </table>
       </div>
     </div>
 
@@ -931,7 +866,7 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
    DATOS & CONFIGURACIÓN
 ═══════════════════════════════════════════════════════════ */
 const API_URL    = 'https://script.google.com/macros/s/AKfycbyJ7ziLiqqBqpld84Rjybve2ZCMIasb2SRUFu2hLAKPHhoazEyLuD3Sq0SRMPffuX22yQ/exec'; // Script Control Comercial
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxPrLGILlUdf0xeARJf9WFWutOsHklB6nS7uvjqu6IbYC6DHEbuZsR5ekapRwqk1JelEQ/exec'; // Script Rentabilidad (GET+POST)
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxJrAusmJ2GWvMt9rrvN1599y8v0law60EUwn0kyur59v4QEUeYfpbyyFQdeF80KETnoQ/exec'; // Script Rentabilidad (GET+POST)
 const WEBHOOK_URL = '';
 
 const OH_EQUIPO = 1.23;   // Overhead Rentabilidad de Equipo (123%)
@@ -1196,6 +1131,14 @@ function fmtM(v) {
   if (n === 0) return '$0,0 M';
   return '$' + n.toLocaleString('es-AR', {minimumFractionDigits:1, maximumFractionDigits:2}) + ' M';
 }
+function fmtCC(v) {
+  // Control Comercial: valor interno en MILES → se muestra en MILLONES, 2 decimales, sin sufijo
+  // (ej: 1.500.450 miles → "$1.500,45")
+  if (v === null || v === undefined || v === '') return '<span style="color:#404040">—</span>';
+  const n = parseFloat(v);
+  if (isNaN(n)) return '<span style="color:#404040">—</span>';
+  return '<span style="color:#ccc">$' + (n/1000).toLocaleString('es-AR', {minimumFractionDigits:2, maximumFractionDigits:2}) + '</span>';
+}
 
 /* ═══════════════════════════════════════════════════════════
    NAVEGACIÓN ENTRE PÁGINAS
@@ -1265,15 +1208,15 @@ function renderKPIsComercial(clientes) {
   // IDs actualizados — Big7 ahora usa donuts con IDs b7*
   const _set = (id, val) => { const e=document.getElementById(id); if(e) e.textContent=val; };
   const _setColor = (id, color) => { const e=document.getElementById(id); if(e) e.style.color=color; };
-  _set('kpiInv',    '$' + tInv.toFixed(1));
-  _set('kpiPresup', '$' + tPresup.toFixed(1));
+  _set('kpiInv',    '$' + (tInv/1000).toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2}));
+  _set('kpiPresup', '$' + (tPresup/1000).toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2}));
   _set('kpiVs',     (avgVs>0?'+':'') + avgVs.toFixed(1) + '%');
   _setColor('kpiVs', avgVs < -10 ? '#ff4455' : avgVs < 0 ? '#f5c400' : '#00c853');
-  _set('kpiDif',    (dif>=0?'+$':'-$') + Math.abs(dif).toFixed(1));
+  _set('kpiDif',    (dif>=0?'+$':'-$') + Math.abs(dif/1000).toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2}));
   _setColor('kpiDif', dif >= 0 ? '#00c853' : '#ff4455');
-  _set('kpiCmb',    '$' + tCmb.toFixed(1));
+  _set('kpiCmb',    '$' + (tCmb/1000).toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2}));
   if (document.getElementById('kpiCmbPresup')) {
-    document.getElementById('kpiCmbPresup').textContent = tCmbPresup > 0 ? '$' + tCmbPresup.toFixed(1) : '—';
+    document.getElementById('kpiCmbPresup').textContent = tCmbPresup > 0 ? '$' + (tCmbPresup/1000).toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—';
     const vsCmb = tCmbPresup > 0 ? ((tCmb - tCmbPresup) / tCmbPresup) * 100 : null;
     const vsCmbEl = document.getElementById('kpiVsCmb');
     if (vsCmbEl) {
@@ -1313,7 +1256,7 @@ function renderKPIsComercial(clientes) {
     badge.style.display = 'inline-flex';
     document.getElementById('alertItems').innerHTML = alertas.map(r => {
       const v = parseFloat(String(r.vs).replace('%','').replace(',','.'));
-      return `<div class="alert-item"><strong>${r.nombre}</strong>: Vs Presup. ${v.toFixed(1)}% · Inv $${parseFloat(r.inv||0).toFixed(1)} vs Presup $${parseFloat(r.presup||0).toFixed(1)}</div>`;
+      return `<div class="alert-item"><strong>${r.nombre}</strong>: Vs Presup. ${v.toFixed(1)}% · Inv $${(parseFloat(r.inv||0)/1000).toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2})} vs Presup $${(parseFloat(r.presup||0)/1000).toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>`;
     }).join('');
   } else { panel.classList.remove('visible'); badge.style.display='none'; }
 }
@@ -1333,28 +1276,28 @@ function renderTablas(data) {
       return `<tr>
         <td><div class="client-name"><div class="client-dot" style="background:${d.color||'#606060'}"></div>${r.nombre}</div></td>
         <td style="color:var(--text-muted);font-size:12px">${d.nombre||'—'}</td>
-        <td class="num">${fmt(r.inv)}</td><td class="num">${fmt(r.presup)}</td>
+        <td class="num">${fmtCC(r.inv)}</td><td class="num">${fmtCC(r.presup)}</td>
         <td>${getVsBadge(r.vs)}</td><td>${getProgressBar(r.consumidoAnual)}</td>
-        <td class="num">${fmt(r.presupAnual)}</td><td class="num">${fmt(r.cmb)}</td>
+        <td class="num">${fmtCC(r.presupAnual)}</td><td class="num">${fmtCC(r.cmb)}</td>
         <td class="num" style="color:#ccc">${r.cmbPct||'—'}</td>
-        <td class="num" style="color:var(--text-muted)">${r.cmbPresup!=null?fmt(r.cmbPresup):'—'}</td>
+        <td class="num" style="color:var(--text-muted)">${r.cmbPresup!=null?fmtCC(r.cmbPresup):'—'}</td>
         <td class="num" style="color:${r.vsCmb!=null?(parseFloat(r.vsCmb)>=0?'#00c853':'#ff4455'):'var(--text-muted)'}">${r.vsCmb!=null?(parseFloat(r.vsCmb)>=0?'+':'')+parseFloat(r.vsCmb).toFixed(1)+'%':'—'}</td>
         <td class="num">${fmtFte(r.fteAnt)}</td><td class="num">${fmtFte(r.fteAct)}</td>
         <td>${fmtVsMes(r.vsMes)}</td><td class="num">${fmtFte(r.fteTotal)}</td>
       </tr>`;
     }).join('');
-    let tI=0,tP=0,tF=0;
-    filt.forEach(r => { tI+=parseFloat(r.inv||0); tP+=parseFloat(r.presup||0); tF+=parseFloat(r.fteAct||0); });
-    html += `<tr class="total-row"><td colspan="2">TOTAL</td><td class="num"><span style="color:#ccc">$${tI.toFixed(1)}</span></td><td class="num"><span style="color:#ccc">$${tP.toFixed(1)}</span></td><td colspan="5"></td><td></td><td class="num"><span style="color:#ccc">${tF.toFixed(2)}</span></td><td colspan="2"></td></tr>`;
+    let tI=0,tP=0,tF=0,tCmbTot=0,tCmbPresupTot=0;
+    filt.forEach(r => { tI+=parseFloat(r.inv||0); tP+=parseFloat(r.presup||0); tF+=parseFloat(r.fteAct||0); tCmbTot+=parseFloat(r.cmb||0); tCmbPresupTot+=parseFloat(r.cmbPresup||0); });
+    html += `<tr class="total-row"><td colspan="2">TOTAL</td><td class="num">${fmtCC(tI)}</td><td class="num">${fmtCC(tP)}</td><td colspan="2"></td><td></td><td class="num">${fmtCC(tCmbTot)}</td><td></td><td class="num">${fmtCC(tCmbPresupTot)}</td><td></td><td></td><td class="num"><span style="color:#ccc">${tF.toFixed(2)}</span></td><td colspan="2"></td></tr>`;
     tbody.innerHTML = html;
   }
 
   const tbB = document.getElementById('tbodyBago');
   tbB.innerHTML = bago.length ? bago.map(r => `<tr>
     <td><div class="client-name"><div class="client-dot" style="background:#e8001c"></div>${r.nombre}</div></td>
-    <td class="num">${fmt(r.inv)}</td><td class="num">${fmt(r.presup)}</td>
+    <td class="num">${fmtCC(r.inv)}</td><td class="num">${fmtCC(r.presup)}</td>
     <td>${getVsBadge(r.vs)}</td><td>${getProgressBar(r.consumidoAnual)}</td>
-    <td class="num">${fmt(r.presupAnual)}</td>
+    <td class="num">${fmtCC(r.presupAnual)}</td>
     <td class="num" style="color:#ccc">${r.soi||'—'}</td>
     <td class="num">${fmtFte(r.fteAnt)}</td><td class="num">${fmtFte(r.fteAct)}</td>
     <td>${fmtVsMes(r.vsMes)}</td><td class="num">${fmtFte(r.fteTotal)}</td>
@@ -1416,7 +1359,7 @@ function getGaugeColor(val, type) {
 
 function renderKPIsGauge(data, prefix) {
   // data: {inv, presup, vs, consumidoAnual, presupAnual, cmb, cmbPct, cmbPresup, vsCmb}
-  const fmt = (v) => v != null ? '$' + parseFloat(v).toLocaleString('es-AR',{minimumFractionDigits:1,maximumFractionDigits:1}) : '—';
+  const fmt = (v) => v != null ? '$' + (parseFloat(v)/1000).toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—';
   const fmtPct = (v) => v != null ? (parseFloat(v)>=0?'+':'')+parseFloat(v).toFixed(1)+'%' : '—';
 
   // Cards
@@ -2153,7 +2096,7 @@ function _sumarPeriodoMarca(producto) {
   const vs = presup !== 0 ? ((inv - presup) / presup) * 100 : null;
   const consumidoAnual = presupAnual !== 0 ? (inv / presupAnual) * 100 : 0;
 
-  return { inv, presup, vs, consumidoAnual, presupAnual, soi: fmt(inv) };
+  return { inv, presup, vs, consumidoAnual, presupAnual, soi: fmtCC(inv) };
 }
 
 function aplicarBagoMarcasReal() {
@@ -2701,11 +2644,11 @@ function getCostoConOH(costoBase, esPerf) {
 }
 
 function calcCostoEquipoCliente(cliente, mes) {
-  // TABLA_COSTOS en pesos enteros → dividir por 1.000.000 → millones (igual que CMB del Sheet)
+  // TABLA_COSTOS en pesos enteros → dividir por 1.000 → miles (misma escala que cmb/inv, que vienen de CONTROL_RAW en miles)
   const puestos = (CLIENTES_FTE[cliente] && CLIENTES_FTE[cliente][mes]) || {};
   let total = 0;
   for (const [p, fte] of Object.entries(puestos)) total += getCostoPuesto(p, mes) * fte;
-  return total / 1000000;
+  return total / 1000;
 }
 let MESES_RENT_SELECCIONADOS = []; // independiente de MESES_CC_SELECCIONADOS — se inicializa en initMesesRent()
 
@@ -2811,9 +2754,9 @@ function renderKPIsRent(rows) {
   const tCM  = tCmb - tCosto;
   const tPct = tInv>0 ? (tCM/tInv)*100 : 0;
   document.getElementById('kpisRent').innerHTML = `
-    <div class="kpi"><div class="kpi-label">CMB Total</div><div class="kpi-value" style="font-size:26px">${fmtM(tCmb)}</div><div class="kpi-sub">CMB del período (desde Control Comercial)</div><div class="kpi-accent" style="background:#4488ff"></div></div>
-    <div class="kpi"><div class="kpi-label">Costo Equipo Total</div><div class="kpi-value" style="font-size:26px">${fmtM(tCosto)}</div><div class="kpi-sub">FTE x Costo Compania${ohActivoEquipo?' (con OH)':''}</div><div class="kpi-accent" style="background:var(--yellow)"></div></div>
-    <div class="kpi"><div class="kpi-label">CMO Total</div><div class="kpi-value" style="font-size:26px;color:${tCM>=0?'#00c853':'#ff4455'}">${fmtM(tCM)}</div><div class="kpi-sub">CMB − Costo Equipo</div><div class="kpi-accent" style="background:var(--green)"></div></div>
+    <div class="kpi"><div class="kpi-label">CMB Total</div><div class="kpi-value" style="font-size:26px">${fmtM(tCmb/1000)}</div><div class="kpi-sub">CMB del período (desde Control Comercial)</div><div class="kpi-accent" style="background:#4488ff"></div></div>
+    <div class="kpi"><div class="kpi-label">Costo Equipo Total</div><div class="kpi-value" style="font-size:26px">${fmtM(tCosto/1000)}</div><div class="kpi-sub">FTE x Costo Compania${ohActivoEquipo?' (con OH)':''}</div><div class="kpi-accent" style="background:var(--yellow)"></div></div>
+    <div class="kpi"><div class="kpi-label">CMO Total</div><div class="kpi-value" style="font-size:26px;color:${tCM>=0?'#00c853':'#ff4455'}">${fmtM(tCM/1000)}</div><div class="kpi-sub">CMB − Costo Equipo</div><div class="kpi-accent" style="background:var(--green)"></div></div>
     <div class="kpi"><div class="kpi-label">CMO % Promedio</div><div class="kpi-value" style="font-size:26px;color:${tPct>=20?'#00c853':tPct>=5?'#f5c400':'#ff4455'}">${tPct.toFixed(1)}%</div><div class="kpi-sub">CMO $ / Inv. Período</div><div class="kpi-accent" style="background:var(--purple)"></div></div>`;
 }
 function renderConsolidado(rows) {
@@ -2828,9 +2771,9 @@ function renderConsolidado(rows) {
     const barColor=cmoPctDisplay>=25?'#00c853':cmoPctDisplay>0?'#f5c400':'#ff4455';
     return `<tr>
       <td><div class="client-name"><div class="client-dot" style="background:${d.color||'#606060'}"></div>${r.nombre}</div></td>
-      <td class="num" style="color:#aaa">${fmtM(r.cmb)}</td>
-      <td class="num" style="color:var(--yellow)">${fmtM(costoDisplay)}</td>
-      <td class="num"><div class="cm-bar-wrap"><div class="cm-bar-bg"><div class="cm-bar-fill" style="width:${pct.toFixed(0)}%;background:${barColor}"></div></div><span style="min-width:65px;text-align:right;color:${cmoDisplay>=0?'#f0f0f0':'#ff4455'}">${fmtM(cmoDisplay)}</span></div></td>
+      <td class="num" style="color:#aaa">${fmtM(r.cmb/1000)}</td>
+      <td class="num" style="color:var(--yellow)">${fmtM(costoDisplay/1000)}</td>
+      <td class="num"><div class="cm-bar-wrap"><div class="cm-bar-bg"><div class="cm-bar-fill" style="width:${pct.toFixed(0)}%;background:${barColor}"></div></div><span style="min-width:65px;text-align:right;color:${cmoDisplay>=0?'#f0f0f0':'#ff4455'}">${fmtM(cmoDisplay/1000)}</span></div></td>
       <td class="num" style="color:${cmoPctDisplay>35?'#00c853':cmoPctDisplay>=30?'#f5c400':'#ff4455'};font-weight:600">${cmoPctDisplay.toFixed(1)}%</td>
       <td>${ohActivoEquipo ? getSemaforoOH(cmoPctDisplay) : ''}</td></tr>`;
   }).join('');
@@ -2839,7 +2782,7 @@ function renderConsolidado(rows) {
   const tM=tCmb-tC;
   const tInv=rows.reduce((a,r)=>a+(r.inv||0),0);
   const tP=tInv>0?(tM/tInv)*100:0;
-  html+=`<tr class="total-row"><td>TOTAL</td><td class="num" style="color:#aaa">${fmtM(tCmb)}</td><td class="num" style="color:var(--yellow)">${fmtM(tC)}</td><td class="num" style="color:${tM>=0?'#f0f0f0':'#ff4455'}">${fmtM(tM)}</td><td class="num" style="color:${tP>35?'#00c853':tP>=30?'#f5c400':'#ff4455'}">${tP.toFixed(1)}%</td><td></td></tr>`;
+  html+=`<tr class="total-row"><td>TOTAL</td><td class="num" style="color:#aaa">${fmtM(tCmb/1000)}</td><td class="num" style="color:var(--yellow)">${fmtM(tC/1000)}</td><td class="num" style="color:${tM>=0?'#f0f0f0':'#ff4455'}">${fmtM(tM/1000)}</td><td class="num" style="color:${tP>35?'#00c853':tP>=30?'#f5c400':'#ff4455'}">${tP.toFixed(1)}%</td><td></td></tr>`;
   document.getElementById('tbodyConsolidado').innerHTML = html;
 }
 function renderRanking(rows) {
@@ -2853,7 +2796,7 @@ function renderRanking(rows) {
   });
   const byCM  = [...rowsD].sort((a,b)=>b.cmD-a.cmD);
   const byPct = [...rowsD].sort((a,b)=>b.pctD-a.pctD);
-  document.getElementById('rankingCM').innerHTML = byCM.map((r,i)=>{const d=DIRECTORES[r.nombre]||{};return`<div class="rank-item"><div class="rank-num">${medals[i]||(i+1)}</div><div class="rank-name"><div class="client-dot" style="background:${d.color||'#606060'};display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;vertical-align:middle"></div>${r.nombre}</div><div class="rank-val" style="color:${r.cmD>=0?'#00c853':'#ff4455'}">${fmtM(r.cmD)}</div></div>`;}).join('');
+  document.getElementById('rankingCM').innerHTML = byCM.map((r,i)=>{const d=DIRECTORES[r.nombre]||{};return`<div class="rank-item"><div class="rank-num">${medals[i]||(i+1)}</div><div class="rank-name"><div class="client-dot" style="background:${d.color||'#606060'};display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;vertical-align:middle"></div>${r.nombre}</div><div class="rank-val" style="color:${r.cmD>=0?'#00c853':'#ff4455'}">${fmtM(r.cmD/1000)}</div></div>`;}).join('');
   document.getElementById('rankingPct').innerHTML = byPct.map((r,i)=>`<div class="rank-item"><div class="rank-num">${medals[i]||(i+1)}</div><div class="rank-name">${r.nombre}</div><div class="rank-val" style="color:${r.pctD>35?'#00c853':r.pctD>=30?'#f5c400':'#ff4455'}">${r.pctD.toFixed(1)}%</div></div>`).join('');
 }
 function renderChart(rows) {
@@ -2863,9 +2806,9 @@ function renderChart(rows) {
   chartRentInstance = new Chart(document.getElementById('chartRent'), {
     type:'bar',
     data:{ labels, datasets:[
-      {label:'CMB',         data:rows.map(r=>parseFloat(r.cmb.toFixed(2))), backgroundColor:'rgba(68,136,255,0.7)',borderColor:'#4488ff',borderWidth:1,borderRadius:4},
-      {label:'Costo Equipo', data:rows.map(r=>parseFloat((ohActivoEquipo?r.costoEq*(1+OH_EQUIPO):r.costoEq).toFixed(2))), backgroundColor:'rgba(245,196,0,0.65)',borderColor:'#f5c400',borderWidth:1,borderRadius:4},
-      {label:'CMO $',        data:rows.map(r=>parseFloat((r.cmb-(ohActivoEquipo?r.costoEq*(1+OH_EQUIPO):r.costoEq)).toFixed(2))), backgroundColor:'rgba(0,200,83,0.65)',borderColor:'#00c853',borderWidth:1,borderRadius:4},
+      {label:'CMB',         data:rows.map(r=>parseFloat((r.cmb/1000).toFixed(2))), backgroundColor:'rgba(68,136,255,0.7)',borderColor:'#4488ff',borderWidth:1,borderRadius:4},
+      {label:'Costo Equipo', data:rows.map(r=>parseFloat(((ohActivoEquipo?r.costoEq*(1+OH_EQUIPO):r.costoEq)/1000).toFixed(2))), backgroundColor:'rgba(245,196,0,0.65)',borderColor:'#f5c400',borderWidth:1,borderRadius:4},
+      {label:'CMO $',        data:rows.map(r=>parseFloat(((r.cmb-(ohActivoEquipo?r.costoEq*(1+OH_EQUIPO):r.costoEq))/1000).toFixed(2))), backgroundColor:'rgba(0,200,83,0.65)',borderColor:'#00c853',borderWidth:1,borderRadius:4},
     ]},
     options:{ responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
       scales:{x:{ticks:{color:'#606060',font:{family:'Poppins',size:11}},grid:{color:'rgba(255,255,255,0.03)'}},
