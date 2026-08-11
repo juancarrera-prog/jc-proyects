@@ -264,11 +264,6 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
       <div id="mesesCCSelector" style="display:flex;gap:6px;flex-wrap:wrap"></div>
     </div>
 
-    <div class="alert-panel" id="alertPanel">
-      <div class="alert-panel-title">⚠️ Clientes con desvío mayor al -10%</div>
-      <div class="alert-items" id="alertItems"></div>
-    </div>
-
     <!-- TOTAL AGENCIA — va primero -->
     <div class="section-header">
       <div><div class="section-title">Total Agencia</div><div class="section-sub">Consolidado de todos los clientes · datos cargados en Sheet</div></div>
@@ -476,6 +471,11 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
         </tr></thead>
         <tbody id="tbodyClientes"><tr class="loading-row"><td colspan="15">Cargando datos...</td></tr></tbody>
       </table>
+    </div>
+
+    <div class="alert-panel" id="alertPanel">
+      <div class="alert-panel-title">⚠️ Clientes con desvío mayor al -10%</div>
+      <div class="alert-items" id="alertItems"></div>
     </div>
 
     <div class="section-header" id="bagoSection">
