@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scope of Work — Laboratorio Bagó · Ignis Media Agency</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    color: #1A1A1A;
+    background: #F5F5F2;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .page-wrap {
+    max-width: 1100px;
+    margin: 32px auto;
+    padding: 0 24px 80px;
+  }
+
+  /* ── DOC HEADER ── */
+  .doc-header {
+    background: #0C0C0C;
+    color: #F0EEE8;
+    padding: 28px 36px;
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 0;
+  }
+  .doc-title-block {}
+  .doc-eyebrow { font-size: 9px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #E5453D; margin-bottom: 6px; }
+  .doc-title { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 4px; }
+  .doc-sub { font-size: 11px; color: #888480; }
+  .doc-meta-block { text-align: right; }
+  .doc-meta-row { font-size: 10px; color: #888480; margin-bottom: 3px; }
+  .doc-meta-row span { color: #F0EEE8; font-weight: 500; }
+
+  /* ── BRAND LEGEND ── */
+  .brand-legend {
+    background: #161616;
+    padding: 14px 36px;
+    border-radius: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 0;
+  }
+  .legend-label { font-size: 9px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #888480; margin-right: 8px; }
+  .brand-pill {
+    font-size: 9px; font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 3px;
+    letter-spacing: 0.04em;
+  }
+  .tier-a { background: rgba(200,33,29,0.2); color: #E07070; border: 0.5px solid rgba(200,33,29,0.4); }
+  .tier-b { background: rgba(255,255,255,0.07); color: #B0AEA8; border: 0.5px solid rgba(255,255,255,0.12); }
+
+  /* ── HINT BAR ── */
+  .hint-bar {
+    background: #FAFAF8;
+    border-bottom: 1px solid #E8E6E4;
+    padding: 10px 36px;
+    font-size: 10px;
+    color: #9A9896;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .hint-bar svg { flex-shrink: 0; }
+
+  /* ── SOW WRAP ── */
+  .sow-wrap {
+    border: 1px solid #D0CECC;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    overflow: hidden;
+    background: white;
+  }
+
+  table { width: 100%; border-collapse: collapse; }
+
+  /* ── FAMILY (LEVEL 1) ── */
+  .family { border-bottom: 1px solid #E8E6E4; }
+  .family:last-child { border-bottom: none; }
+
+  .family-header {
+    all: unset;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    background: #0C0C0C;
+    padding: 13px 20px;
+    cursor: pointer;
+    transition: background 0.25s ease;
+  }
+  .family-header:hover { background: #181818; }
+  .family-header:focus-visible { outline: 2px solid #E5453D; outline-offset: -2px; }
+
+  .fam-badge {
+    display: inline-flex; align-items:center; justify-content:center;
+    width: 22px; height: 22px;
+    border-radius: 4px;
+    font-size: 11px; font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  }
+  .fam-a .fam-badge { background: #4E9EE8; }
+  .fam-b .fam-badge { background: #9B80E0; }
+  .fam-c .fam-badge { background: #E08050; }
+  .fam-d .fam-badge { background: #50C0A0; }
+
+  .fam-title {
+    color: #E5453D;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .fam-count {
+    color: #B0322C;
+    font-size: 9px; font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-left: -2px;
+  }
+  .fam-chevron {
+    margin-left: auto;
+    color: #E5453D;
+    font-size: 11px;
+    transition: transform 0.35s cubic-bezier(.65,0,.35,1);
+    display: inline-block;
+  }
+  .family-header[aria-expanded="true"] .fam-chevron { transform: rotate(180deg); }
+
+  /* smooth grid-rows collapse for family body */
+  .family-body {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.45s cubic-bezier(.65,0,.35,1);
+    background: #FCFCFB;
+  }
+  .family-header[aria-expanded="true"] + .family-body { grid-template-rows: 1fr; }
+  .family-body-inner { overflow: hidden; min-height: 0; padding: 10px 14px; display: flex; flex-direction: column; gap: 8px; }
+
+  /* ── SUBCATEGORY (LEVEL 2) ── */
+  .subcat {
+    background: white;
+    border: 1px solid #E8E6E4;
+    border-radius: 6px;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+    transition-delay: calc(var(--i) * 60ms);
+  }
+  .family-header[aria-expanded="true"] + .family-body .subcat {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .subcat-header {
+    all: unset;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    width: 100%;
+    padding: 9px 14px;
+    cursor: pointer;
+    background: white;
+    transition: background 0.2s ease;
+  }
+  .subcat-header:hover { background: #FAFAF8; }
+  .subcat-header:focus-visible { outline: 2px solid #C8211D; outline-offset: -2px; }
+
+  .subcat-chevron {
+    color: #B0AEAD;
+    font-size: 9px;
+    transition: transform 0.3s cubic-bezier(.65,0,.35,1);
+    display: inline-block;
+    width: 10px;
+  }
+  .subcat-header[aria-expanded="true"] .subcat-chevron { transform: rotate(90deg); color: #C8211D; }
+
+  .subcat-title {
+    font-size: 11px; font-weight: 600; color: #1A1A1A;
+    letter-spacing: 0.01em;
+  }
+  .subcat-count {
+    font-size: 9px; font-weight: 700; color: #888480;
+    background: #F0EFED;
+    border-radius: 20px;
+    padding: 1px 7px;
+    margin-left: 2px;
+  }
+
+  .subcat-body {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.4s cubic-bezier(.65,0,.35,1);
+    border-top: 0px solid #E8E6E4;
+  }
+  .subcat-header[aria-expanded="true"] + .subcat-body { grid-template-rows: 1fr; border-top-width: 1px; }
+  .subcat-body-inner { overflow: hidden; min-height: 0; }
+
+  /* ── COLUMN HEADER (black/red, per brief) ── */
+  .col-header td {
+    background: #0C0C0C;
+    color: #E5453D;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 7px 14px;
+    border-bottom: 1px solid #2A2A2A;
+  }
+
+  /* ── DATA ROWS (white, per brief) ── */
+  .entregable-row td {
+    background: white;
+    padding: 10px 14px;
+    border-bottom: 0.5px solid #ECEAE8;
+    vertical-align: top;
+    border-right: 1px solid #ECEAE8;
+    line-height: 1.5;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  .entregable-row td:last-child { border-right: none; }
+  .entregable-row:last-child td { border-bottom: none; }
+  .entregable-row:hover td { background: #FAFAF8; }
+  .subcat-header[aria-expanded="true"] + .subcat-body .entregable-row td {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .del-name { font-weight: 600; font-size: 11px; color: #1A1A1A; margin-bottom: 2px; }
+  .del-sub { font-size: 10px; color: #888480; line-height: 1.4; }
+
+  .timing-cell { color: #555250; font-size: 10px; }
+  .timing-main { font-weight: 600; color: #1A1A1A; }
+
+  .brand-tag {
+    display: inline-block;
+    font-size: 9px; font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 2px;
+    margin: 1px 2px 1px 0;
+    letter-spacing: 0.03em;
+  }
+  .bt-a { background: rgba(200,33,29,0.08); color: #9B1A17; border: 0.5px solid rgba(200,33,29,0.2); }
+  .bt-b { background: #F0EFED; color: #666460; border: 0.5px solid #DDDBD9; }
+  .bt-all { background: #EEF5FD; color: #2B6CB0; border: 0.5px solid #B3D0F0; }
+  .bt-agency { background: #F0F9F4; color: #276749; border: 0.5px solid #B3DFCA; }
+
+  .notes-cell { font-size: 10px; color: #666460; line-height: 1.6; }
+  .notes-cell strong { color: #333; font-weight: 600; }
+
+  /* Propuestas a futuro */
+  .future-wrap {
+    margin-top: 16px;
+    border: 1px dashed #C9A227;
+    border-radius: 8px;
+    background: #FFFBEF;
+    padding: 16px 20px;
+  }
+  .future-header {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    color: #8A6D00; margin-bottom: 10px;
+  }
+  .future-item { margin-bottom: 10px; }
+  .future-item:last-child { margin-bottom: 0; }
+  .future-name { font-size: 11px; font-weight: 600; color: #4A3B00; margin-bottom: 2px; }
+  .future-desc { font-size: 10px; color: #6B5A1E; line-height: 1.6; }
+
+  /* Footer */
+  .doc-footer {
+    margin-top: 28px;
+    display: flex; justify-content: space-between; align-items: flex-start;
+    padding: 0 4px;
+    flex-wrap: wrap; gap: 16px;
+  }
+  .footer-note { font-size: 9px; color: #9A9896; max-width: 480px; line-height: 1.6; }
+  .footer-note strong { color: #666; }
+  .footer-version { font-size: 9px; color: #B0AEAD; text-align: right; }
+
+  @media print {
+    body { background: white; font-size: 10px; }
+    .page-wrap { margin: 0; padding: 0 16px; }
+    .family-body, .subcat-body { grid-template-rows: 1fr !important; }
+    .subcat { opacity: 1 !important; transform: none !important; }
+    .entregable-row td { opacity: 1 !important; transform: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <!-- HEADER -->
+  <div class="doc-header">
+    <div class="doc-title-block">
+      <div class="doc-eyebrow">Scope of Work · Branding</div>
+      <div class="doc-title">Laboratorio Bagó</div>
+      <div class="doc-sub">Ignis Media Agency · Servicio full-service de Branding</div>
+    </div>
+    <div class="doc-meta-block">
+      <div class="doc-meta-row">Fecha <span>Agosto 2026 (v7)</span></div>
+      <div class="doc-meta-row">Account Director <span>Mercedes Silva</span></div>
+      <div class="doc-meta-row">Commercial Manager <span>Juan Carrera</span></div>
+    </div>
+  </div>
+
+  <!-- BRAND LEGEND -->
+  <div class="brand-legend">
+    <span class="legend-label">Líneas activas</span>
+    <span class="brand-pill tier-a">Capilares</span>
+    <span class="brand-pill tier-a">Faciales</span>
+    <span class="brand-pill tier-a">Corporales</span>
+    <span class="brand-pill tier-a">Dioxaflex</span>
+    <span class="brand-pill tier-a">Bagó+</span>
+    <span class="brand-pill tier-b">Anaflex</span>
+    <span class="brand-pill tier-b">Solares</span>
+    <span class="brand-pill tier-b">Esoprazol</span>
+    <span class="brand-pill tier-b">Institucional</span>
+  </div>
+
+  <!-- HINT -->
+  <div class="hint-bar">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+    Clickeá una familia (A–D) para ver sus subcategorías, y una subcategoría para ver sus entregables.
+  </div>
+
+  <!-- SOW ACCORDION -->
+  <div class="sow-wrap">
+
+    <div class="family fam-a">
+      <button class="family-header" data-target="fam-a" aria-expanded="false">
+        <span class="fam-badge">A</span>
+        <span class="fam-title">Estrategia y Planeamiento</span>
+        <span class="fam-count">9 entregables</span>
+        <span class="fam-chevron">&#9662;</span>
+      </button>
+      <div class="family-body" id="fam-a">
+        <div class="family-body-inner">
+
+        <div class="subcat" style="--i:0">
+          <button class="subcat-header" data-target="a-sc0" aria-expanded="false">
+            <span class="subcat-chevron">&#9656;</span>
+            <span class="subcat-title">Estrategia Anual</span>
+            <span class="subcat-count">3</span>
+          </button>
+          <div class="subcat-body" id="a-sc0">
+            <div class="subcat-body-inner">
+              <table>
+                <thead>
+                  <tr class="col-header">
+                    <td>Entregable</td>
+                    <td style="width:130px">Frecuencia / Timing</td>
+                    <td style="width:230px">Marcas</td>
+                    <td>Descripción / Notas</td>
+                  </tr>
+                </thead>
+                <tbody>
+            <tr class="entregable-row">
+              <td><div class="del-name">Relevamiento de necesidades</div><div class="del-sub">A1 · Kick-off estratégico de inicio de año</div></td>
+              <td class="timing-cell"><span class="timing-main">Anual</span><br>Enero / Febrero</td>
+              <td class="brands-cell"><span class="brand-tag bt-all">Todas las marcas</span></td>
+              <td class="notes-cell">Reunión de apertura de año con todo el equipo de Bagó. Incluye objetivos de marca, cambios en portfolio, prioridades de inversión por línea.</td>
+            </tr>
+            <tr class="entregable-row">
+              <td><div class="del-name">Brief anual de marca</div><div class="del-sub">A2 · Documento base de posicionamiento y objectives</div></td>
+              <td class="timing-cell"><span class="timing-main">Anual</span><br>Enero / Febrero</td>
+              <td class="brands-cell"><span class="brand-tag bt-a">Capilares</span><span class="brand-tag bt-a">Faciales</span><span class="brand-tag bt-a">Corporales</span><span class="brand-tag bt-a">Dioxaflex</span><span class="brand-tag bt-a">Bagó+</span><span class="brand-tag bt-b">Anaflex</span><span class="brand-tag bt-b">Solares</span><span class="brand-tag bt-b">Esoprazol</span></td>
+              <td class="notes-cell">Brief anual por línea de marca. Incluye objetivos, posicionamiento, target, presupuesto estimado, y KPIs de referencia para el año. Base para toda planificación de campaña posterior.</td>
+            </tr>
+            <tr class="entregable-row">
+              <td><div class="del-name">Briefing anual multi-línea</div><div class="del-sub">A9 · Sesión de 4hs en sala de Bagó · 1h por línea</div></td>
+              <td class="timing-cell"><span class="timing-main">Anual</span><br>Octubre</td>
+              <td class="brands-cell"><span class="brand-tag bt-a">Dermo</span><span class="brand-tag bt-a">Dolor</span><span class="brand-tag bt-a">Suple</span><span class="brand-tag bt-a">Gastro</span></td>
+              <td class="notes-cell">Sesión presencial convocada por la Gerencia de Marketing de Bagó. 1h por división terapéutica. Participan equipo completo Ignis + Bagó. Base para planning 2026.</td>
+            </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="subcat" style="--i:1">
+          <button class="subcat-header" data-target="a-sc1" aria-expanded="false">
+            <span class="subcat-chevron">&#9656;</span>
+            <span class="subcat-title">Estrategia de Campaña</span>
+            <span class="subcat-count">3</span>
+          </button>
+          <div class="subcat-body" id="a-sc1">
+            <div class="subcat-body-inner">
+              <table>
+                <thead>
+                  <tr class="col-header">
+                    <td>Entregable</td>
+                    <td style="width:130px">Frecuencia / Timing</td>
+                    <td style="width:230px">Marcas</td>
+                    <td>Descripción / Notas</td>
+                  </tr>
+                </thead>
+                <tbody>
+            <tr class="entregable-row">
+              <td><div class="del-name">Brief por campaña</div><div class="del-sub">A3 · Documento disparador de cada campaña</div></td>
+              <td class="timing-cell"><span class="timing-main">Por campaña</span><br>1–2 meses antes del lanzamiento</td>
+              <td class="brands-cell"><span class="brand-tag bt-a">Capilares</span><span class="brand-tag bt-a">Faciales</span><span class="brand-tag bt-a">Corporales</span><span class="brand-tag bt-a">Dioxaflex</span><span class="brand-tag bt-a">Bagó+</span><span class="brand-tag bt-b">Anaflex</span><span class="brand-tag bt-b">Solares</span></td>
+              <td class="notes-cell">Documento recibido de Bagó o elaborado en conjunto. Define objetivo de campaña, target, budget, timeline, y creatividad. Disparador formal del proceso de planificación táctica.</td>
+            </tr>
+            <tr class="entregable-row">
+              <td><div class="del-name">Direccionamiento estratégico</div><div class="del-sub">A4 · Propuesta de approach estratégico por campaña</div></td>
+              <td class="timing-cell"><span class="timing-main">Por campaña</span><br>Previo a planificación táctica</td>
+              <td class="brands-cell"><span class="brand-tag bt-a">Capilares</span><span class="brand-tag bt-a">Faciales</span><span class="brand-tag bt-a">Corporales</span><span class="brand-tag bt-a">Dioxaflex</span><span class="brand-tag bt-a">Bagó+</span><span class="brand-tag bt-b">Anaflex</span></td>
+              <td class="notes-cell">Propuesta de estrategia de medios alineada al brief. Incluye recomendación de mix, flighting, audiencias clave y benchmarks de referencia. Presentado y aprobado antes del plan.</td>
+            </tr>
+            <tr class="entregable-row">
+              <td><div class="del-name">Planificación estratégica + táctica</div><div class="del-sub">A5 + A6 · Del direccionamiento al plan por sistema</div></td>
+              <td class="timing-cell"><span class="timing-main">Por campaña</span><br>1 mes antes de lanzamiento</td>
+              <td class="brands-cell"><span class="brand-tag bt-a">Capilares</span><span class="brand-tag bt-a">Faciales</span><span class="brand-tag bt-a">Corporales</span><span class="brand-tag bt-a">Dioxaflex</span><span class="brand-tag bt-a">Bagó+</span><span class="brand-tag bt-b">Anaflex</span><span class="brand-tag bt-b">Solares</span></td>
+              <td class="notes-cell">Incluye: overview de principios de medios, TRPs (Target Rating Points, el objetivo de rating semanal) por semana, evaluación de vehículos, % de presupuesto por etapa del funnel, % de impresiones calificadas, estrategia de audiencia, recomendación de formatos de vía pública (OOH) y Digital.</td>
+            </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="subcat" style="--i:2">
+          <button class="subcat-header" data-target="a-sc2" aria-expanded="false">
+            <span class="subcat-chevron">&#9656;</span>
+            <span class="subcat-title">Plan y Ejecución</span>
+            <span class="subcat-count">2</span>
+          </button>
+          <div class="subcat-body" id="a-sc2">
+            <div class="subcat-body-inner">
+              <table>
+                <thead>
+                  <tr class="col-header">
+                    <td>Entregable</td>
+                    <td style="width:130px">Frecuencia / Timing</td>
+                    <td style="width:230px">Marcas</td>
+                    <td>Descripción / Notas</td>
+                  </tr>
+                </thead>
+                <tbody>
+            <tr class="entregable-row">
+              <td><div class="del-name">Plan final + Negociación de medios</div><div class="del-sub">A7 · Cierre del plan y órdenes de compra</div></td>
+              <td class="timing-cell"><span class="timing-main">Por campaña</span><br>Previo a go-live</td>
+              <td class="brands-cell"><span class="brand-tag bt-a">Capilares</span><span class="brand-tag bt-a">Faciales</span><span class="brand-tag bt-a">Corporales</span><span class="brand-tag bt-a">Dioxaflex</span><span class="brand-tag bt-a">Bagó+</span><span class="brand-tag bt-b">Anaflex</span><span class="brand-tag bt-b">Solares</span></td>
+              <td class="notes-cell">Plan final aprobado por cliente. Incluye selección definitiva de medios/programas/formatos, inversión por funnel, distribución por audiencia, Battle Plan, simulación universo/cobertura/frecuencia/contactos/impresiones.</td>
+            </tr>
+            <tr class="entregable-row">
+              <td><div class="del-name">Propuesta comercial anual / Negociación de fee</div><div class="del-sub">A8 · Ciclo anual de renovación de contrato</div></td>
+              <td class="timing-cell"><span class="timing-main">Anual</span><br>Enero – Abril</td>
+              <td class="brands-cell"><span class="brand-tag bt-agency">Agencia</span></td>
+              <td class="notes-cell">Proceso anual de presentación y negociación del fee de agencia. Incluye reunión de apertura con el área de Compras, rondas de revisión y ajuste, presentación formal de propuesta, y cierre. Interlocutores: Julieta Raffo, Pablo Sangiorgi. Validado con Mercedes Silva (jul 2026): el ciclo arranca el 4 de diciembre, con la presentación de todos los planes estratégicos iniciales por marca a Compras, y las negociaciones cierran en marzo del año siguiente.</td>
+            </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="family fam-b">
+      <button class="family-header" data-target="fam-b" aria-expanded="false">
+        <span class="fam-badge">B</span>
+        <span class="fam-title">Investigación e Inteligencia</span>
+        <span class="fam-count">8 entregables</span>
+        <span class="fam-chevron">&#9662;</span>
+      </button>
+      <div class="family-body" id="fam-b">
+        <div class="family-body-inner">
+
+        <div class="subcat" style="--i:0">
+          <button class="subcat-header" data-target="b-sc0" aria-expanded="false">
+            <span class="subcat-chevron">&#9656;</span>
+            <span class="subcat-title">Inteligencia Continua</span>
+            <span class="subcat-count">3</span>
+          </button>
+          <div class="subcat-body" id="b-sc0">
+            <div class="subcat-body-inner">
+              <table>
+                <thead>
+                  <tr class="col-header">
+                    <td>Entregable</td>
+                    <td style="width:130px">Frecuencia / Timing</td>
+                    <td style="width:230px">Marcas</td>
+                    <td>Descripción / Notas</td>
+                  </tr>
+                </thead>
+                <tbody>
+            <tr class="entregable-row">
+              <td><div class="del-name">Competitive report semanal</div><div class="del-sub">B3 · Monitoreo competitivo de inversión y presencia</div></td>
+              <td class="timing-cell"><span class="timing-main">Semanal</span></td>
+              <td class="brands-cell"><span class="brand-tag bt-all">Todas las marcas</span></td>
+              <td class="notes-cell">Monitoreo semanal de la actividad competitiva por categoría. Incluye seguimiento de inversión, presencia en medios y novedades del mercado. Alimenta el competitive report mensual y el brand plan. Validado con Mercedes Silva (jul 2026): en evaluación llevarlo a cadencia quincenal para ganar profundidad, sin resolución aún.</td>
+            </tr>
+            <tr class="entregable-row">
+              <td><div class="del-name">Competitive report mensual</div><div class="del-sub">B4 · Análisis consolidado mensual</div></td>
+              <td class="timing-cell"><span class="timing-main">Mensual</span></td>
+              <td class="brands-cell"><span class="brand-tag bt-all">Todas las marcas</span></td>
+              <td class="notes-cell">Consolidación mensual del monitoreo competitivo. Incluye share of investment, share of voice, evolución de formatos, y alertas de categoría.</td>
+            </tr>
+            <tr class="entregable-row">
+              <td><div class="del-name">Competitive / tendencias ad hoc</div><div class="del-sub">B5 · Análisis específico por solicitud</div></td>
+              <td class="timing-cell"><span class="timing-main">Ad hoc</span><br>Por solicitud</td>
+              <td class="brands-cell"><span class="brand-tag bt-a">Capilares</span><span class="brand-tag bt-a">Dioxaflex</span><span class="brand-tag bt-a">Bagó+</span><span class="brand-tag bt-b">Anaflex</span><span class="brand-tag bt-b">Solares</span></td>
+              <td class="notes-cell">Análisis ad hoc de mercado o tendencias por solicitud del cliente. Principalmente marcas de alta actividad. Produce documentos standalone de 1 a 3 días de elaboración.</td>
+            </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="subcat" style="--i:1">
+          <button class="subcat-header" data-target="b-sc1" aria-expanded="false">
+            <span class="subcat-chevron">&#9656;</span>
+            <span class="subcat-title">Tendencias y Prospectiva</span>
+            <span class="subcat-count">2</span>
+          </button>
+          <div class="subcat-body" id="b-sc1">
+            <div class="subcat-body-inner">
+              <table>
+                <thead>
+                  <tr class="col-header">
+                    <td>Entregable</td>
+                    <td style="width:130px">Frecuencia / Timing</td>
+                    <td style="width:230px">Marcas</td>
+                    <td>Descripción / Notas</td>
+                  </tr>
+                </thead>
+                <tbody>
+            <tr class="entregable-row">
+              <td><div class="del-name">Reporte de tendencias de medios</div><div class="del-sub">B7 · Presentación al equipo completo de Bagó</div></td>
+              <td class="timing-cell"><span class="timing-main">Semestral</span><br>Enero / Julio</td>
+              <td class="brands-cell"><span class="brand-tag bt-all">Todas las marcas</span></td>
+              <td class="notes-cell">Presentación de 2–3hs con todo el equipo de Bagó. Tendencias de medios, formatos emergentes, benchmarks internacionales, y recomendaciones para el portfolio.</td>
+            </tr>
+            <tr class="entregable-row">
+              <td><div class="del-name">Informe de tendencias a 5 años</div><div class="del-sub">B8 · Nuevo — validado con Mercedes Silva, jul 2026</div></td>
+              <td class="timing-cell"><span class="timing-main">Anual</span><br>Julio, previo al Brand Plan</td>
+              <td class="brands-cell"><span class="brand-tag bt-all">Todas las marcas</span></td>
+              <td class="notes-cell">Informe de tendencias de medios a 5 años, elaborado por Sol Terzi (CSO) y Juan Navarro. Insumo directo del Brand Plan de cada marca (B6): plantea hacia dónde evoluciona cada canal (ej. caída de TV, crecimiento de otros medios) para que Bagó proyecte sus próximos pasos por marca. Se hizo por primera vez en 2026; el equipo lo da por fijo de acá en adelante.</td>
+            </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="subcat" style="--i:2">
+          <button class="subcat-header" data-target="b-sc2" aria-expanded="false">
+            <span class="subcat-chevron">&#9656;</span>
+            <span class="subcat-title">Research por Campaña</span>
+            <span class="subcat-count">3</span>
+          </button>
+          <div class="subcat-body" id="b-sc2">
+            <div class="subcat-body-inner">
+              <table>
+                <thead>
+                  <tr class="col-header">
+                    <td>Entregable</td>
+                    <td style="width:130px">Frecuencia / Timing</td>
+                    <td style="width:230px">Marcas</td>
+                    <td>Descripción / Notas</td>
+                  </tr>
+                </thead>
+                <tbody>
+            <tr class="entregable-row">
+              <td><div class="del-name">Investigación de mercado / categoría</div><div class="del-sub">B1 · Análisis previo al direccionamiento</div></td>
+              <td class="timing-cell"><span class="timing-main">Por campaña</span><br>Previo a direccionamiento</td>
+              <td class="brands-cell"><span class="brand-tag bt-a">Capilares</span><span class="brand-tag bt-a">Faciales</span><span class="brand-tag bt-a">Dioxaflex</span><span class="brand-tag bt-a">Bagó+</span><span class="brand-tag bt-b">Anaflex</span></td>
+              <td class="notes-cell">Análisis de la categoría: share de inversión, share de voice, evolución de competidores, benchmarks. Producción interna del equipo de Consumer Insight (CI), no genera reunión externa.</td>
+            </tr>
+            <tr class="entregable-row">
+              <td><div class="del-name">Investigación de audiencia</div><div class="del-sub">B2 · Audience insights para planificación</div></td>
+              <td class="timing-cell"><span class="timing-main">Por campaña</span><br>Previo a planificación</td>
+              <td class="brands-cell"><span class="brand-tag bt-a">Capilares</span><span class="brand-tag bt-a">Faciales</span><span class="brand-tag bt-a">Dioxaflex</span><span class="brand-tag bt-a">Bagó+</span><span class="brand-tag bt-b">Anaflex</span><span class="brand-tag bt-b">Solares</span></td>
+              <td class="notes-cell">Perfilado de audiencias por etapa del funnel. Planificación estratégica de audiencia con datos propios (1P), de partners (2P) y de terceros (3P). Definición de KPIs (indicadores clave) por audiencia. Alimenta la planificación táctica por vehículo y formato.</td>
+            </tr>
+            <tr class="entregable-row">
+              <td><div class="del-name">Brand plan por marca</div><div class="del-sub">B6 · Planning de Consumer Insight (CI) previo al brief formal</div></td>
+              <td class="timing-cell"><span class="timing-main">Anual</span><br>Julio – Septiembre</td>
+              <td class="brands-cell"><span class="brand-tag bt-a">Capilares</span><span class="brand-tag bt-a">Faciales</span><span class="brand-tag bt-a">Corporales</span><span class="brand-tag bt-a">Dioxaflex</span><span class="brand-tag bt-a">Bagó+</span><span class="brand-tag bt-b">Anaflex</span><span class="brand-tag bt-b">Solares</span></td>
+              <td class="notes-cell">Sesión de planning por marca, previa al brief formal. Análisis de tendencias de categoría, comportamiento de audiencia, y recomendaciones de posicionamiento para el año siguiente. Alimenta el brief anual de marca. En julio 2026 se documentaron tres sesiones de "Pre Brand Plan" con el cliente (una por categoría: Bagovit, Analgésicos/Dolor, Esoprazol), realizadas presencialmente en salas de Bagó y convocadas por Bárbara Chamorro, con participación de Rosario Torterola, Victoria Villaver, Juan Navarro y Sol Terzi.<br><br><strong>Actualización validada con Mercedes Silva (jul 2026):</strong> en 2026 se sumó por primera vez, y queda fijo de acá en adelante, un Brand Plan ad hoc a 5 años por cada una de las 8 marcas de Bagó (alimentado por el Informe de tendencias a 5 años, B8). Por la carga de trabajo que implica, se presentan en orden de prioridad de negocio (primero Esoprazol, Anaflex y Facial; el resto se comparte por mail o se presenta según disponibilidad de agenda). Participan Consumer Insight, Sol Terzi (CSO), dirección de estrategia, coordinación y planner — es el entregable de mayor carga de trabajo de toda la Familia B.</td>
+            </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="family fam-c">
+      <button class="family-header" data-target="fam-c" aria-expanded="false">
+        <span class="fam-badge">C</span>
+        <span class="fam-title">Reporting y Análisis</span>
+        <span class="fam-count">6 entregables</span>
+        <span class="fam-chevron">&#9662;</span>
+      </button>
+      <div class="family-body" id="fam-c">
+        <div class="family-body-inner">
+
+        <div class="subcat" style="--i:0">
+          <button class="subcat-header" data-target="c-sc0" aria-expanded="false">
+            <span class="subcat-chevron">&#9656;</span>
+            <span class="subcat-title">Reporting Periódico</span>
+            <span class="subcat-count">4</span>
+          </button>
+          <div class="subcat-body" id="c-sc0">
+            <div class="subcat-body-inner">
+              <table>
+                <thead>
+                  <tr class="col-header">
+                    <td>Entregable</td>
+                    <td style="width:130px">Frecuencia / Timing</td>
+                    <td style="width:230px">Marcas</td>
+                    <td>Descripción / Notas</td>
+                  </tr>
+                </thead>
+                <tbody>
+            <tr class="entregable-row">
+              <td><div class="del-name">Dashboard de seguimiento semanal</div><div class="del-sub">C1 · Monitoreo de KPIs en tiempo real</div></td>
+              <td class="timing-cell"><span class="timing-main">Semanal</span></td>
+              <td class="brands-cell"><span class="brand-tag bt-all">Todas las marcas</span></td>
+              <td class="notes-cell">Dashboard de seguimiento de campañas activas. Incluye evolución de inversión, métricas de performance por vehículo, y alertas de desvíos vs plan.</td>
+            </tr>
+            <tr class="entregable-row">
+              <td><div class="del-name">Executive report quincenal</div><div class="del-sub">C6 · Reporte ejecutivo consolidado</div></td>
+              <td class="timing-cell"><span class="timing-main">Quincenal</span></td>
+              <td class="brands-cell"><span class="brand-tag bt-all">Todas las marcas</span></td>
+              <td class="notes-cell">Consolidación quincenal del estado de todas las marcas. Formato Word. Incluye semanas de campaña, estado de órdenes de compra, alertas, y próximos pasos por marca.</td>
+            </tr>
+            <tr class="entregable-row">
+              <td><div class="del-name">Reporte mensual de marca</div><div class="del-sub">C2 · Análisis de performance mensual</div></td>
+              <td class="timing-cell"><span class="timing-main">Mensual</span><br>Primeros 10 días del mes</td>
+              <td class="brands-cell"><span class="brand-tag bt-a">Capilares</span><span class="brand-tag bt-a">Faciales</span><span class="brand-tag bt-a">Corporales</span><span class="brand-tag bt-a">Dioxaflex</span><span class="brand-tag bt-a">Bagó+</span><span class="brand-tag bt-b">Anaflex</span><span class="brand-tag bt-b">Solares</span></td>
+              <td class="notes-cell">Reporte mensual por marca activa. Incluye inversión ejecutada vs presupuestada, performance de campaña, share of voice, y recomendaciones para el mes siguiente. Validado con Mercedes Silva (jul 2026): incluye además un mailing mensual liviano de creatividades que no funcionaron, con foco en qué se optimizó y oportunidades de mejora (versión acotada; se descartaron los reportes extensos de creatividad que se hacían antes por baja utilidad para el cliente).</td>
+            </tr>
+            <tr class="entregable-row">
+              <td><div class="del-name">Análisis de wear-out de creatividades</div><div class="del-sub">C7 · Evaluación de desgaste de piezas en rotación</div></td>
+              <td class="timing-cell"><span class="timing-main">Semestral</span><br>Dic / Jun</td>
+              <td class="brands-cell"><span class="brand-tag bt-a">Capilares</span><span class="brand-tag bt-a">Faciales</span><span class="brand-tag bt-a">Corporales</span><span class="brand-tag bt-a">Dioxaflex</span><span class="brand-tag bt-a">Bagó+</span></td>
+              <td class="notes-cell">Análisis de desgaste de creatividades en rotación. Incluye evaluación por vehículo y recomendación de renovación. Foco en marcas con mayor continuidad de pautas.</td>
+            </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="subcat" style="--i:1">
+          <button class="subcat-header" data-target="c-sc1" aria-expanded="false">
+            <span class="subcat-chevron">&#9656;</span>
+            <span class="subcat-title">Post-Campaign Analysis</span>
+            <span class="subcat-count">2</span>
+          </button>
+          <div class="subcat-body" id="c-sc1">
+            <div class="subcat-body-inner">
+              <table>
+                <thead>
+                  <tr class="col-header">
+                    <td>Entregable</td>
+                    <td style="width:130px">Frecuencia / Timing</td>
+                    <td style="width:230px">Marcas</td>
+                    <td>Descripción / Notas</td>
+                  </tr>
+                </thead>
+                <tbody>
+            <tr class="entregable-row">
+              <td><div class="del-name">Post buy preliminar</div><div class="del-sub">C3 · Resultados preliminares al cierre de campaña</div></td>
+              <td class="timing-cell"><span class="timing-main">Por campaña</span><br>Al cierre de pauta</td>
+              <td class="brands-cell"><span class="brand-tag bt-a">Capilares</span><span class="brand-tag bt-a">Faciales</span><span class="brand-tag bt-a">Corporales</span><span class="brand-tag bt-a">Dioxaflex</span><span class="brand-tag bt-a">Bagó+</span><span class="brand-tag bt-b">Anaflex</span></td>
+              <td class="notes-cell">Análisis preliminar de resultados al cierre de cada campaña. Inversión ejecutada, delivery de impresiones, cobertura/frecuencia por segmento, y desvíos vs proyección.</td>
+            </tr>
+            <tr class="entregable-row">
+              <td><div class="del-name">Post buy final de cierre de año (EOY)</div><div class="del-sub">C4 + C5 · Análisis de cierre semestral y anual</div></td>
+              <td class="timing-cell"><span class="timing-main">Semestral / Anual</span><br>Jul + Dic</td>
+              <td class="brands-cell"><span class="brand-tag bt-a">Capilares</span><span class="brand-tag bt-a">Faciales</span><span class="brand-tag bt-a">Corporales</span><span class="brand-tag bt-a">Dioxaflex</span><span class="brand-tag bt-a">Bagó+</span><span class="brand-tag bt-b">Anaflex</span><span class="brand-tag bt-b">Solares</span></td>
+              <td class="notes-cell">Post buy consolidado del semestre/año. Incluye conciliación entre el Last Estimate (LE, la última proyección de inversión antes del cierre) y los datos reales del sistema, análisis de eficiencia por vehículo y formato, comparativa año contra año (YoY), y recomendaciones estructurales para el año siguiente.</td>
+            </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="family fam-d">
+      <button class="family-header" data-target="fam-d" aria-expanded="false">
+        <span class="fam-badge">D</span>
+        <span class="fam-title">Reuniones y Coordinación</span>
+        <span class="fam-count">15 entregables</span>
+        <span class="fam-chevron">&#9662;</span>
+      </button>
+      <div class="family-body" id="fam-d">
+        <div class="family-body-inner">
+
+        <div class="subcat" style="--i:0">
+          <button class="subcat-header" data-target="d-sc0" aria-expanded="false">
+            <span class="subcat-chevron">&#9656;</span>
+            <span class="subcat-title">Reuniones Recurrentes</span>
+            <span class="subcat-count">5</span>
+          </button>
+          <div class="subcat-body" id="d-sc0">
+            <div class="subcat-body-inner">
+              <table>
+                <thead>
+                  <tr class="col-header">
+                    <td>Entregable</td>
+                    <td style="width:130px">Frecuencia / Timing</td>
+                    <td style="width:230px">Marcas</td>
+                    <td>Descripción / Notas</td>
+                  </tr>
+                </thead>
+                <tbody>
+            <tr class="entregable-row">
+              <td><div class="del-name">Status semanal de cuenta</div><div class="del-sub">D2 · Sincronización operativa con el cliente</div></td>
+              <td class="timing-cell"><span class="timing-main">Quincenal</span><br>Escalable a semanal</td>
+              <td class="brands-cell"><span class="brand-tag bt-all">Todas las marcas</span></td>
+              <td class="notes-cell">Reunión de status con el equipo de Bagó. Repaso de campañas activas, aprobaciones pendientes, próximos hitos. Generalmente 45–60 min. Validado con Mercedes Silva (jul 2026): el estándar real es quincenal, alternando con la semana de status de Performance (el cliente tiene una instancia semanal, pero se turna entre Branding y Performance). Sube a cadencia semanal cuando hay coyuntura que lo justifica (caídos, desvíos, eficiencias en baja, etc.).</td>
+            </tr>
+            <tr class="entregable-row">
+              <td><div class="del-name">Revisión estratégica trimestral (QBR)</div><div class="del-sub">D5 · Dos capas: operativa + ejecutiva</div></td>
+              <td class="timing-cell"><span class="timing-main">Trimestral</span><br>Fin de Q</td>
+              <td class="brands-cell"><span class="brand-tag bt-all">Todas las marcas</span></td>
+              <td class="notes-cell">Revisión de performance de campaña, KPIs, post buy, y recomendaciones estratégicas por marca. Participan equipo de cuenta e interlocutores de Bagó. Interlocutores: Rosario Torterola, Bárbara Chamorro.</td>
+            </tr>
+            <tr class="entregable-row">
+              <td><div class="del-name">Iteración / revisión de plan anual</div><div class="del-sub">D4 · Rondas de negociación y ajuste por marca</div></td>
+              <td class="timing-cell"><span class="timing-main">3–4 rondas</span><br>Por marca, por año</td>
+              <td class="brands-cell"><span class="brand-tag bt-a">Capilares</span><span class="brand-tag bt-a">Faciales</span><span class="brand-tag bt-a">Corporales</span><span class="brand-tag bt-a">Dioxaflex</span><span class="brand-tag bt-a">Bagó+</span><span class="brand-tag bt-b">Anaflex</span></td>
+              <td class="notes-cell">Reuniones de feedback y ajuste sobre el plan anual, con foco principal en televisión. Validado con Mercedes Silva (jul 2026): son estándar 3 a 4 rondas por marca desde que se presenta el plan negociado (fee, tarifa, volumen de TRP) hasta que los brand managers aprueban el plan anual táctico. Pueden sumarse rondas eventuales adicionales ante cambios de último momento (ej. reducción de segundaje, recortes de presupuesto) — estas son esporádicas y no forman parte del estándar de 3–4.</td>
+            </tr>
+            <tr class="entregable-row">
+              <td><div class="del-name">Aprobación mensual del plan táctico</div><div class="del-sub">D12 · Nuevo — validado con Mercedes Silva, jul 2026</div></td>
+              <td class="timing-cell"><span class="timing-main">Mensual</span><br>1–2 rondas</td>
+              <td class="brands-cell"><span class="brand-tag bt-a">Capilares</span><span class="brand-tag bt-a">Faciales</span><span class="brand-tag bt-a">Corporales</span><span class="brand-tag bt-a">Dioxaflex</span><span class="brand-tag bt-a">Bagó+</span><span class="brand-tag bt-b">Anaflex</span></td>
+              <td class="notes-cell">Una vez aprobado el plan anual, la bajada táctica mes a mes requiere su propia aprobación: 1 a 2 rondas de ida y vuelta, mayormente por mail (cliente muy "mail-centrista"), sobre flows y ajustes puntuales. Distinto de D4 (que es la negociación del plan anual completo).</td>
+            </tr>
+            <tr class="entregable-row">
+              <td><div class="del-name">Revisión trimestral de objetivos y KPIs</div><div class="del-sub">D13 · Nuevo — validado con Mercedes Silva, jul 2026</div></td>
+              <td class="timing-cell"><span class="timing-main">Trimestral</span></td>
+              <td class="brands-cell"><span class="brand-tag bt-all">Todas las marcas</span></td>
+              <td class="notes-cell">Replanificación de KPIs anuales: revisión de si se cumplieron los supuestos de costos e incrementos planteados a principio de año (ej. costo de digital) y ajuste de objetivos y planificación para el resto del año. Distinta del QBR (D5): esta es una instancia más operativa/analítica, no la revisión ejecutiva con Compras y Marketing. También recoge el impacto de los cierres de Q y de IPC sobre las proyecciones anuales.</td>
+            </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="subcat" style="--i:1">
+          <button class="subcat-header" data-target="d-sc1" aria-expanded="false">
+            <span class="subcat-chevron">&#9656;</span>
+            <span class="subcat-title">Reuniones de Lanzamiento</span>
+            <span class="subcat-count">2</span>
+          </button>
+          <div class="subcat-body" id="d-sc1">
+            <div class="subcat-body-inner">
+              <table>
+                <thead>
+                  <tr class="col-header">
+                    <td>Entregable</td>
+                    <td style="width:130px">Frecuencia / Timing</td>
+                    <td style="width:230px">Marcas</td>
+                    <td>Descripción / Notas</td>
+                  </tr>
+                </thead>
+                <tbody>
+            <tr class="entregable-row">
+              <td><div class="del-name">Kick-off de campaña</div><div class="del-sub">D1 · Reunión de apertura formal de cada campaña</div></td>
+              <td class="timing-cell"><span class="timing-main">Por campaña</span><br>1–2 sem antes de lanzamiento</td>
+              <td class="brands-cell"><span class="brand-tag bt-a">Capilares</span><span class="brand-tag bt-a">Faciales</span><span class="brand-tag bt-a">Corporales</span><span class="brand-tag bt-a">Dioxaflex</span><span class="brand-tag bt-a">Bagó+</span><span class="brand-tag bt-b">Anaflex</span><span class="brand-tag bt-b">Solares</span></td>
+              <td class="notes-cell">Reunión formal de arranque de campaña. Participan el Account Director (AD), el equipo de Consumer Insight y el equipo de Digital Strategy. Se presenta el plan final aprobado, se definen responsables y fechas de entrega. Genera el acta de inicio.</td>
+            </tr>
+            <tr class="entregable-row">
+              <td><div class="del-name">Presentación de estrategia / plan</div><div class="del-sub">D3 · Presentación formal al cliente</div></td>
+              <td class="timing-cell"><span class="timing-main">Por campaña</span><br>Previo a go-live</td>
+              <td class="brands-cell"><span class="brand-tag bt-a">Capilares</span><span class="brand-tag bt-a">Faciales</span><span class="brand-tag bt-a">Corporales</span><span class="brand-tag bt-a">Dioxaflex</span><span class="brand-tag bt-a">Bagó+</span><span class="brand-tag bt-b">Anaflex</span><span class="brand-tag bt-b">Solares</span></td>
+              <td class="notes-cell">Presentación formal del plan de medios al equipo de Bagó. Incluye estrategia, mix, flighting, inversión por medio y formato, y KPIs proyectados.</td>
+            </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="subcat" style="--i:2">
+          <button class="subcat-header" data-target="d-sc2" aria-expanded="false">
+            <span class="subcat-chevron">&#9656;</span>
+            <span class="subcat-title">Reuniones Estratégicas</span>
+            <span class="subcat-count">6</span>
+          </button>
+          <div class="subcat-body" id="d-sc2">
+            <div class="subcat-body-inner">
+              <table>
+                <thead>
+                  <tr class="col-header">
+                    <td>Entregable</td>
+                    <td style="width:130px">Frecuencia / Timing</td>
+                    <td style="width:230px">Marcas</td>
+                    <td>Descripción / Notas</td>
+                  </tr>
+                </thead>
+                <tbody>
+            <tr class="entregable-row">
+              <td><div class="del-name">Ignis Session / sesión de inspiración</div><div class="del-sub">D6 · Sesión estratégica de innovación</div></td>
+              <td class="timing-cell"><span class="timing-main">Cada 1–2 meses</span><br>Cadencia fija</td>
+              <td class="brands-cell"><span class="brand-tag bt-all">Todas las marcas</span></td>
+              <td class="notes-cell">Sesión de trabajo estratégico conjunto entre Ignis y el equipo de Bagó. Formato taller. Temas: tendencias, nuevos formatos, oportunidades de mercado, innovación en medios. Validado con Mercedes Silva (jul 2026): dejó de ser ad hoc — quedó fija con esta cadencia.</td>
+            </tr>
+            <tr class="entregable-row">
+              <td><div class="del-name">Inducción ad hoc de medios</div><div class="del-sub">D15 · Nuevo — validado con Mercedes Silva, jul 2026</div></td>
+              <td class="timing-cell"><span class="timing-main">Ad hoc</span><br>Por ingreso de personal nuevo</td>
+              <td class="brands-cell"><span class="brand-tag bt-all">Todas las marcas</span></td>
+              <td class="notes-cell">Cada vez que ingresa una persona nueva al equipo de marketing de Bagó sin background de medios (ej. un/a analista nuevo/a en una categoría), se arma una inducción puntual para nivelarla en conceptos básicos de medios y en la estrategia vigente de su marca. Distinta de la capacitación anual formal (D7) y del workshop temático (D10): es reactiva, no programada.</td>
+            </tr>
+            <tr class="entregable-row">
+              <td><div class="del-name">Capacitación de medios y plataformas</div><div class="del-sub">D7 · Formación anual del equipo de marketing del cliente</div></td>
+              <td class="timing-cell"><span class="timing-main">Anual</span><br>Julio</td>
+              <td class="brands-cell"><span class="brand-tag bt-all">Todas las marcas</span></td>
+              <td class="notes-cell">Sesión presencial de 3hs en oficinas de Ignis. Formato formativo. Participan equipo completo de marketing de Bagó + equipo Ignis. Temario: plataformas digitales (Google, TikTok, Meta), nuevos formatos, tendencias de inversión.</td>
+            </tr>
+            <tr class="entregable-row">
+              <td><div class="del-name">Status por categoría / marca con el cliente</div><div class="del-sub">D8 · Reuniones recurrentes específicas por línea de producto</div></td>
+              <td class="timing-cell"><span class="timing-main">Semanal / Quincenal</span><br>Por línea</td>
+              <td class="brands-cell"><span class="brand-tag bt-a">Dolor</span><span class="brand-tag bt-a">Bagovit</span><span class="brand-tag bt-a">Bagó+</span><span class="brand-tag bt-b">Esoprazol</span></td>
+              <td class="notes-cell">Reuniones recurrentes de status específicas por categoría de marca, con los brand managers correspondientes de Bagó. Paralelas e independientes del status semanal general de cuenta. Cada una tiene su cadencia propia y sus interlocutores específicos en el cliente: Dolor (semanal) con Maia Fischer / Laura Pérez Gamas; Bagovit (quincenal) con Sofia Rodriguez Ares / Trinidad Álvarez; Bagó+ (quincenal) con Fatima Espinasse; Esoprazol (quincenal) con María Eugenia Martijena.</td>
+            </tr>
+            <tr class="entregable-row">
+              <td><div class="del-name">Reunión mensual con partners de retail y performance</div><div class="del-sub">D9 · Farmacity Connect · Rappi reporte mensual</div></td>
+              <td class="timing-cell"><span class="timing-main">Mensual</span><br>Por partner</td>
+              <td class="brands-cell"><span class="brand-tag bt-all">Todas las marcas</span></td>
+              <td class="notes-cell">Reuniones mensuales recurrentes con los principales partners de retail y plataformas de performance, con presencia conjunta de Bagó e Ignis. Documentadas para Farmacity Connect (desde sep 2025) y Rappi (desde ago 2025). Incluyen revisión de resultados de acciones y definición de próximas iniciativas.</td>
+            </tr>
+            <tr class="entregable-row">
+              <td><div class="del-name">Workshop de novedades de plataformas</div><div class="del-sub">D10 · Sesión táctica de actualización técnica</div></td>
+              <td class="timing-cell"><span class="timing-main">Semestral</span><br>Estándar</td>
+              <td class="brands-cell"><span class="brand-tag bt-all">Todas las marcas</span></td>
+              <td class="notes-cell">Sesión presencial de formación en profundidad sobre una herramienta o disciplina específica. Diferente a la capacitación anual de medios (D7): es táctica, no estratégica — foco en qué cambió en las plataformas (Meta, YouTube, herramientas de IA) y cómo aprovecharlo para mejorar campañas y creatividades. Ejemplo documentado: taller sobre la plataforma Search ("WS Search | Bago - Presencial", jul 2026). Validado con Mercedes Silva (jul 2026): pasa de ad hoc a cadencia semestral estándar.</td>
+            </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="subcat" style="--i:3">
+          <button class="subcat-header" data-target="d-sc3" aria-expanded="false">
+            <span class="subcat-chevron">&#9656;</span>
+            <span class="subcat-title">Administración y Control</span>
+            <span class="subcat-count">2</span>
+          </button>
+          <div class="subcat-body" id="d-sc3">
+            <div class="subcat-body-inner">
+              <table>
+                <thead>
+                  <tr class="col-header">
+                    <td>Entregable</td>
+                    <td style="width:130px">Frecuencia / Timing</td>
+                    <td style="width:230px">Marcas</td>
+                    <td>Descripción / Notas</td>
+                  </tr>
+                </thead>
+                <tbody>
+            <tr class="entregable-row">
+              <td><div class="del-name">Control mensual de Órdenes de Compra (OCs) y presupuesto</div><div class="del-sub">D11 · Revisión administrativa mensual de cierre y proyección</div></td>
+              <td class="timing-cell"><span class="timing-main">Mensual</span><br>Cierre de mes</td>
+              <td class="brands-cell"><span class="brand-tag bt-all">Todas las marcas</span></td>
+              <td class="notes-cell">Reunión mensual recurrente entre el equipo de cuenta (Mechi, Mariana, Tati), administración de Ignis y el área de coordinación, para cierre del mes anterior, control del presupuesto y flujo de caja vigente, y emisión de las Órdenes de Compra (OCs) del mes siguiente.</td>
+            </tr>
+            <tr class="entregable-row">
+              <td><div class="del-name">Envío de flow consolidado</div><div class="del-sub">D14 · Nuevo — validado con Mercedes Silva, jul 2026</div></td>
+              <td class="timing-cell"><span class="timing-main">Quincenal</span><br>Cada 15 días</td>
+              <td class="brands-cell"><span class="brand-tag bt-all">Todas las marcas</span></td>
+              <td class="notes-cell">Envío a Rosario Torterola del flow consolidado (único archivo unificado de todas las marcas, a diferencia de los flows individuales por marca), con TRP de TV, inversión ejecutada y proyectada, y desvíos. Es una instancia distinta del cierre mensual de OCs (D11): una cubre el cierre de facturación, la otra los cambios de mitad de mes y siguientes (ej. cambio de segundaje de un aviso), para que el cliente tenga la foto completa de inversión por sistema, por marca y total.</td>
+            </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /sow-wrap -->
+
+  <!-- PROPUESTAS A FUTURO (no forman parte del catálogo vigente) -->
+  <div class="future-wrap">
+    <div class="future-header">Propuestas a futuro · No implementadas aún — para evaluar en 2027</div>
+    <div class="future-item">
+      <div class="future-name">Reporte trimestral de competencia</div>
+      <div class="future-desc">Mercedes Silva planteó que, para clientes grandes como Bagó, lo ideal sería un análisis de competencia trimestral más robusto que el mensual (B4) — hoy la profundidad extra sólo se da a nivel semestral (B7). No está implementado; queda como mejora a evaluar.</div>
+    </div>
+    <div class="future-item">
+      <div class="future-name">Relevamiento manual de creatividades digitales de la competencia</div>
+      <div class="future-desc">Los dashboards automáticos no capturan histórico de creatividades digitales de competidores (ej. Meta no permite ver piezas pasadas fuera de tiempo real; Google Ads Library sí permite retroceder en el tiempo). Mercedes propuso sumar un relevamiento manual recurrente (quincenal o mensual, según categoría) de bibliotecas de anuncios, y evaluar herramientas pagas tipo AdQuality. Hoy no es una tarea recurrente — se hace sólo dentro de análisis ad hoc puntuales (B5).</div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="doc-footer">
+    <div class="footer-note">
+      Este documento describe el alcance estándar del servicio de Branding de Ignis para Laboratorio Bagó. Refleja el conjunto de entregables, análisis y reuniones que forman parte del servicio actual, organizados por familia de actividad y línea de marca.
+    </div>
+    <div class="footer-version">
+      Ignis Media Agency · Branding<br>
+      Framework Scope &amp; Tiers · v7 · Agosto 2026<br>
+      Validado con Mercedes Silva (AD Bagó) el 25/jul/2026
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  var familyHeaders = document.querySelectorAll('.family-header');
+  familyHeaders.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var isOpen = btn.getAttribute('aria-expanded') === 'true';
+      // accordion across families: close all first
+      familyHeaders.forEach(function(b){ b.setAttribute('aria-expanded','false'); });
+      if(!isOpen){ btn.setAttribute('aria-expanded','true'); }
+    });
+  });
+
+  var subcatHeaders = document.querySelectorAll('.subcat-header');
+  subcatHeaders.forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      var isOpen = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
