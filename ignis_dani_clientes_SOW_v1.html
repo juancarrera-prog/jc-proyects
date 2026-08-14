@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scope of Work — Banco Patagonia · La Paulina · Ignis Media Agency</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    color: #1A1A1A;
+    background: #F5F5F2;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .page-wrap {
+    max-width: 1100px;
+    margin: 32px auto;
+    padding: 0 24px 80px;
+  }
+
+  /* ── DOC HEADER ── */
+  .doc-header {
+    background: #0C0C0C;
+    color: #F0EEE8;
+    padding: 28px 36px;
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .doc-eyebrow { font-size: 9px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #E5453D; margin-bottom: 6px; }
+  .doc-title { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 4px; }
+  .doc-sub { font-size: 11px; color: #888480; }
+  .doc-meta-block { text-align: right; }
+  .doc-meta-row { font-size: 10px; color: #888480; margin-bottom: 3px; }
+  .doc-meta-row span { color: #F0EEE8; font-weight: 500; }
+
+  /* ── CLIENT SELECTOR ── */
+  .client-selector {
+    background: #161616;
+    padding: 16px 36px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .selector-label { font-size: 9px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #888480; margin-right: 6px; }
+  .client-btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px; font-weight: 600;
+    padding: 7px 18px;
+    border-radius: 20px;
+    border: 1px solid #383838;
+    background: transparent;
+    color: #B0AEA8;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .client-btn:hover { border-color: #555; color: #F0EEE8; }
+  .client-btn.active {
+    background: #E5453D;
+    border-color: #E5453D;
+    color: white;
+  }
+  .client-count {
+    font-size: 9px;
+    opacity: 0.75;
+    margin-left: 4px;
+  }
+
+  /* ── HINT BAR ── */
+  .hint-bar {
+    background: #FAFAF8;
+    border-bottom: 1px solid #E8E6E4;
+    padding: 10px 36px;
+    font-size: 10px;
+    color: #9A9896;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* ── SOW WRAP / CLIENT PANEL ── */
+  .sow-wrap {
+    border: 1px solid #D0CECC;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    overflow: hidden;
+    background: white;
+  }
+  .client-panel { display: none; }
+  .client-panel.active { display: block; }
+
+  .client-note {
+    background: #FFF7E6;
+    border-bottom: 1px solid #E8DCC0;
+    padding: 10px 20px;
+    font-size: 10px;
+    color: #7A5C0E;
+    line-height: 1.6;
+  }
+  .client-note strong { color: #5C4508; }
+
+  table { width: 100%; border-collapse: collapse; }
+
+  /* ── FAMILY (LEVEL 1) ── */
+  .family { border-bottom: 1px solid #E8E6E4; }
+  .family:last-child { border-bottom: none; }
+
+  .family-header {
+    all: unset;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    background: #0C0C0C;
+    padding: 13px 20px;
+    cursor: pointer;
+    transition: background 0.25s ease;
+  }
+  .family-header:hover { background: #181818; }
+  .family-header:focus-visible { outline: 2px solid #E5453D; outline-offset: -2px; }
+
+  .fam-badge {
+    display: inline-flex; align-items:center; justify-content:center;
+    width: 22px; height: 22px;
+    border-radius: 4px;
+    font-size: 11px; font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  }
+  .fam-a .fam-badge { background: #4E9EE8; }
+  .fam-b .fam-badge { background: #9B80E0; }
+  .fam-c .fam-badge { background: #E08050; }
+  .fam-d .fam-badge { background: #50C0A0; }
+
+  .fam-title {
+    color: #E5453D;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .fam-count {
+    color: #B0322C;
+    font-size: 9px; font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-left: -2px;
+  }
+  .fam-chevron {
+    margin-left: auto;
+    color: #E5453D;
+    font-size: 11px;
+    transition: transform 0.35s cubic-bezier(.65,0,.35,1);
+    display: inline-block;
+  }
+  .family-header[aria-expanded="true"] .fam-chevron { transform: rotate(180deg); }
+
+  .family-body {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.45s cubic-bezier(.65,0,.35,1);
+    background: #FCFCFB;
+  }
+  .family-header[aria-expanded="true"] + .family-body { grid-template-rows: 1fr; }
+  .family-body-inner { overflow: hidden; min-height: 0; padding: 10px 14px; display: flex; flex-direction: column; gap: 8px; }
+
+  /* ── SUBCATEGORY (LEVEL 2) ── */
+  .subcat {
+    background: white;
+    border: 1px solid #E8E6E4;
+    border-radius: 6px;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+    transition-delay: calc(var(--i) * 60ms);
+  }
+  .family-header[aria-expanded="true"] + .family-body .subcat {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .subcat-header {
+    all: unset;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    width: 100%;
+    padding: 9px 14px;
+    cursor: pointer;
+    background: white;
+    transition: background 0.2s ease;
+  }
+  .subcat-header:hover { background: #FAFAF8; }
+  .subcat-header:focus-visible { outline: 2px solid #C8211D; outline-offset: -2px; }
+
+  .subcat-chevron {
+    color: #B0AEAD;
+    font-size: 9px;
+    transition: transform 0.3s cubic-bezier(.65,0,.35,1);
+    display: inline-block;
+    width: 10px;
+  }
+  .subcat-header[aria-expanded="true"] .subcat-chevron { transform: rotate(90deg); color: #C8211D; }
+
+  .subcat-title {
+    font-size: 11px; font-weight: 600; color: #1A1A1A;
+    letter-spacing: 0.01em;
+  }
+  .subcat-count {
+    font-size: 9px; font-weight: 700; color: #888480;
+    background: #F0EFED;
+    border-radius: 20px;
+    padding: 1px 7px;
+    margin-left: 2px;
+  }
+
+  .subcat-body {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.4s cubic-bezier(.65,0,.35,1);
+  }
+  .subcat-header[aria-expanded="true"] + .subcat-body { grid-template-rows: 1fr; border-top: 1px solid #E8E6E4; }
+  .subcat-body-inner { overflow: hidden; min-height: 0; }
+
+  /* ── COLUMN HEADER (black/red) ── */
+  .col-header td {
+    background: #0C0C0C;
+    color: #E5453D;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 7px 14px;
+    border-bottom: 1px solid #2A2A2A;
+  }
+
+  /* ── DATA ROWS (white) ── */
+  .entregable-row td {
+    background: white;
+    padding: 10px 14px;
+    border-bottom: 0.5px solid #ECEAE8;
+    vertical-align: top;
+    border-right: 1px solid #ECEAE8;
+    line-height: 1.5;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  .entregable-row td:last-child { border-right: none; }
+  .entregable-row:last-child td { border-bottom: none; }
+  .entregable-row:hover td { background: #FAFAF8; }
+  .subcat-header[aria-expanded="true"] + .subcat-body .entregable-row td {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .del-name { font-weight: 600; font-size: 11px; color: #1A1A1A; margin-bottom: 2px; }
+  .del-sub { font-size: 10px; color: #888480; line-height: 1.4; }
+
+  .timing-cell { color: #555250; font-size: 10px; }
+  .timing-main { font-weight: 600; color: #1A1A1A; }
+
+  .brand-tag {
+    display: inline-block;
+    font-size: 9px; font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 2px;
+    margin: 1px 2px 1px 0;
+    letter-spacing: 0.03em;
+  }
+  .bt-line { background: rgba(200,33,29,0.08); color: #9B1A17; border: 0.5px solid rgba(200,33,29,0.2); }
+  .bt-all { background: #EEF5FD; color: #2B6CB0; border: 0.5px solid #B3D0F0; }
+
+  .notes-cell { font-size: 10px; color: #666460; line-height: 1.6; }
+  .notes-cell strong { color: #333; font-weight: 600; }
+
+  /* Footer */
+  .doc-footer {
+    margin-top: 28px;
+    display: flex; justify-content: space-between; align-items: flex-start;
+    padding: 0 4px;
+    flex-wrap: wrap; gap: 16px;
+  }
+  .footer-note { font-size: 9px; color: #9A9896; max-width: 480px; line-height: 1.6; }
+  .footer-version { font-size: 9px; color: #B0AEAD; text-align: right; }
+
+  @media print {
+    body { background: white; font-size: 10px; }
+    .page-wrap { margin: 0; padding: 0 16px; }
+    .family-body, .subcat-body { grid-template-rows: 1fr !important; }
+    .subcat { opacity: 1 !important; transform: none !important; }
+    .entregable-row td { opacity: 1 !important; transform: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <!-- HEADER -->
+  <div class="doc-header">
+    <div>
+      <div class="doc-eyebrow">Scope of Work · Branding</div>
+      <div class="doc-title">Banco Patagonia · La Paulina</div>
+      <div class="doc-sub">Ignis Media Agency · Servicio full-service de Branding</div>
+    </div>
+    <div class="doc-meta-block">
+      <div class="doc-meta-row">Fecha <span>Agosto 2026</span></div>
+      <div class="doc-meta-row">Account Director <span>Daniela Kravanja</span></div>
+      <div class="doc-meta-row">Branding Coordinator <span>Yamila Ganez / Rocío Casco</span></div>
+      <div class="doc-meta-row">Commercial Manager <span>Juan Carrera</span></div>
+    </div>
+  </div>
+
+  <!-- CLIENT SELECTOR -->
+  <div class="client-selector">
+    <span class="selector-label">Cliente</span>
+    <button class="client-btn active" onclick="showClient('patagonia')">Banco Patagonia <span class="client-count">9</span></button>
+    <button class="client-btn" onclick="showClient('paulina')">La Paulina <span class="client-count">10</span></button>
+  </div>
+
+  <!-- HINT -->
+  <div class="hint-bar">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+    Clickeá una familia (A–D) para ver sus subcategorías, y una subcategoría para ver sus entregables.
+  </div>
+
+
+  <div class="sow-wrap client-panel active" id="panel-patagonia">
+    <div class="client-note">Cuenta gestionada por el equipo de Daniela Kravanja (Account Director), con Rocío Casco y Liscedt González en coordinación. Catálogo construido a partir de calendarios de Daniela Kravanja, Yamila Ganez y Rocío Casco, período 2025 – agosto 2026.</div>
+    <div class="accordion">
+
+    <div class="family fam-a">
+      <button class="family-header" data-target="patagonia-fam-a" aria-expanded="false">
+        <span class="fam-badge">A</span>
+        <span class="fam-title">Estrategia y Planeamiento</span>
+        <span class="fam-count">2 entregables</span>
+        <span class="fam-chevron">&#9662;</span>
+      </button>
+      <div class="family-body" id="patagonia-fam-a">
+        <div class="family-body-inner">
+
+        <div class="subcat" style="--i:0">
+          <button class="subcat-header" data-target="patagonia-fam-a-sc0" aria-expanded="false">
+            <span class="subcat-chevron">&#9656;</span>
+            <span class="subcat-title">Estrategia de Cuenta</span>
+            <span class="subcat-count">2</span>
+          </button>
+          <div class="subcat-body" id="patagonia-fam-a-sc0">
+            <div class="subcat-body-inner">
+              <table>
+                <thead>
+                  <tr class="col-header">
+                    <td>Entregable</td>
+                    <td style="width:130px">Frecuencia / Timing</td>
+                    <td style="width:230px">Marcas</td>
+                    <td>Descripción / Notas</td>
+                  </tr>
+                </thead>
+                <tbody>
+            <tr class="entregable-row">
+              <td><div class="del-name">Reunión de transformación digital</div><div class="del-sub">Sesión estratégica banco + agencia</div></td>
+              <td class="timing-cell"><span class="timing-main">Ad hoc</span></td>
+              <td class="brands-cell"><span class="brand-tag bt-all">Cuenta general</span></td>
+              <td class="notes-cell">Sesión de trabajo estratégico entre Ignis y el equipo de Transformación Digital del banco. Confirmada en calendario como "Banco & Ignis | Transformación Digital" (ene 2025).</td>
+            </tr>
+            <tr class="entregable-row">
+              <td><div class="del-name">Reunión de definición de campaña</div><div class="del-sub">Alineación banco + agencia</div></td>
+              <td class="timing-cell"><span class="timing-main">Ad hoc</span></td>
+              <td class="brands-cell"><span class="brand-tag bt-all">Cuenta general</span></td>
+              <td class="notes-cell">Reuniones de trabajo conjunto para definir estrategia y alcance de campañas específicas. Confirmada en calendario como "Reunión Banco - Ignis" (may 2025).</td>
+            </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="family fam-c">
+      <button class="family-header" data-target="patagonia-fam-c" aria-expanded="false">
+        <span class="fam-badge">C</span>
+        <span class="fam-title">Reporting y Análisis</span>
+        <span class="fam-count">2 entregables</span>
+        <span class="fam-chevron">&#9662;</span>
+      </button>
+      <div class="family-body" id="patagonia-fam-c">
+        <div class="family-body-inner">
+
+        <div class="subcat" style="--i:0">
+          <button class="subcat-header" data-target="patagonia-fam-c-sc0" aria-expanded="false">
+            <span class="subcat-chevron">&#9656;</span>
+            <span class="subcat-title">Reporting Periódico</span>
+            <span class="subcat-count">2</span>
+          </button>
+          <div class="subcat-body" id="patagonia-fam-c-sc0">
+            <div class="subcat-body-inner">
+              <table>
+                <thead>
+                  <tr class="col-header">
+                    <td>Entregable</td>
+                    <td style="width:130px">Frecuencia / Timing</td>
+                    <td style="width:230px">Marcas</td>
+                    <td>Descripción / Notas</td>
+                  </tr>
+                </thead>
+                <tbody>
+            <tr class="entregable-row">
+              <td><div class="del-name">Status semanal de cuenta</div><div class="del-sub">Sincronización operativa con el banco</div></td>
+              <td class="timing-cell"><span class="timing-main">Semanal</span></td>
+              <td class="brands-cell"><span class="brand-tag bt-all">Cuenta general</span></td>
+              <td class="notes-cell">Reunión de status semanal recurrente entre el equipo de cuenta de Ignis y el banco. Entregable de mayor frecuencia y consistencia documentado para esta cuenta, sostenido de forma ininterrumpida durante todo el período analizado (2025–2026).</td>
+            </tr>
+            <tr class="entregable-row">
+              <td><div class="del-name">Control de órdenes de compra</div><div class="del-sub">Gestión administrativa</div></td>
+              <td class="timing-cell"><span class="timing-main">Mensual</span></td>
+              <td class="brands-cell"><span class="brand-tag bt-all">Cuenta general</span></td>
+              <td class="notes-cell">Reunión de control y conciliación de órdenes de compra entre Ignis y el banco. Confirmada en calendario como "Banco + Ignis | OCs" (mar 2025).</td>
+            </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="family fam-d">
+      <button class="family-header" data-target="patagonia-fam-d" aria-expanded="false">
+        <span class="fam-badge">D</span>
+        <span class="fam-title">Reuniones y Coordinación</span>
+        <span class="fam-count">5 entregables</span>
+        <span class="fam-chevron">&#9662;</span>
+      </button>
+      <div class="family-body" id="patagonia-fam-d">
+        <div class="family-body-inner">
+
+        <div class="subcat" style="--i:0">
+          <button class="subcat-header" data-target="patagonia-fam-d-sc0" aria-expanded="false">
+            <span class="subcat-chevron">&#9656;</span>
+            <span class="subcat-title">Campañas Estacionales</span>
+            <span class="subcat-count">2</span>
+          </button>
+          <div class="subcat-body" id="patagonia-fam-d-sc0">
+            <div class="subcat-body-inner">
+              <table>
+                <thead>
+                  <tr class="col-header">
+                    <td>Entregable</td>
+                    <td style="width:130px">Frecuencia / Timing</td>
+                    <td style="width:230px">Marcas</td>
+                    <td>Descripción / Notas</td>
+                  </tr>
+                </thead>
+                <tbody>
+            <tr class="entregable-row">
+              <td><div class="del-name">Coordinación de campaña ExpoAgro</div><div class="del-sub">Auspicio anual de feria</div></td>
+              <td class="timing-cell"><span class="timing-main">Anual</span><br>Febrero/Marzo</td>
+              <td class="brands-cell"><span class="brand-tag bt-line">ExpoAgro</span></td>
+              <td class="notes-cell">Kick-off y coordinación de materiales de pauta para la presencia del banco en ExpoAgro, feria agroindustrial de auspicio anual. Confirmado en calendario: "ExpoAgro | Ignis - BP" y "Campaña Expo Agro 2025 - Materiales PAUTA" (feb 2025).</td>
+            </tr>
+            <tr class="entregable-row">
+              <td><div class="del-name">Coordinación de campañas de producto digital</div><div class="del-sub">Descarga de app + Tienda</div></td>
+              <td class="timing-cell"><span class="timing-main">Por campaña</span></td>
+              <td class="brands-cell"><span class="brand-tag bt-line">App Banco Patagonia</span><span class="brand-tag bt-line">Tienda</span></td>
+              <td class="notes-cell">Coordinación de campañas de performance/branding para productos digitales del banco (descarga de aplicación, tienda de beneficios). Confirmado en calendario: "BP + Ignis | Campañas Descarga + Tienda" (abr 2025).</td>
+            </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="subcat" style="--i:1">
+          <button class="subcat-header" data-target="patagonia-fam-d-sc1" aria-expanded="false">
+            <span class="subcat-chevron">&#9656;</span>
+            <span class="subcat-title">Coordinación con Proveedores y Relación Comercial</span>
+            <span class="subcat-count">3</span>
+          </button>
+          <div class="subcat-body" id="patagonia-fam-d-sc1">
+            <div class="subcat-body-inner">
+              <table>
+                <thead>
+                  <tr class="col-header">
+                    <td>Entregable</td>
+                    <td style="width:130px">Frecuencia / Timing</td>
+                    <td style="width:230px">Marcas</td>
+                    <td>Descripción / Notas</td>
+                  </tr>
+                </thead>
+                <tbody>
+            <tr class="entregable-row">
+              <td><div class="del-name">Coordinación con proveedor de vía pública</div><div class="del-sub">Urbana</div></td>
+              <td class="timing-cell"><span class="timing-main">Por campaña</span></td>
+              <td class="brands-cell"><span class="brand-tag bt-all">Cuenta general</span></td>
+              <td class="notes-cell">Reunión de coordinación con el proveedor de vía pública "Urbana" para pauta del banco. Confirmada en calendario (may 2025).</td>
+            </tr>
+            <tr class="entregable-row">
+              <td><div class="del-name">Reunión con partner tecnológico</div><div class="del-sub">Logan</div></td>
+              <td class="timing-cell"><span class="timing-main">Ad hoc</span></td>
+              <td class="brands-cell"><span class="brand-tag bt-all">Cuenta general</span></td>
+              <td class="notes-cell">Instancia relacional/comercial con Logan (partner tecnológico), con participación de Ignis y del banco. Confirmada en calendario como almuerzo conjunto (ago 2026).</td>
+            </tr>
+            <tr class="entregable-row">
+              <td><div class="del-name">Evento relacional</div><div class="del-sub">Almuerzos y encuentros</div></td>
+              <td class="timing-cell"><span class="timing-main">Periódico</span></td>
+              <td class="brands-cell"><span class="brand-tag bt-all">Cuenta general</span></td>
+              <td class="notes-cell">Instancias relacionales periódicas (almuerzos, encuentros) entre los equipos de Ignis y el banco para fortalecer el vínculo comercial.</td>
+            </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div><!-- /panel-patagonia -->
+
+  <div class="sow-wrap client-panel" id="panel-paulina">
+    <div class="client-note">Marca de quesos de Saputo Argentina. Cuenta gestionada por el equipo de Daniela Kravanja (Account Director), con Yamila Ganez en coordinación. Catálogo construido a partir de calendarios de Daniela Kravanja y Yamila Ganez, período 2025 – agosto 2026.</div>
+    <div class="accordion">
+
+    <div class="family fam-a">
+      <button class="family-header" data-target="paulina-fam-a" aria-expanded="false">
+        <span class="fam-badge">A</span>
+        <span class="fam-title">Estrategia y Planeamiento</span>
+        <span class="fam-count">3 entregables</span>
+        <span class="fam-chevron">&#9662;</span>
+      </button>
+      <div class="family-body" id="paulina-fam-a">
+        <div class="family-body-inner">
+
+        <div class="subcat" style="--i:0">
+          <button class="subcat-header" data-target="paulina-fam-a-sc0" aria-expanded="false">
+            <span class="subcat-chevron">&#9656;</span>
+            <span class="subcat-title">Brief y Estrategia Anual</span>
+            <span class="subcat-count">2</span>
+          </button>
+          <div class="subcat-body" id="paulina-fam-a-sc0">
+            <div class="subcat-body-inner">
+              <table>
+                <thead>
+                  <tr class="col-header">
+                    <td>Entregable</td>
+                    <td style="width:130px">Frecuencia / Timing</td>
+                    <td style="width:230px">Marcas</td>
+                    <td>Descripción / Notas</td>
+                  </tr>
+                </thead>
+                <tbody>
+            <tr class="entregable-row">
+              <td><div class="del-name">Brief anual de marca</div><div class="del-sub">Recepción del brief del año</div></td>
+              <td class="timing-cell"><span class="timing-main">Anual</span></td>
+              <td class="brands-cell"><span class="brand-tag bt-all">Marca general</span></td>
+              <td class="notes-cell">Sesión de recepción del brief anual de la marca. Confirmada en calendario como "La Paulina - Brief 2025" (may 2025).</td>
+            </tr>
+            <tr class="entregable-row">
+              <td><div class="del-name">Definición de estrategia anual</div><div class="del-sub">Estrategia de marca del año</div></td>
+              <td class="timing-cell"><span class="timing-main">Anual</span></td>
+              <td class="brands-cell"><span class="brand-tag bt-all">Marca general</span></td>
+              <td class="notes-cell">Sesión de definición de la estrategia de marca y de medios para el año. Confirmada en calendario como "Estrategia La Paulina 2025" (may 2025).</td>
+            </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="subcat" style="--i:1">
+          <button class="subcat-header" data-target="paulina-fam-a-sc1" aria-expanded="false">
+            <span class="subcat-chevron">&#9656;</span>
+            <span class="subcat-title">Campañas Estacionales</span>
+            <span class="subcat-count">1</span>
+          </button>
+          <div class="subcat-body" id="paulina-fam-a-sc1">
+            <div class="subcat-body-inner">
+              <table>
+                <thead>
+                  <tr class="col-header">
+                    <td>Entregable</td>
+                    <td style="width:130px">Frecuencia / Timing</td>
+                    <td style="width:230px">Marcas</td>
+                    <td>Descripción / Notas</td>
+                  </tr>
+                </thead>
+                <tbody>
+            <tr class="entregable-row">
+              <td><div class="del-name">Brief de campaña estacional</div><div class="del-sub">&quot;Mes del Queso&quot; (MDQ)</div></td>
+              <td class="timing-cell"><span class="timing-main">Anual</span><br>Febrero</td>
+              <td class="brands-cell"><span class="brand-tag bt-line">Mes del Queso</span></td>
+              <td class="notes-cell">Brief y coordinación de la campaña estacional "Mes del Queso", campaña ancla de la marca. Confirmada en calendario: "LP - Brief Mes del Queso LP" y "La Paulina | MDQ" (feb 2025).</td>
+            </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="family fam-b">
+      <button class="family-header" data-target="paulina-fam-b" aria-expanded="false">
+        <span class="fam-badge">B</span>
+        <span class="fam-title">Investigación e Inteligencia</span>
+        <span class="fam-count">2 entregables</span>
+        <span class="fam-chevron">&#9662;</span>
+      </button>
+      <div class="family-body" id="paulina-fam-b">
+        <div class="family-body-inner">
+
+        <div class="subcat" style="--i:0">
+          <button class="subcat-header" data-target="paulina-fam-b-sc0" aria-expanded="false">
+            <span class="subcat-chevron">&#9656;</span>
+            <span class="subcat-title">Research y Audiencias</span>
+            <span class="subcat-count">2</span>
+          </button>
+          <div class="subcat-body" id="paulina-fam-b-sc0">
+            <div class="subcat-body-inner">
+              <table>
+                <thead>
+                  <tr class="col-header">
+                    <td>Entregable</td>
+                    <td style="width:130px">Frecuencia / Timing</td>
+                    <td style="width:230px">Marcas</td>
+                    <td>Descripción / Notas</td>
+                  </tr>
+                </thead>
+                <tbody>
+            <tr class="entregable-row">
+              <td><div class="del-name">Investigación de audiencias</div><div class="del-sub">Aire abierto (AO)</div></td>
+              <td class="timing-cell"><span class="timing-main">Anual</span></td>
+              <td class="brands-cell"><span class="brand-tag bt-all">Marca general</span></td>
+              <td class="notes-cell">Análisis de audiencias en televisión de aire abierto para planificación de medios. Confirmado en calendario: "La Paulina | AO | Audiencias" (ene 2025).</td>
+            </tr>
+            <tr class="entregable-row">
+              <td><div class="del-name">Informe de televisión</div><div class="del-sub">Presentación de estudio de mercado</div></td>
+              <td class="timing-cell"><span class="timing-main">Anual</span></td>
+              <td class="brands-cell"><span class="brand-tag bt-all">Marca general</span></td>
+              <td class="notes-cell">Presentación de informe de comportamiento y tendencias de televisión para la categoría. Confirmado en calendario: "La Paulina Presentación Informe TV" (mar 2025).</td>
+            </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="family fam-c">
+      <button class="family-header" data-target="paulina-fam-c" aria-expanded="false">
+        <span class="fam-badge">C</span>
+        <span class="fam-title">Reporting y Análisis</span>
+        <span class="fam-count">2 entregables</span>
+        <span class="fam-chevron">&#9662;</span>
+      </button>
+      <div class="family-body" id="paulina-fam-c">
+        <div class="family-body-inner">
+
+        <div class="subcat" style="--i:0">
+          <button class="subcat-header" data-target="paulina-fam-c-sc0" aria-expanded="false">
+            <span class="subcat-chevron">&#9656;</span>
+            <span class="subcat-title">Reporting</span>
+            <span class="subcat-count">2</span>
+          </button>
+          <div class="subcat-body" id="paulina-fam-c-sc0">
+            <div class="subcat-body-inner">
+              <table>
+                <thead>
+                  <tr class="col-header">
+                    <td>Entregable</td>
+                    <td style="width:130px">Frecuencia / Timing</td>
+                    <td style="width:230px">Marcas</td>
+                    <td>Descripción / Notas</td>
+                  </tr>
+                </thead>
+                <tbody>
+            <tr class="entregable-row">
+              <td><div class="del-name">Status semanal de cuenta</div><div class="del-sub">Sincronización operativa</div></td>
+              <td class="timing-cell"><span class="timing-main">Semanal</span></td>
+              <td class="brands-cell"><span class="brand-tag bt-all">Marca general</span></td>
+              <td class="notes-cell">Reunión de status semanal recurrente ("Status Semanal LP"), organizada por Daniela Kravanja, con Andrea Fassbind y Juan Ignacio Genisso (Saputo) como interlocutores principales. Sostenida de forma consistente durante todo el período analizado.</td>
+            </tr>
+            <tr class="entregable-row">
+              <td><div class="del-name">Presentación de resultados de campaña</div><div class="del-sub">Cierre de campaña anual</div></td>
+              <td class="timing-cell"><span class="timing-main">Anual</span><br>Enero</td>
+              <td class="brands-cell"><span class="brand-tag bt-all">Marca general</span></td>
+              <td class="notes-cell">Presentación de resultados de la campaña del año anterior. Confirmada en calendario: "IGNIS - LP | Presentación de resultados Campaña 2024" (ene 2025).</td>
+            </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="family fam-d">
+      <button class="family-header" data-target="paulina-fam-d" aria-expanded="false">
+        <span class="fam-badge">D</span>
+        <span class="fam-title">Reuniones y Coordinación</span>
+        <span class="fam-count">3 entregables</span>
+        <span class="fam-chevron">&#9662;</span>
+      </button>
+      <div class="family-body" id="paulina-fam-d">
+        <div class="family-body-inner">
+
+        <div class="subcat" style="--i:0">
+          <button class="subcat-header" data-target="paulina-fam-d-sc0" aria-expanded="false">
+            <span class="subcat-chevron">&#9656;</span>
+            <span class="subcat-title">Medios y Contenido</span>
+            <span class="subcat-count">3</span>
+          </button>
+          <div class="subcat-body" id="paulina-fam-d-sc0">
+            <div class="subcat-body-inner">
+              <table>
+                <thead>
+                  <tr class="col-header">
+                    <td>Entregable</td>
+                    <td style="width:130px">Frecuencia / Timing</td>
+                    <td style="width:230px">Marcas</td>
+                    <td>Descripción / Notas</td>
+                  </tr>
+                </thead>
+                <tbody>
+            <tr class="entregable-row">
+              <td><div class="del-name">Coordinación de pauta en aire abierto</div><div class="del-sub">AO</div></td>
+              <td class="timing-cell"><span class="timing-main">Por campaña</span></td>
+              <td class="brands-cell"><span class="brand-tag bt-all">Marca general</span></td>
+              <td class="notes-cell">Reuniones de coordinación de pauta en televisión de aire abierto (AO). Confirmado en calendario como "AO - LA PAULINA + IGNIS" (abr 2025) — mismo tipo de instancia documentada también en la cuenta Escorial.</td>
+            </tr>
+            <tr class="entregable-row">
+              <td><div class="del-name">Coordinación de streaming</div><div class="del-sub">Plataformas de contenido</div></td>
+              <td class="timing-cell"><span class="timing-main">Por campaña</span></td>
+              <td class="brands-cell"><span class="brand-tag bt-all">Marca general</span></td>
+              <td class="notes-cell">Reuniones de coordinación de pauta y contenido en plataformas de streaming. Confirmado en calendario: "La Paulina + Ignis | Streaming" (mar 2025).</td>
+            </tr>
+            <tr class="entregable-row">
+              <td><div class="del-name">Coordinación de salida en contenido especial</div><div class="del-sub">Ej. programa &quot;OLGA&quot;</div></td>
+              <td class="timing-cell"><span class="timing-main">Ad hoc</span></td>
+              <td class="brands-cell"><span class="brand-tag bt-line">OLGA</span></td>
+              <td class="notes-cell">Coordinación de una salida/integración específica de marca en contenido de alto perfil (ej. el programa de streaming "OLGA"). Confirmado en calendario: "La Paulina + Ignis | Salida Olga" (mar 2025).</td>
+            </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div><!-- /panel-paulina -->
+
+  <!-- FOOTER -->
+  <div class="doc-footer">
+    <div class="footer-note">
+      Este documento describe el alcance estándar del servicio de Branding de Ignis para Banco Patagonia y La Paulina. Refleja el conjunto de entregables, análisis y reuniones que forman parte del servicio actual de cada cuenta, organizados por familia de actividad.
+    </div>
+    <div class="footer-version">
+      Ignis Media Agency · Branding<br>
+      Framework Scope &amp; Tiers · Agosto 2026<br>
+      Catálogo construido con calendarios hasta el 13/ago/2026
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  function initClient(panel){
+    var familyHeaders = panel.querySelectorAll('.family-header');
+    familyHeaders.forEach(function(btn){
+      if (btn.dataset.bound) return;
+      btn.dataset.bound = "1";
+      btn.addEventListener('click', function(){
+        var isOpen = btn.getAttribute('aria-expanded') === 'true';
+        familyHeaders.forEach(function(b){ b.setAttribute('aria-expanded','false'); });
+        if(!isOpen){ btn.setAttribute('aria-expanded','true'); }
+      });
+    });
+    var subcatHeaders = panel.querySelectorAll('.subcat-header');
+    subcatHeaders.forEach(function(btn){
+      if (btn.dataset.bound) return;
+      btn.dataset.bound = "1";
+      btn.addEventListener('click', function(e){
+        e.stopPropagation();
+        var isOpen = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+      });
+    });
+  }
+
+  document.querySelectorAll('.client-panel').forEach(initClient);
+
+  window.showClient = function(id) {
+    document.querySelectorAll('.client-panel').forEach(function(p){ p.classList.remove('active'); });
+    document.querySelectorAll('.client-btn').forEach(function(b){ b.classList.remove('active'); });
+    document.getElementById('panel-' + id).classList.add('active');
+    if (window.event && window.event.currentTarget) {
+      window.event.currentTarget.classList.add('active');
+    }
+  };
+})();
+</script>
+
+</body>
+</html>
