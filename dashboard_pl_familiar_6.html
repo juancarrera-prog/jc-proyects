@@ -43,7 +43,7 @@ body{background:var(--bg0);color:var(--t1);font-family:-apple-system,BlinkMacSys
 .fbar{background:var(--bg1);border:1px solid var(--border);border-radius:var(--r12);padding:10px 16px;display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;position:sticky;top:8px;z-index:100;backdrop-filter:blur(12px)}
 .fbar-label{font-size:11px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
 .fd-sep{width:1px;height:20px;background:var(--border);flex-shrink:0}
-.year-btns{display:flex;gap:4px}
+.year-btns{display:flex;gap:4px;flex-wrap:wrap}
 .year-btn{padding:5px 14px;border-radius:var(--r20);border:1px solid var(--border);background:var(--bg2);color:var(--t2);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s}
 .year-btn:hover{border-color:var(--border2);color:var(--t1)}
 .year-btn.active{background:var(--green);border-color:var(--green);color:#fff}
@@ -153,19 +153,22 @@ const CAT_COLORS  = ['#4a8af4','#22c55e','#f59e0b','#ef4444','#a855f7','#22d3ee'
 
 let activeYears  = new Set();
 let activeMonths = new Set();
+let allYears     = [];
 let charts = {};
 
+// ── parseKey: soporta cualquier año sin hardcodeo ──────────────────────────
 function parseKey(k) {
   const parts = k.trim().toLowerCase().split(/\s+/);
   let mes = MESES_ALIAS[parts[0]] || parts[0];
-  const anio = '20' + (parts[1] || '25');
+  // parts[1] es siempre el año en 2 dígitos: "25", "26", "27", "28"...
+  const anio = parts[1] ? '20' + parts[1] : String(new Date().getFullYear());
   return { mes, anio };
 }
 
 async function init() {
   const now  = new Date();
   const opts = { day:'numeric', month:'long', year:'numeric' };
-  document.getElementById('hdrDate').textContent   = now.toLocaleDateString('es-AR', opts);
+  document.getElementById('hdrDate').textContent    = now.toLocaleDateString('es-AR', opts);
   document.getElementById('footerDate').textContent = now.toLocaleDateString('es-AR', opts);
 
   try {
@@ -182,30 +185,35 @@ async function init() {
     return;
   }
 
-  const years     = [...new Set(Object.keys(DATA).map(k => parseKey(k).anio))].sort();
-  const allMonths = [...new Set(Object.keys(DATA).map(k => parseKey(k).mes))];
-  allMonths.sort((a,b) => (MESES_ORDER.indexOf(a)||99) - (MESES_ORDER.indexOf(b)||99));
+  // ── Detectar todos los años dinámicamente desde los datos ─────────────────
+  allYears = [...new Set(Object.keys(DATA).map(k => parseKey(k).anio))].sort();
 
-  // Activar último año por defecto
-  activeYears = new Set([years[years.length-1]]);
+  const allMonthsSet = new Set(Object.keys(DATA).map(k => parseKey(k).mes));
+  const allMonths = MESES_ORDER.filter(m => allMonthsSet.has(m));
 
-  // Year buttons
+  // Activar el año actual (o el último disponible si el actual no está)
+  const currentYear = String(now.getFullYear());
+  const defaultYear = allYears.includes(currentYear) ? currentYear : allYears[allYears.length - 1];
+  activeYears = new Set([defaultYear]);
+
+  // ── Year buttons — dinámicos, sin hardcodeo ───────────────────────────────
   const yb = document.getElementById('yearBtns');
-  years.forEach(y => {
+  allYears.forEach(y => {
     const btn = document.createElement('button');
-    btn.className = 'year-btn' + (activeYears.has(y) ? ' active' : '');
-    btn.textContent = y;
+    btn.className    = 'year-btn' + (activeYears.has(y) ? ' active' : '');
+    btn.textContent  = y;
+    btn.dataset.year = y;
     btn.onclick = () => toggleYear(y, btn);
     yb.appendChild(btn);
   });
 
-  // Month buttons
+  // ── Month buttons ─────────────────────────────────────────────────────────
   const mb = document.getElementById('monthBtns');
   MESES_ORDER.forEach((m, idx) => {
     if (!allMonths.includes(m)) return;
     const btn = document.createElement('button');
-    btn.className    = 'month-btn';
-    btn.textContent  = MESES_FULL[idx];
+    btn.className     = 'month-btn';
+    btn.textContent   = MESES_FULL[idx];
     btn.dataset.month = m;
     btn.onclick = () => toggleMonth(m, btn);
     mb.appendChild(btn);
@@ -217,7 +225,7 @@ async function init() {
 }
 
 function toggleYear(y, btn) {
-  if (activeYears.has(y) && activeYears.size === 1) return;
+  if (activeYears.has(y) && activeYears.size === 1) return; // al menos 1 activo
   activeYears.has(y) ? activeYears.delete(y) : activeYears.add(y);
   btn.classList.toggle('active');
   rebuildMonthButtons();
@@ -278,7 +286,6 @@ function calcTotals(filtered) {
     limpios  += d.totalLimpios;
     Object.entries(d.gastos).forEach(([c,v]) => { if(v>0) catMap[c] = (catMap[c]||0)+v; });
   });
-  // Egresos = suma real de todas las categorías de gastos
   const egresos = Object.values(catMap).reduce((a,b)=>a+b, 0);
   return { ingresos, egresos, limpios, catMap };
 }
@@ -286,7 +293,7 @@ function calcTotals(filtered) {
 function getMonthly(filtered) {
   return filtered.map(([k,d]) => {
     const { mes, anio } = parseKey(k);
-    const mIdx = MESES_ORDER.indexOf(mes);
+    const mIdx  = MESES_ORDER.indexOf(mes);
     const label = MESES_FULL[mIdx] + ' ' + anio;
     const ing   = Object.values(d.ingresos).reduce((a,b)=>a+b,0);
     const egr   = Object.values(d.gastos).reduce((a,b)=>a+b,0);
