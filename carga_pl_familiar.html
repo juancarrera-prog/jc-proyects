@@ -641,9 +641,11 @@ function init() {
   document.getElementById('headerDate').textContent =
     now.toLocaleDateString('es-AR', { day: 'numeric', month: 'short', year: 'numeric' });
 
-  // Poblar selectores de mes
+  // Poblar selectores de mes — dinámico, desde ene 25 hasta 4 años adelante
   const mesesOptions = [];
-  for (let y = 2025; y <= 2026; y++) {
+  const anioInicio = 2025;
+  const anioFin = now.getFullYear() + 4;
+  for (let y = anioInicio; y <= anioFin; y++) {
     for (let m = 0; m < 12; m++) {
       mesesOptions.push({
         value: MESES[m] + ' ' + String(y).slice(-2),
