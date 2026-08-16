@@ -219,8 +219,7 @@ function renderProyeccion() {
     div.innerHTML = `
       <div class="proy-mes-label">${MESES_FULL[mIdx]} ${anioNum}${esActual ? ' ◀ HOY' : ''}</div>
       <div class="proy-mes-monto">$${Math.round(d.total).toLocaleString('es-AR')}</div>
-      ${d.cats.slice(0,4).map(c => `<div class="proy-cat"><span>${c.cat}</span><span>$${c.monto.toLocaleString('es-AR')}</span></div>`).join('')}
-      ${d.cats.length > 4 ? `<div class="proy-cat" style="color:var(--t3)">+${d.cats.length-4} más</div>` : ''}`;
+      ${d.cats.sort((a,b)=>b.monto-a.monto).map(c => `<div class="proy-cat"><span>${c.cat}</span><span>$${c.monto.toLocaleString('es-AR')}</span></div>`).join('')}`;
     scroll.appendChild(div);
   });
   // Scroll al mes actual
