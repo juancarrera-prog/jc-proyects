@@ -119,46 +119,17 @@ td:last-child{text-align:right}
     <div class="table-title">📋 Detalle por Categoría de Egresos</div>
     <table><thead><tr><th>Categoría</th><th>Monto</th><th>% del total</th></tr></thead><tbody id="tableBody"></tbody></table>
   </div>
-  <div class="footer">Base: Ene–Ago 2026 · Nuevas cargas desde Hoja 2 · Actualizado al <span id="footerDate"></span></div>
+  <div class="footer">Fuente: Hoja 2 · Actualizado al <span id="footerDate"></span> · P&L Familiar Carrera</div>
 </div>
 <script>
+const API_URL='https://script.google.com/macros/s/AKfycbxRtqVcsbmdNLLiVHtirexJr4ERNyElKNZTkxShNKYvmZq1UVFtDvHwabHiuA7R-jyI1A/exec';
 const MESES_ORDER=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
 const MESES_FULL=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 const CAT_COLORS=['#4a8af4','#22c55e','#f59e0b','#ef4444','#a855f7','#22d3ee','#fb923c','#ec4899','#84cc16','#06b6d4','#8b5cf6','#f97316','#14b8a6','#6366f1','#e11d48'];
-const API_URL='https://script.google.com/macros/s/AKfycbyDFc2xlIqGJ4t0Lp9pnaAqvJtkHQwtWCScTeDzNBthJwkhlI7TDY2or9zmOg_0Uk03Tg/exec';
 
-// ── BASE HARDCODEADA ene-ago 2026 ─────────────────────────────────────────
-const BASE_DATA={"ene 26": {"ingresos": {"Sueldo Juani": 4595000, "Sueldo Nati": 3302609, "Extras": 150000}, "gastos": {"Comida + Supermercado": 515125, "Agua Poybe (Cimes)": 75200, "Maternal Renu": 530000, "Expensas": 475408, "Ocio": 397300, "Regalos": 204893, "Renata": 64163, "Cosas para el hogar": 454649, "Queso y Milo": 47745, "Municipalidad": 122660, "Nafta Sandero": 115510, "Seguro Auto": 106566, "Seguro Virtus": 82534, "GYM Nati": 30000, "GAS": 29756, "LUZ": 111932, "Peajes": 38000, "Mary Limpieza": 115900, "Mary ART + aportes": 8359, "Peluqueria/Barberia": 115000, "Cable + Internet": 48783, "Pileta y mundo limp": 53000, "Caja de psicologos": 100000, "ColPsi matricula": 30813, "Osde diferencia": 59600, "OTROS": 19260, "Inversiones": 105814}, "totalGastos": 4057970, "totalLimpios": 3989639}, "feb 26": {"ingresos": {"Sueldo Juani": 3650000, "Sueldo Nati": 1549000, "Extras": 2260000}, "gastos": {"Comida + Supermercado": 523402, "Agua Poybe (Cimes)": 47200, "Dover": 679070, "Maternal Renu": 530000, "Expensas": 412200, "Ocio": 412591, "Regalos": 251394, "Renata": 217563, "Cosas para el hogar": 574649, "Queso y Milo": 89500, "Farmacia": 17630, "Municipalidad": 122661, "ARBA": 280288, "Nafta Virtus": 30000, "Nafta Sandero": 193000, "Mecanico Auto": 77000, "Seguro Auto": 75217, "Seguro Virtus": 64396, "GYM Nati": 30000, "GAS": 25485, "LUZ": 227254, "Peajes": 101800, "Mary Limpieza": 126840, "Mary ART + aportes": 8742, "Cable + Internet": 43987, "Apple (fin de mes)": 10900, "Pileta y mundo limp": 76100, "ColPsi matricula": 25000, "Inversiones": 1124000}, "totalGastos": 6397869, "totalLimpios": 1061131}, "mar 26": {"ingresos": {"Sueldo Juani": 3500000, "Sueldo Nati": 1563720}, "gastos": {"Comida + Supermercado": 447669, "Agua Poybe (Cimes)": 88100, "Dover": 679070, "Maternal Renu": 35000, "Expensas": 436172, "Ocio": 237000, "Regalos": 132512, "Renata": 117296, "Cosas para el hogar": 490185, "Queso y Milo": 28000, "Municipalidad": 129255, "Nafta Virtus": 30000, "Nafta Sandero": 220000, "Seguro Auto": 79537, "Seguro Virtus": 64396, "Patente Auto": 14262, "GAS": 25512, "LUZ": 112191, "Peajes": 23700, "Mary Limpieza": 110460, "Mary ART + aportes": 8742, "Cable + Internet": 47000, "Apple (fin de mes)": 13487, "Caja de psicologos": 65000, "ColPsi matricula": 25000, "OTROS": 49835}, "totalGastos": 3709381, "totalLimpios": 1354339}, "abr 26": {"ingresos": {"Sueldo Juani": 3334000, "Sueldo Nati": 1665362, "Extras": 160000}, "gastos": {"Comida + Supermercado": 336684, "Dover": 702854, "Expensas": 424351, "Ocio": 184000, "Regalos": 267941, "Renata": 95294, "Cosas para el hogar": 294057, "Queso y Milo": 26000, "Municipalidad": 129255, "Nafta Virtus": 245000, "Nafta Sandero": 129000, "Seguro Auto": 79375, "Seguro Virtus": 112478, "Patente Auto": 14228, "GYM Nati": 55000, "GAS": 26564, "LUZ": 128248, "Peajes": 23700, "Mary Limpieza": 104602, "Mary ART + aportes": 8742, "Cable + Internet": 47268, "Apple (fin de mes)": 13487, "Caja de psicologos": 79843, "ColPsi matricula": 24413, "Vacaciones": 215450, "Inversiones": 180490, "Dolares": 201550}, "totalGastos": 4149874, "totalLimpios": 1009488}, "may 26": {"ingresos": {"Sueldo Juani": 3266000, "Sueldo Nati": 1563720, "Extras": 170000}, "gastos": {"Comida + Supermercado": 761060, "Agua Poybe (Cimes)": 78000, "Dover": 720433, "Expensas": 495707, "Ocio": 858770, "Regalos": 312309, "Renata": 242596, "Cosas para el hogar": 282765, "Farmacia": 221081, "Municipalidad": 136822, "Nafta Virtus": 511440, "Nafta Sandero": 286233, "Seguro Auto": 158608, "Seguro Virtus": 227472, "Patente Auto": 14931, "GYM Nati": 55000, "GAS": 26578, "LUZ": 208758, "Peajes": 272658, "Mary Limpieza": 219378, "Mary ART + aportes": 8884, "Cable + Internet": 44215, "OTROS": 285000, "Queso y Milo": 42883, "Spotify": 10000, "Apple (fin de mes)": 36000}, "totalGastos": 6517581, "totalLimpios": -1517861}, "jun 26": {"ingresos": {"Extras": 1028141}, "gastos": {"Regalos": 231738, "OTROS": 191500, "Nafta Virtus": 180000, "Comida + Supermercado": 728587, "Expensas": 507066, "Farmacia": 41700, "Mary Limpieza": 193748, "Ocio": 725358, "Mary ART + aportes": 9007, "Osde diferencia": 13207, "Patente Virtus": 38642, "Municipalidad": 136823, "GAS": 66031, "Queso y Milo": 161300, "Nafta Sandero": 131000, "Renata": 48333, "Cosas para el hogar": 469200, "LUZ": 84643, "Agua Poybe (Cimes)": 56000, "Peluqueria/Barberia": 25000, "Dover": 720433}, "totalGastos": 4759316, "totalLimpios": -3731175}, "jul 26": {"ingresos": {"Extras": 290000, "Sueldo Juani": 3620000, "Sueldo Nati": 1906500}, "gastos": {"Regalos": 148265, "OTROS": 422100, "Renata": 77233, "Expensas": 509361, "Patente Virtus": 39580, "Osde diferencia": 78281, "GAS": 65420, "Nafta Sandero": 235000, "Mary Limpieza": 160350, "Cosas para el hogar": 30000, "Comida + Supermercado": 1055787, "Dolares": 1053500, "Agua Poybe (Cimes)": 90000, "Caja de psicologos": 145000, "Ocio": 740400, "Municipalidad": 145542, "Mary ART + aportes": 9568, "ColPsi matricula": 26198, "Peluqueria/Barberia": 20000, "Nafta Virtus": 95000, "LUZ": 122166, "Inversiones": 800000}, "totalGastos": 6068751, "totalLimpios": -252251}, "ago 26": {"ingresos": {"Extras": 209000, "Sueldo Juani": 3600000, "Sueldo Nati": 1906500}, "gastos": {"Regalos": 88265, "Renata": 308894, "Dover": 767, "Nafta Virtus": 187000, "Comida + Supermercado": 294408, "Peluqueria/Barberia": 40000, "Ocio": 334590, "Cosas para el hogar": 114575, "Expensas": 534364, "Nafta Sandero": 50000, "OTROS": 91841, "Mary Limpieza": 64140, "Cable + Internet": 47975, "Patente Auto": 14243, "Municipalidad": 145542, "Mary ART + aportes": 10089, "Patente Virtus": 40349, "GAS": 135327, "Queso y Milo": 42883, "Caja de psicologos": 145000, "ColPsi matricula": 26198}, "totalGastos": 2716450, "totalLimpios": 2999050}, "sep 26": {"ingresos": {}, "gastos": {"Regalos": 88265, "Renata": 6633}, "totalGastos": 94898, "totalLimpios": -94898}, "oct 26": {"ingresos": {}, "gastos": {"Regalos": 59198}, "totalGastos": 59198, "totalLimpios": -59198}, "nov 26": {"ingresos": {}, "gastos": {"Regalos": 41667}, "totalGastos": 41667, "totalLimpios": -41667}};
-
-// ── CUOTAS PARA PROYECCIÓN ────────────────────────────────────────────────
-const CUOTAS=[
-  {cat:'Regalos',monto:39747,cuotas:6,mesInicio:'may 26',comentario:'Perfume Juani'},
-  {cat:'OTROS',monto:429000,cuotas:3,mesInicio:'may 26',comentario:'Curso Nati'},
-  {cat:'Regalos',monto:65440,cuotas:6,mesInicio:'may 26',comentario:'Zapas Marta'},
-  {cat:'Renata',monto:34000,cuotas:3,mesInicio:'jun 26',comentario:'Renata'},
-  {cat:'Regalos',monto:130000,cuotas:6,mesInicio:'jun 26',comentario:'Regalo Nati cumple'},
-  {cat:'Regalos',monto:120000,cuotas:6,mesInicio:'jun 26',comentario:'Zapas Nati Patri'},
-  {cat:'Regalos',monto:47700,cuotas:3,mesInicio:'jul 26',comentario:'Dexter zapas'},
-  {cat:'Renata',monto:19900,cuotas:3,mesInicio:'jul 26',comentario:'Renata'},
-  {cat:'Regalos',monto:39500,cuotas:3,mesInicio:'jul 26',comentario:'Boina'},
-];
-
-let DATA={},activeYears=new Set(),activeMonths=new Set(),allYears=[],charts={};
+let DATA={},CUOTAS=[],activeYears=new Set(),activeMonths=new Set(),allYears=[],charts={};
 
 function parseKey(k){const p=k.trim().toLowerCase().split(/\s+/);return{mes:p[0],anio:p[1]?'20'+p[1]:String(new Date().getFullYear())};}
-
-// Normalizar categorías del Sheet para que coincidan con la base
-function normCat(c){
-  const m={'Ocio':'Ocio',' Ocio ':'Ocio','LUZ 💡 ':'LUZ','LUZ 💡':'LUZ','GAS💨':'GAS',
-    'Queso y Milo🐩🐩':'Queso y Milo','Renata 👶🏻💕':'Renata',
-    'Cosas para el hogar🏠🔧':'Cosas para el hogar','Mary ART + aportes 🧹':'Mary ART + aportes',
-    'Osde diferencia 🏥':'Osde diferencia','Caja de psicólogos ':'Caja de psicologos',
-    'Caja de psicólogos':'Caja de psicologos','Vacaciones 🏝️':'Vacaciones',
-    'Cable + Internet 📺emision dia 28 mes':'Cable + Internet',
-    'Pileta y mundo limp 🧼':'Pileta y mundo limp','ColPsi matrícula':'ColPsi matricula',
-    'Peluquería/Barbería':'Peluqueria/Barberia','Dólares':'Dolares','ARBA (pagar MANUAL)':'ARBA'};
-  return m[c.trim()]||c.trim();
-}
 
 function calcProyeccion(){
   const proy={};
@@ -167,7 +138,7 @@ function calcProyeccion(){
     for(let i=0;i<c.cuotas;i++){
       const mIdx=(mi+i)%12,anio=ab+Math.floor((mi+i)/12),key=MESES_ORDER[mIdx]+' '+String(anio).slice(-2);
       if(!proy[key])proy[key]={total:0,cats:[]};
-      proy[key].total+=pc;proy[key].cats.push({cat:c.comentario,monto:pc});
+      proy[key].total+=pc;proy[key].cats.push({cat:c.comentario||c.cat,monto:pc});
     }
   });
   return proy;
@@ -175,6 +146,7 @@ function calcProyeccion(){
 
 function renderProyeccion(){
   const proy=calcProyeccion(),now=new Date(),ma=MESES_ORDER[now.getMonth()]+' '+String(now.getFullYear()).slice(-2);
+  if(Object.keys(proy).length===0){document.getElementById('proyScroll').innerHTML='<div style="color:var(--t3);font-size:12px;padding:8px">No hay cuotas comprometidas</div>';return;}
   const meses=Object.keys(proy).sort((a,b)=>{const[ma2,aa]=a.split(' '),[mb,ab]=b.split(' ');return(parseInt('20'+aa)*12+MESES_ORDER.indexOf(ma2))-(parseInt('20'+ab)*12+MESES_ORDER.indexOf(mb));});
   const scroll=document.getElementById('proyScroll');scroll.innerHTML='';
   meses.forEach(mes=>{
@@ -193,45 +165,17 @@ async function init(){
   document.getElementById('hdrDate').textContent=now.toLocaleDateString('es-AR',opts);
   document.getElementById('footerDate').textContent=now.toLocaleDateString('es-AR',opts);
 
-  // Arrancar con base
-  DATA=JSON.parse(JSON.stringify(BASE_DATA));
-  renderProyeccion();
-
-  // Leer Hoja 2 del Sheet — agrega datos y cuotas dinámicas
   try{
     const res=await fetch(API_URL);
     const resp=await res.json();
+    DATA=resp.data||{};
+    CUOTAS=resp.cuotas||[];
+  }catch(e){
+    document.getElementById('loader').innerHTML=`<div style="text-align:center;padding:20px"><div style="font-size:32px;margin-bottom:12px">⚠️</div><div style="color:var(--t1);font-size:14px;margin-bottom:8px">No se pudo conectar al Sheet</div><button onclick="location.reload()" style="margin-top:16px;padding:8px 20px;background:var(--green);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:12px">Reintentar</button></div>`;
+    return;
+  }
 
-    // El Apps Script devuelve {data:{...meses}, cuotas:[...filas con cuotas>1]}
-    const sheetData=resp.data||resp;
-    const sheetCuotas=resp.cuotas||[];
-
-    // Agregar cuotas nuevas de Hoja 2 a la proyección
-    sheetCuotas.forEach(c=>{
-      CUOTAS.push({cat:normCat(c.categoria),monto:c.monto,cuotas:c.cuotas,mesInicio:c.mesInicio,comentario:c.comentario||normCat(c.categoria)});
-    });
-    if(sheetCuotas.length>0) renderProyeccion();
-
-    // Agregar datos por mes
-    Object.entries(sheetData).forEach(([k,v])=>{
-      const{anio}=parseKey(k);
-      if(parseInt(anio)<2026)return;
-      if(!DATA[k]){
-        const ing={},gas={};
-        Object.entries(v.ingresos||{}).forEach(([c,val])=>{ing[normCat(c)]=(ing[normCat(c)]||0)+val;});
-        Object.entries(v.gastos||{}).forEach(([c,val])=>{gas[normCat(c)]=(gas[normCat(c)]||0)+val;});
-        DATA[k]={ingresos:ing,gastos:gas,
-          totalGastos:Object.values(gas).reduce((a,b)=>a+b,0),
-          totalLimpios:Object.values(ing).reduce((a,b)=>a+b,0)-Object.values(gas).reduce((a,b)=>a+b,0)};
-      } else {
-        // Sumar siempre — el Sheet tiene lo nuevo que no está en la base
-        Object.entries(v.ingresos||{}).forEach(([c,val])=>{const nc=normCat(c);DATA[k].ingresos[nc]=(DATA[k].ingresos[nc]||0)+val;});
-        Object.entries(v.gastos||{}).forEach(([c,val])=>{const nc=normCat(c);DATA[k].gastos[nc]=(DATA[k].gastos[nc]||0)+val;});
-        DATA[k].totalGastos=Object.values(DATA[k].gastos).reduce((a,b)=>a+b,0);
-        DATA[k].totalLimpios=Object.values(DATA[k].ingresos).reduce((a,b)=>a+b,0)-DATA[k].totalGastos;
-      }
-    });
-  }catch(e){console.log('Sheet no disponible, usando base local');}
+  renderProyeccion();
 
   allYears=[...new Set(Object.keys(DATA).map(k=>parseKey(k).anio))].sort();
   const cy=String(now.getFullYear()),dy=allYears.includes(cy)?cy:allYears[allYears.length-1];
@@ -282,12 +226,12 @@ function isDark(){return!document.documentElement.classList.contains('light');}
 function lc(){return isDark()?'#8a95ad':'#4a5878';}
 function renderDonut(ing,egr){
   destroyChart('donut');const ctx=document.getElementById('chartDonut').getContext('2d');
-  charts.donut=new Chart(ctx,{type:'doughnut',data:{labels:['Ingresos','Egresos'],datasets:[{data:[ing,egr],backgroundColor:['#22c55e','#ef4444'],borderColor:isDark()?'#0f1420':'#ffffff',borderWidth:3,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{position:'bottom',labels:{color:lc(),font:{size:11},padding:16,boxWidth:10}},tooltip:{callbacks:{label:c=>' '+fmt(c.raw)+' ('+(c.raw/(ing+egr)*100).toFixed(1)+'%)'}}}}}  );
+  charts.donut=new Chart(ctx,{type:'doughnut',data:{labels:['Ingresos','Egresos'],datasets:[{data:[ing,egr],backgroundColor:['#22c55e','#ef4444'],borderColor:isDark()?'#0f1420':'#ffffff',borderWidth:3,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{position:'bottom',labels:{color:lc(),font:{size:11},padding:16,boxWidth:10}},tooltip:{callbacks:{label:c=>' '+fmt(c.raw)+' ('+(c.raw/(ing+egr)*100).toFixed(1)+'%)'}}}}});
 }
 function renderCats(cm){
   destroyChart('cats');const s=Object.entries(cm).sort((a,b)=>b[1]-a[1]).slice(0,10);
   const ctx=document.getElementById('chartCats').getContext('2d');
-  charts.cats=new Chart(ctx,{type:'doughnut',data:{labels:s.map(([k])=>k),datasets:[{data:s.map(([,v])=>v),backgroundColor:CAT_COLORS,borderColor:isDark()?'#0f1420':'#ffffff',borderWidth:2,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'right',labels:{color:lc(),font:{size:10},padding:8,boxWidth:8}},tooltip:{callbacks:{label:c=>' '+fmt(c.raw)}}}}}  );
+  charts.cats=new Chart(ctx,{type:'doughnut',data:{labels:s.map(([k])=>k),datasets:[{data:s.map(([,v])=>v),backgroundColor:CAT_COLORS,borderColor:isDark()?'#0f1420':'#ffffff',borderWidth:2,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'right',labels:{color:lc(),font:{size:10},padding:8,boxWidth:8}},tooltip:{callbacks:{label:c=>' '+fmt(c.raw)}}}}});
 }
 function renderTable(cm,total){
   const s=Object.entries(cm).sort((a,b)=>b[1]-a[1]);
