@@ -224,8 +224,9 @@ async function init(){
           totalGastos:Object.values(gas).reduce((a,b)=>a+b,0),
           totalLimpios:Object.values(ing).reduce((a,b)=>a+b,0)-Object.values(gas).reduce((a,b)=>a+b,0)};
       } else {
-        Object.entries(v.ingresos||{}).forEach(([c,val])=>{const nc=normCat(c);if(!DATA[k].ingresos[nc])DATA[k].ingresos[nc]=val;});
-        Object.entries(v.gastos||{}).forEach(([c,val])=>{const nc=normCat(c);if(!DATA[k].gastos[nc])DATA[k].gastos[nc]=val;});
+        // Sumar siempre — el Sheet tiene lo nuevo que no está en la base
+        Object.entries(v.ingresos||{}).forEach(([c,val])=>{const nc=normCat(c);DATA[k].ingresos[nc]=(DATA[k].ingresos[nc]||0)+val;});
+        Object.entries(v.gastos||{}).forEach(([c,val])=>{const nc=normCat(c);DATA[k].gastos[nc]=(DATA[k].gastos[nc]||0)+val;});
         DATA[k].totalGastos=Object.values(DATA[k].gastos).reduce((a,b)=>a+b,0);
         DATA[k].totalLimpios=Object.values(DATA[k].ingresos).reduce((a,b)=>a+b,0)-DATA[k].totalGastos;
       }
