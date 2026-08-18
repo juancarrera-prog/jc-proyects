@@ -6,19 +6,10 @@
 <title>P&L Familiar · Carrera</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-:root{
-  --bg0:#090b12;--bg1:#0f1420;--bg2:#161d2e;--bg3:#1c2438;--bg4:#222b3d;
-  --border:#263043;--border2:#303d56;
-  --t1:#dde3f0;--t2:#8a95ad;--t3:#4f5e78;
-  --green:#22c55e;--red:#ef4444;--blue:#4a8af4;--amber:#f59e0b;--purple:#a855f7;
-  --r4:4px;--r8:8px;--r12:12px;--r20:20px;
-}
-html.light{
-  --bg0:#f0f3f9;--bg1:#ffffff;--bg2:#f5f7fc;--bg3:#eaeff8;--bg4:#dde4f0;
-  --border:#d0d8ea;--border2:#b8c4d8;--t1:#1a2038;--t2:#4a5878;--t3:#8a95ad;
-}
+:root{--bg0:#090b12;--bg1:#0f1420;--bg2:#161d2e;--bg4:#222b3d;--border:#263043;--border2:#303d56;--t1:#dde3f0;--t2:#8a95ad;--t3:#4f5e78;--green:#22c55e;--red:#ef4444;--blue:#4a8af4;--amber:#f59e0b;--r8:8px;--r12:12px;--r20:20px}
+html.light{--bg0:#f0f3f9;--bg1:#ffffff;--bg2:#f5f7fc;--bg4:#dde4f0;--border:#d0d8ea;--border2:#b8c4d8;--t1:#1a2038;--t2:#4a5878;--t3:#8a95ad}
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg0);color:var(--t1);font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;font-size:13px;min-height:100vh}
+body{background:var(--bg0);color:var(--t1);font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;font-size:13px;min-height:100vh}
 #loader{position:fixed;inset:0;z-index:9999;background:var(--bg0);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;transition:opacity .4s}
 #loader.hidden{opacity:0;pointer-events:none}
 .pl-spinner{width:40px;height:40px;border:3px solid var(--border2);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite}
@@ -29,7 +20,7 @@ body{background:var(--bg0);color:var(--t1);font-family:-apple-system,BlinkMacSys
 .hdr-left{display:flex;align-items:center;gap:14px}
 .hdr-icon{width:40px;height:40px;background:linear-gradient(135deg,#22c55e22,#22c55e44);border:1px solid #22c55e44;border-radius:var(--r12);display:flex;align-items:center;justify-content:center;font-size:20px}
 .hdr-meta{display:flex;flex-direction:column;gap:2px;padding-left:12px;border-left:2px solid var(--border2)}
-.hdr-title{font-size:15px;font-weight:700;color:var(--t1);letter-spacing:-.2px}
+.hdr-title{font-size:15px;font-weight:700;letter-spacing:-.2px}
 .hdr-sub{font-size:11px;color:var(--t2)}
 .hdr-right{display:flex;align-items:center;gap:10px}
 .live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px #22c55e88;animation:pulse 2s infinite}
@@ -47,22 +38,22 @@ body{background:var(--bg0);color:var(--t1);font-family:-apple-system,BlinkMacSys
 .kpi{background:var(--bg1);border:1px solid var(--border);border-radius:var(--r12);padding:16px 18px;position:relative;overflow:hidden}
 .kpi-accent{position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--r12) var(--r12) 0 0}
 .kpi-label{font-size:11px;color:var(--t2);font-weight:500;margin-bottom:8px}
-.kpi-value{font-size:22px;font-weight:700;color:var(--t1);letter-spacing:-.5px;line-height:1}
+.kpi-value{font-size:22px;font-weight:700;letter-spacing:-.5px;line-height:1}
 .kpi-sub{font-size:11px;color:var(--t3);margin-top:6px}
 .kpi-delta{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:600;padding:2px 7px;border-radius:var(--r20);margin-top:6px}
 .kpi-delta.pos{background:#22c55e22;color:var(--green)}
 .kpi-delta.neg{background:#ef444422;color:var(--red)}
 .charts-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
 .chart-card{background:var(--bg1);border:1px solid var(--border);border-radius:var(--r12);padding:18px}
-.chart-title{font-size:12px;font-weight:600;color:var(--t1);margin-bottom:4px}
+.chart-title{font-size:12px;font-weight:600;margin-bottom:4px}
 .chart-sub{font-size:11px;color:var(--t3);margin-bottom:16px}
 .chart-wrap{position:relative;height:220px}
 .proyeccion-card{background:var(--bg1);border:1px solid var(--border);border-radius:var(--r12);padding:18px;margin-bottom:12px}
-.proyeccion-title{font-size:12px;font-weight:600;color:var(--t1);margin-bottom:4px}
+.proyeccion-title{font-size:12px;font-weight:600;margin-bottom:4px}
 .proyeccion-sub{font-size:11px;color:var(--t3);margin-bottom:16px}
 .proy-scroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
 .proy-scroll::-webkit-scrollbar{display:none}
-.proy-mes{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r8);padding:12px;min-width:140px;flex-shrink:0}
+.proy-mes{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r8);padding:12px;min-width:150px;flex-shrink:0}
 .proy-mes-label{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
 .proy-mes-monto{font-size:16px;font-weight:700;color:var(--amber);margin-bottom:8px}
 .proy-cat{font-size:10px;color:var(--t2);display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid var(--border)}
@@ -71,12 +62,12 @@ body{background:var(--bg0);color:var(--t1);font-family:-apple-system,BlinkMacSys
 .proy-mes.actual{border-color:var(--amber);background:rgba(245,158,11,0.05)}
 .proy-mes.actual .proy-mes-label{color:var(--amber);font-weight:700}
 .table-card{background:var(--bg1);border:1px solid var(--border);border-radius:var(--r12);padding:18px;margin-bottom:12px}
-.table-title{font-size:12px;font-weight:600;color:var(--t1);margin-bottom:16px}
+.table-title{font-size:12px;font-weight:600;margin-bottom:16px}
 table{width:100%;border-collapse:collapse}
 thead tr{border-bottom:1px solid var(--border)}
 th{font-size:11px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.4px;padding:6px 12px;text-align:left}
 th:last-child{text-align:right}
-td{padding:9px 12px;font-size:12px;color:var(--t1);border-bottom:1px solid var(--border)}
+td{padding:9px 12px;font-size:12px;border-bottom:1px solid var(--border)}
 tbody tr:last-child td{border-bottom:none}
 tbody tr:hover{background:var(--bg2)}
 td:last-child{text-align:right}
@@ -86,36 +77,24 @@ td:last-child{text-align:right}
 .pct-bar{height:4px;border-radius:2px;background:var(--bg4);flex:1;overflow:hidden;min-width:60px}
 .pct-bar-fill{height:4px;border-radius:2px}
 .footer{text-align:center;font-size:11px;color:var(--t3);padding:20px 0 8px;border-top:1px solid var(--border);margin-top:8px}
-@media(max-width:640px){
-  .charts-row{grid-template-columns:1fr}
-  .kpi-grid{grid-template-columns:1fr 1fr}
-  .page{padding:16px 12px}
-}
+@media(max-width:640px){.charts-row{grid-template-columns:1fr}.kpi-grid{grid-template-columns:1fr 1fr}.page{padding:16px 12px}}
 </style>
 </head>
 <body>
-<div id="loader">
-  <div class="pl-spinner"></div>
-  <div style="font-size:13px;color:var(--t2)">Cargando P&L Familiar…</div>
-</div>
+<div id="loader"><div class="pl-spinner"></div><div style="font-size:13px;color:var(--t2)">Cargando P&L Familiar…</div></div>
 <div class="page">
   <div class="hdr">
     <div class="hdr-left">
       <div class="hdr-icon">🏠</div>
-      <div class="hdr-meta">
-        <div class="hdr-title">P&L Familiar · Carrera</div>
-        <div class="hdr-sub">Dashboard de ingresos y egresos</div>
-      </div>
+      <div class="hdr-meta"><div class="hdr-title">P&L Familiar · Carrera</div><div class="hdr-sub">Dashboard de ingresos y egresos</div></div>
     </div>
     <div class="hdr-right">
-      <div class="live-dot"></div>
-      <div class="hdr-date" id="hdrDate"></div>
+      <div class="live-dot"></div><div class="hdr-date" id="hdrDate"></div>
       <button class="theme-btn" onclick="toggleTheme()">☀️</button>
     </div>
   </div>
   <div class="fbar">
-    <span class="fbar-label">Año</span>
-    <div class="year-btns" id="yearBtns"></div>
+    <span class="fbar-label">Año</span><div class="year-btns" id="yearBtns"></div>
     <div class="fd-sep"></div>
     <span class="fbar-label">Meses</span>
     <button class="all-btn" onclick="toggleAllMonths()">Todos</button>
@@ -133,295 +112,188 @@ td:last-child{text-align:right}
   </div>
   <div class="proyeccion-card">
     <div class="proyeccion-title">📅 Cuotas comprometidas — proyección mensual</div>
-    <div class="proyeccion-sub">Lo que ya tenés comprometido mes a mes por compras en cuotas (porcelanatos, regalos, etc.)</div>
+    <div class="proyeccion-sub">Lo que ya tenés comprometido mes a mes por compras en cuotas</div>
     <div class="proy-scroll" id="proyScroll"></div>
   </div>
   <div class="table-card">
     <div class="table-title">📋 Detalle por Categoría de Egresos</div>
     <table><thead><tr><th>Categoría</th><th>Monto</th><th>% del total</th></tr></thead><tbody id="tableBody"></tbody></table>
   </div>
-  <div class="footer">Base: Comentarios cargados · Actualizado al <span id="footerDate"></span> · P&L Familiar Carrera</div>
+  <div class="footer">Base: Ene–Ago 2026 · Nuevas cargas desde Hoja 2 · Actualizado al <span id="footerDate"></span></div>
 </div>
 <script>
-const MESES_ORDER = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
-const MESES_FULL  = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-const CAT_COLORS  = ['#4a8af4','#22c55e','#f59e0b','#ef4444','#a855f7','#22d3ee','#fb923c','#ec4899','#84cc16','#06b6d4','#8b5cf6','#f97316','#14b8a6','#6366f1','#e11d48'];
+const MESES_ORDER=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+const MESES_FULL=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+const CAT_COLORS=['#4a8af4','#22c55e','#f59e0b','#ef4444','#a855f7','#22d3ee','#fb923c','#ec4899','#84cc16','#06b6d4','#8b5cf6','#f97316','#14b8a6','#6366f1','#e11d48'];
+const API_URL='https://script.google.com/macros/s/AKfycbyPfxVhJByib-PpbpgrYzkBp2NAoMEjgqeuf-Co3PXqRdRiD8aliz-rM0Cd7TCwA7ilXA/exec';
 
-// ── BASE HARDCODEADA desde Comentarios ───────────────────────────────────────
-const BASE_DATA = {"may 26": {"ingresos": {"Extras": 170000}, "gastos": {"Cable + Internet 📺emision dia 28 mes": 44215, "Regalos": 143931, "Comida + Supermercado": 346190, "Patente Auto": 14791, "OTROS": 185000, "Queso y Milo🐩🐩": 42883, "GAS💨": 26578, "Mary Limpieza": 95162, "Agua Poybe (Cimes)": 78000, "Ocio": 320000, "Farmacia": 146172, "Seguro Virtus": 114510, "Peajes": 189400, "Nafta Virtus": 134000, "Renata 👶🏻💕": 89500, "LUZ 💡": 95957, "Nafta Sandero": 169233, "Seguro Auto": 79233, "Spotify": 10000, "Apple (fin de mes)": 36000}, "totalGastos": 2360755, "totalLimpios": -2190755}, "jun 26": {"ingresos": {"Extras": 1028141}, "gastos": {"Regalos": 231738, "OTROS": 191500, "Nafta Virtus": 180000, "Comida + Supermercado": 728587, "Expensas": 507066, "Farmacia": 41700, "Mary Limpieza": 193748, "Ocio": 725358, "Mary ART + aportes 🧹": 9007, "Osde diferencia 🏥": 13207, "Patente Virtus": 38642, "Municipalidad": 136823, "GAS💨": 66031, "Queso y Milo🐩🐩": 161300, "Nafta Sandero": 131000, "Renata 👶🏻💕": 48333, "Cosas para el hogar🏠🔧": 469200, "LUZ 💡": 84643, "Agua Poybe (Cimes)": 56000, "Peluquería/Barbería": 25000, "Dover": 720433}, "totalGastos": 4759316, "totalLimpios": -3731175}, "jul 26": {"ingresos": {"Extras": 290000, "Sueldo Juani": 3620000, "Sueldo Nati": 1906500}, "gastos": {"Regalos": 148265, "OTROS": 422100, "Renata 👶🏻💕": 77233, "Expensas": 509361, "Patente Virtus": 39580, "Osde diferencia 🏥": 78281, "GAS💨": 65420, "Nafta Sandero": 235000, "Mary Limpieza": 160350, "Cosas para el hogar🏠🔧": 30000, "Comida + Supermercado": 1055787, "Dólares": 1053500, "Agua Poybe (Cimes)": 90000, "Caja de psicólogos": 145000, "Ocio": 740400, "Municipalidad": 145542, "Mary ART + aportes 🧹": 9568, "ColPsi matrícula": 26198, "Peluquería/Barbería": 20000, "Nafta Virtus": 95000, "LUZ 💡": 122166, "Inversiones": 800000}, "totalGastos": 6068751, "totalLimpios": -252251}, "ago 26": {"ingresos": {"Extras": 209000}, "gastos": {"Regalos": 88265, "Renata 👶🏻💕": 308894, "Dover": 767, "Nafta Virtus": 187000, "Comida + Supermercado": 294408, "Peluquería/Barbería": 40000, "Ocio": 334590, "Cosas para el hogar🏠🔧": 277768, "Expensas": 534364, "Nafta Sandero": 50000, "OTROS": 91841, "Mary Limpieza": 64140, "Cable + Internet 📺emision dia 28 mes": 47975, "Patente Auto": 14243, "Municipalidad": 145542, "Mary ART + aportes 🧹": 10089, "Patente Virtus": 40349, "GAS💨": 135327}, "totalGastos": 2665562, "totalLimpios": -2456562}, "sep 26": {"ingresos": {}, "gastos": {"Regalos": 88265, "Renata 👶🏻💕": 6633, "Cosas para el hogar🏠🔧": 163193}, "totalGastos": 258091, "totalLimpios": -258091}, "oct 26": {"ingresos": {}, "gastos": {"Regalos": 59198, "Cosas para el hogar🏠🔧": 163193}, "totalGastos": 222391, "totalLimpios": -222391}, "nov 26": {"ingresos": {}, "gastos": {"Regalos": 41667, "Cosas para el hogar🏠🔧": 163193}, "totalGastos": 204860, "totalLimpios": -204860}, "dic 26": {"ingresos": {}, "gastos": {"Cosas para el hogar🏠🔧": 163193}, "totalGastos": 163193, "totalLimpios": -163193}, "ene 27": {"ingresos": {}, "gastos": {"Cosas para el hogar🏠🔧": 163193}, "totalGastos": 163193, "totalLimpios": -163193}, "feb 27": {"ingresos": {}, "gastos": {"Cosas para el hogar🏠🔧": 163193}, "totalGastos": 163193, "totalLimpios": -163193}, "mar 27": {"ingresos": {}, "gastos": {"Cosas para el hogar🏠🔧": 163193}, "totalGastos": 163193, "totalLimpios": -163193}, "abr 27": {"ingresos": {}, "gastos": {"Cosas para el hogar🏠🔧": 163193}, "totalGastos": 163193, "totalLimpios": -163193}, "may 27": {"ingresos": {}, "gastos": {"Cosas para el hogar🏠🔧": 163193}, "totalGastos": 163193, "totalLimpios": -163193}, "jun 27": {"ingresos": {}, "gastos": {"Cosas para el hogar🏠🔧": 163193}, "totalGastos": 163193, "totalLimpios": -163193}, "jul 27": {"ingresos": {}, "gastos": {"Cosas para el hogar🏠🔧": 163193}, "totalGastos": 163193, "totalLimpios": -163193}, "ago 27": {"ingresos": {}, "gastos": {"Cosas para el hogar🏠🔧": 63750}, "totalGastos": 63750, "totalLimpios": -63750}, "sep 27": {"ingresos": {}, "gastos": {"Cosas para el hogar🏠🔧": 63750}, "totalGastos": 63750, "totalLimpios": -63750}, "oct 27": {"ingresos": {}, "gastos": {"Cosas para el hogar🏠🔧": 63750}, "totalGastos": 63750, "totalLimpios": -63750}, "nov 27": {"ingresos": {}, "gastos": {"Cosas para el hogar🏠🔧": 63750}, "totalGastos": 63750, "totalLimpios": -63750}, "dic 27": {"ingresos": {}, "gastos": {"Cosas para el hogar🏠🔧": 63750}, "totalGastos": 63750, "totalLimpios": -63750}, "ene 28": {"ingresos": {}, "gastos": {"Cosas para el hogar🏠🔧": 63750}, "totalGastos": 63750, "totalLimpios": -63750}, "feb 28": {"ingresos": {}, "gastos": {"Cosas para el hogar🏠🔧": 63750}, "totalGastos": 63750, "totalLimpios": -63750}, "mar 28": {"ingresos": {}, "gastos": {"Cosas para el hogar🏠🔧": 63750}, "totalGastos": 63750, "totalLimpios": -63750}, "abr 28": {"ingresos": {}, "gastos": {"Cosas para el hogar🏠🔧": 63750}, "totalGastos": 63750, "totalLimpios": -63750}, "may 28": {"ingresos": {}, "gastos": {"Cosas para el hogar🏠🔧": 63750}, "totalGastos": 63750, "totalLimpios": -63750}, "jun 28": {"ingresos": {}, "gastos": {"Cosas para el hogar🏠🔧": 63750}, "totalGastos": 63750, "totalLimpios": -63750}, "jul 28": {"ingresos": {}, "gastos": {"Cosas para el hogar🏠🔧": 63750}, "totalGastos": 63750, "totalLimpios": -63750}};
+// ── BASE HARDCODEADA ene-ago 2026 ─────────────────────────────────────────
+const BASE_DATA={"ene 26": {"ingresos": {"Sueldo Juani": 4595000, "Sueldo Nati": 3302609, "Extras": 150000}, "gastos": {"Comida + Supermercado": 515125, "Agua Poybe (Cimes)": 75200, "Maternal Renu": 530000, "Expensas": 475408, "Ocio": 397300, "Regalos": 204893, "Renata": 64163, "Cosas para el hogar": 454649, "Queso y Milo": 47745, "Municipalidad": 122660, "Nafta Sandero": 115510, "Seguro Auto": 106566, "Seguro Virtus": 82534, "GYM Nati": 30000, "GAS": 29756, "LUZ": 111932, "Peajes": 38000, "Mary Limpieza": 115900, "Mary ART + aportes": 8359, "Peluqueria/Barberia": 115000, "Cable + Internet": 48783, "Pileta y mundo limp": 53000, "Caja de psicologos": 100000, "ColPsi matricula": 30813, "Osde diferencia": 59600, "OTROS": 19260, "Inversiones": 105814}, "totalGastos": 4057970, "totalLimpios": 3989639}, "feb 26": {"ingresos": {"Sueldo Juani": 3650000, "Sueldo Nati": 1549000, "Extras": 2260000}, "gastos": {"Comida + Supermercado": 523402, "Agua Poybe (Cimes)": 47200, "Dover": 679070, "Maternal Renu": 530000, "Expensas": 412200, "Ocio": 412591, "Regalos": 251394, "Renata": 217563, "Cosas para el hogar": 574649, "Queso y Milo": 89500, "Farmacia": 17630, "Municipalidad": 122661, "ARBA": 280288, "Nafta Virtus": 30000, "Nafta Sandero": 193000, "Mecanico Auto": 77000, "Seguro Auto": 75217, "Seguro Virtus": 64396, "GYM Nati": 30000, "GAS": 25485, "LUZ": 227254, "Peajes": 101800, "Mary Limpieza": 126840, "Mary ART + aportes": 8742, "Cable + Internet": 43987, "Apple (fin de mes)": 10900, "Pileta y mundo limp": 76100, "ColPsi matricula": 25000, "Inversiones": 1124000}, "totalGastos": 6397869, "totalLimpios": 1061131}, "mar 26": {"ingresos": {"Sueldo Juani": 3500000, "Sueldo Nati": 1563720}, "gastos": {"Comida + Supermercado": 447669, "Agua Poybe (Cimes)": 88100, "Dover": 679070, "Maternal Renu": 35000, "Expensas": 436172, "Ocio": 237000, "Regalos": 132512, "Renata": 117296, "Cosas para el hogar": 490185, "Queso y Milo": 28000, "Municipalidad": 129255, "Nafta Virtus": 30000, "Nafta Sandero": 220000, "Seguro Auto": 79537, "Seguro Virtus": 64396, "Patente Auto": 14262, "GAS": 25512, "LUZ": 112191, "Peajes": 23700, "Mary Limpieza": 110460, "Mary ART + aportes": 8742, "Cable + Internet": 47000, "Apple (fin de mes)": 13487, "Caja de psicologos": 65000, "ColPsi matricula": 25000, "OTROS": 49835}, "totalGastos": 3709381, "totalLimpios": 1354339}, "abr 26": {"ingresos": {"Sueldo Juani": 3334000, "Sueldo Nati": 1665362, "Extras": 160000}, "gastos": {"Comida + Supermercado": 336684, "Dover": 702854, "Expensas": 424351, "Ocio": 184000, "Regalos": 267941, "Renata": 95294, "Cosas para el hogar": 294057, "Queso y Milo": 26000, "Municipalidad": 129255, "Nafta Virtus": 245000, "Nafta Sandero": 129000, "Seguro Auto": 79375, "Seguro Virtus": 112478, "Patente Auto": 14228, "GYM Nati": 55000, "GAS": 26564, "LUZ": 128248, "Peajes": 23700, "Mary Limpieza": 104602, "Mary ART + aportes": 8742, "Cable + Internet": 47268, "Apple (fin de mes)": 13487, "Caja de psicologos": 79843, "ColPsi matricula": 24413, "Vacaciones": 215450, "Inversiones": 180490, "Dolares": 201550}, "totalGastos": 4149874, "totalLimpios": 1009488}, "may 26": {"ingresos": {"Sueldo Juani": 3266000, "Sueldo Nati": 1563720, "Extras": 170000}, "gastos": {"Comida + Supermercado": 761060, "Agua Poybe (Cimes)": 78000, "Dover": 720433, "Expensas": 495707, "Ocio": 858770, "Regalos": 312309, "Renata": 242596, "Cosas para el hogar": 282765, "Farmacia": 221081, "Municipalidad": 136822, "Nafta Virtus": 511440, "Nafta Sandero": 286233, "Seguro Auto": 158608, "Seguro Virtus": 227472, "Patente Auto": 14931, "GYM Nati": 55000, "GAS": 26578, "LUZ": 208758, "Peajes": 272658, "Mary Limpieza": 219378, "Mary ART + aportes": 8884, "Cable + Internet": 44215, "OTROS": 285000, "Queso y Milo": 42883, "Spotify": 10000, "Apple (fin de mes)": 36000}, "totalGastos": 6517581, "totalLimpios": -1517861}, "jun 26": {"ingresos": {"Extras": 1028141}, "gastos": {"Regalos": 231738, "OTROS": 191500, "Nafta Virtus": 180000, "Comida + Supermercado": 728587, "Expensas": 507066, "Farmacia": 41700, "Mary Limpieza": 193748, "Ocio": 725358, "Mary ART + aportes": 9007, "Osde diferencia": 13207, "Patente Virtus": 38642, "Municipalidad": 136823, "GAS": 66031, "Queso y Milo": 161300, "Nafta Sandero": 131000, "Renata": 48333, "Cosas para el hogar": 469200, "LUZ": 84643, "Agua Poybe (Cimes)": 56000, "Peluqueria/Barberia": 25000, "Dover": 720433}, "totalGastos": 4759316, "totalLimpios": -3731175}, "jul 26": {"ingresos": {"Extras": 290000, "Sueldo Juani": 3620000, "Sueldo Nati": 1906500}, "gastos": {"Regalos": 148265, "OTROS": 422100, "Renata": 77233, "Expensas": 509361, "Patente Virtus": 39580, "Osde diferencia": 78281, "GAS": 65420, "Nafta Sandero": 235000, "Mary Limpieza": 160350, "Cosas para el hogar": 30000, "Comida + Supermercado": 1055787, "Dolares": 1053500, "Agua Poybe (Cimes)": 90000, "Caja de psicologos": 145000, "Ocio": 740400, "Municipalidad": 145542, "Mary ART + aportes": 9568, "ColPsi matricula": 26198, "Peluqueria/Barberia": 20000, "Nafta Virtus": 95000, "LUZ": 122166, "Inversiones": 800000}, "totalGastos": 6068751, "totalLimpios": -252251}, "ago 26": {"ingresos": {"Extras": 209000, "Sueldo Juani": 3600000, "Sueldo Nati": 1906500}, "gastos": {"Regalos": 88265, "Renata": 308894, "Dover": 767, "Nafta Virtus": 187000, "Comida + Supermercado": 294408, "Peluqueria/Barberia": 40000, "Ocio": 334590, "Cosas para el hogar": 114575, "Expensas": 534364, "Nafta Sandero": 50000, "OTROS": 91841, "Mary Limpieza": 64140, "Cable + Internet": 47975, "Patente Auto": 14243, "Municipalidad": 145542, "Mary ART + aportes": 10089, "Patente Virtus": 40349, "GAS": 135327, "Queso y Milo": 42883, "Caja de psicologos": 145000, "ColPsi matricula": 26198}, "totalGastos": 2716450, "totalLimpios": 2999050}, "sep 26": {"ingresos": {}, "gastos": {"Regalos": 88265, "Renata": 6633}, "totalGastos": 94898, "totalLimpios": -94898}, "oct 26": {"ingresos": {}, "gastos": {"Regalos": 59198}, "totalGastos": 59198, "totalLimpios": -59198}, "nov 26": {"ingresos": {}, "gastos": {"Regalos": 41667}, "totalGastos": 41667, "totalLimpios": -41667}};
 
-// ── Cuotas para proyección ───────────────────────────────────────────────────
-const CUOTAS = [
+// ── CUOTAS PARA PROYECCIÓN ────────────────────────────────────────────────
+const CUOTAS=[
   {cat:'Regalos',monto:39747,cuotas:6,mesInicio:'may 26',comentario:'Perfume Juani'},
   {cat:'OTROS',monto:429000,cuotas:3,mesInicio:'may 26',comentario:'Curso Nati'},
   {cat:'Regalos',monto:65440,cuotas:6,mesInicio:'may 26',comentario:'Zapas Marta'},
-  {cat:'Renata 👶🏻💕',monto:34000,cuotas:3,mesInicio:'jun 26',comentario:'Renata'},
-  {cat:'Regalos',monto:130000,cuotas:6,mesInicio:'jun 26',comentario:'Regalo Nati'},
+  {cat:'Renata',monto:34000,cuotas:3,mesInicio:'jun 26',comentario:'Renata'},
+  {cat:'Regalos',monto:130000,cuotas:6,mesInicio:'jun 26',comentario:'Regalo Nati cumple'},
   {cat:'Regalos',monto:120000,cuotas:6,mesInicio:'jun 26',comentario:'Zapas Nati Patri'},
   {cat:'Regalos',monto:47700,cuotas:3,mesInicio:'jul 26',comentario:'Dexter zapas'},
-  {cat:'Renata 👶🏻💕',monto:19900,cuotas:3,mesInicio:'jul 26',comentario:'Renata'},
+  {cat:'Renata',monto:19900,cuotas:3,mesInicio:'jul 26',comentario:'Renata'},
   {cat:'Regalos',monto:39500,cuotas:3,mesInicio:'jul 26',comentario:'Boina'},
-  {cat:'Cosas para el hogar🏠🔧',monto:1530000,cuotas:24,mesInicio:'ago 26',comentario:'Porcelanatos'},
-  {cat:'Cosas para el hogar🏠🔧',monto:1193320,cuotas:12,mesInicio:'ago 26',comentario:'Hogar'},
 ];
 
-let DATA = JSON.parse(JSON.stringify(BASE_DATA));
-let activeYears  = new Set();
-let activeMonths = new Set();
-let allYears     = [];
-let charts = {};
+let DATA={},activeYears=new Set(),activeMonths=new Set(),allYears=[],charts={};
 
-function parseKey(k) {
-  const parts = k.trim().toLowerCase().split(/\s+/);
-  const mes = parts[0];
-  const anio = parts[1] ? '20' + parts[1] : String(new Date().getFullYear());
-  return { mes, anio };
+function parseKey(k){const p=k.trim().toLowerCase().split(/\s+/);return{mes:p[0],anio:p[1]?'20'+p[1]:String(new Date().getFullYear())};}
+
+// Normalizar categorías del Sheet para que coincidan con la base
+function normCat(c){
+  const m={'Ocio':'Ocio',' Ocio ':'Ocio','LUZ 💡 ':'LUZ','LUZ 💡':'LUZ','GAS💨':'GAS',
+    'Queso y Milo🐩🐩':'Queso y Milo','Renata 👶🏻💕':'Renata',
+    'Cosas para el hogar🏠🔧':'Cosas para el hogar','Mary ART + aportes 🧹':'Mary ART + aportes',
+    'Osde diferencia 🏥':'Osde diferencia','Caja de psicólogos ':'Caja de psicologos',
+    'Caja de psicólogos':'Caja de psicologos','Vacaciones 🏝️':'Vacaciones',
+    'Cable + Internet 📺emision dia 28 mes':'Cable + Internet',
+    'Pileta y mundo limp 🧼':'Pileta y mundo limp','ColPsi matrícula':'ColPsi matricula',
+    'Peluquería/Barbería':'Peluqueria/Barberia','Dólares':'Dolares','ARBA (pagar MANUAL)':'ARBA'};
+  return m[c.trim()]||c.trim();
 }
 
-function calcProyeccion() {
-  const proy = {};
-  CUOTAS.forEach(c => {
-    const parts = c.mesInicio.split(' ');
-    const mesIdx = MESES_ORDER.indexOf(parts[0]);
-    const anioBase = parseInt('20' + parts[1]);
-    const porCuota = Math.round(c.monto / c.cuotas);
-    for (let i = 0; i < c.cuotas; i++) {
-      const mIdx = (mesIdx + i) % 12;
-      const anio = anioBase + Math.floor((mesIdx + i) / 12);
-      const key = MESES_ORDER[mIdx] + ' ' + String(anio).slice(-2);
-      if (!proy[key]) proy[key] = { total: 0, cats: [] };
-      proy[key].total += porCuota;
-      proy[key].cats.push({ cat: c.comentario, monto: porCuota });
+function calcProyeccion(){
+  const proy={};
+  CUOTAS.forEach(c=>{
+    const p=c.mesInicio.split(' '),mi=MESES_ORDER.indexOf(p[0]),ab=parseInt('20'+p[1]),pc=Math.round(c.monto/c.cuotas);
+    for(let i=0;i<c.cuotas;i++){
+      const mIdx=(mi+i)%12,anio=ab+Math.floor((mi+i)/12),key=MESES_ORDER[mIdx]+' '+String(anio).slice(-2);
+      if(!proy[key])proy[key]={total:0,cats:[]};
+      proy[key].total+=pc;proy[key].cats.push({cat:c.comentario,monto:pc});
     }
   });
   return proy;
 }
 
-function renderProyeccion() {
-  const proy = calcProyeccion();
-  const now = new Date();
-  const mesActual = MESES_ORDER[now.getMonth()] + ' ' + String(now.getFullYear()).slice(-2);
-  const mesesOrdenados = Object.keys(proy).sort((a, b) => {
-    const [ma, aa] = a.split(' '), [mb, ab] = b.split(' ');
-    return (parseInt('20'+aa)*12 + MESES_ORDER.indexOf(ma)) - (parseInt('20'+ab)*12 + MESES_ORDER.indexOf(mb));
-  });
-  const scroll = document.getElementById('proyScroll');
-  scroll.innerHTML = '';
-  mesesOrdenados.forEach(mes => {
-    const d = proy[mes];
-    const [m, a] = mes.split(' ');
-    const mIdx = MESES_ORDER.indexOf(m);
-    const anioNum = parseInt('20' + a);
-    const esPasado = new Date(anioNum, mIdx + 1, 0) < now;
-    const esActual = mes === mesActual;
-    const div = document.createElement('div');
-    div.className = 'proy-mes' + (esPasado ? ' pasado' : '') + (esActual ? ' actual' : '');
-    div.innerHTML = `
-      <div class="proy-mes-label">${MESES_FULL[mIdx]} ${anioNum}${esActual ? ' ◀ HOY' : ''}</div>
-      <div class="proy-mes-monto">$${Math.round(d.total).toLocaleString('es-AR')}</div>
-      ${d.cats.sort((a,b)=>b.monto-a.monto).map(c => `<div class="proy-cat"><span>${c.cat}</span><span>$${c.monto.toLocaleString('es-AR')}</span></div>`).join('')}`;
+function renderProyeccion(){
+  const proy=calcProyeccion(),now=new Date(),ma=MESES_ORDER[now.getMonth()]+' '+String(now.getFullYear()).slice(-2);
+  const meses=Object.keys(proy).sort((a,b)=>{const[ma2,aa]=a.split(' '),[mb,ab]=b.split(' ');return(parseInt('20'+aa)*12+MESES_ORDER.indexOf(ma2))-(parseInt('20'+ab)*12+MESES_ORDER.indexOf(mb));});
+  const scroll=document.getElementById('proyScroll');scroll.innerHTML='';
+  meses.forEach(mes=>{
+    const d=proy[mes],[m,a]=mes.split(' '),mIdx=MESES_ORDER.indexOf(m),anioNum=parseInt('20'+a);
+    const esPasado=new Date(anioNum,mIdx+1,0)<now,esActual=mes===ma;
+    const div=document.createElement('div');
+    div.className='proy-mes'+(esPasado?' pasado':'')+(esActual?' actual':'');
+    div.innerHTML=`<div class="proy-mes-label">${MESES_FULL[mIdx]} ${anioNum}${esActual?' ◀ HOY':''}</div><div class="proy-mes-monto">$${Math.round(d.total).toLocaleString('es-AR')}</div>${d.cats.sort((a,b)=>b.monto-a.monto).map(c=>`<div class="proy-cat"><span>${c.cat}</span><span>$${c.monto.toLocaleString('es-AR')}</span></div>`).join('')}`;
     scroll.appendChild(div);
   });
-  // Scroll al mes actual
-  const actualEl = scroll.querySelector('.actual');
-  if (actualEl) setTimeout(() => actualEl.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'}), 300);
+  const el=scroll.querySelector('.actual');if(el)setTimeout(()=>el.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'}),300);
 }
 
-async function init() {
-  const now  = new Date();
-  const opts = { day:'numeric', month:'long', year:'numeric' };
-  document.getElementById('hdrDate').textContent    = now.toLocaleDateString('es-AR', opts);
-  document.getElementById('footerDate').textContent = now.toLocaleDateString('es-AR', opts);
+async function init(){
+  const now=new Date(),opts={day:'numeric',month:'long',year:'numeric'};
+  document.getElementById('hdrDate').textContent=now.toLocaleDateString('es-AR',opts);
+  document.getElementById('footerDate').textContent=now.toLocaleDateString('es-AR',opts);
 
+  // Arrancar con base
+  DATA=JSON.parse(JSON.stringify(BASE_DATA));
   renderProyeccion();
 
-  // Intentar enriquecer con Sheet (no bloqueante)
-  try {
-    const res = await fetch('https://script.google.com/macros/s/AKfycbxoeuecGTWz80SrRv-bkvVpwqkj-5Ep5K0v28TxaHNaVrUJCSisGAjf_sb5FNS47-8c_A/exec');
-    const sheetData = await res.json();
-    // Mergear: el Sheet agrega lo nuevo que se cargó después de la base
-    Object.entries(sheetData).forEach(([k, v]) => {
-      const { anio } = parseKey(k);
-      if (parseInt(anio) < 2026) return; // solo 2026+
-      // Si el mes ya está en BASE_DATA, no pisamos — la base es más confiable
-      // Solo agregamos meses que no estén en la base
-      if (!DATA[k]) DATA[k] = v;
+  // Leer Hoja 2 del Sheet — agrega todo lo nuevo encima de la base
+  try{
+    const res=await fetch(API_URL);
+    const sheetData=await res.json();
+    Object.entries(sheetData).forEach(([k,v])=>{
+      const{anio}=parseKey(k);
+      if(parseInt(anio)<2026)return;
+      if(!DATA[k]){
+        // Mes nuevo — agregar completo normalizando cats
+        const ing={},gas={};
+        Object.entries(v.ingresos||{}).forEach(([c,val])=>{ing[normCat(c)]=(ing[normCat(c)]||0)+val;});
+        Object.entries(v.gastos||{}).forEach(([c,val])=>{gas[normCat(c)]=(gas[normCat(c)]||0)+val;});
+        DATA[k]={ingresos:ing,gastos:gas,
+          totalGastos:Object.values(gas).reduce((a,b)=>a+b,0),
+          totalLimpios:Object.values(ing).reduce((a,b)=>a+b,0)-Object.values(gas).reduce((a,b)=>a+b,0)};
+      } else {
+        // Mes existente — sumar cats nuevas (las que no están en base)
+        Object.entries(v.ingresos||{}).forEach(([c,val])=>{const nc=normCat(c);if(!DATA[k].ingresos[nc])DATA[k].ingresos[nc]=val;});
+        Object.entries(v.gastos||{}).forEach(([c,val])=>{const nc=normCat(c);if(!DATA[k].gastos[nc])DATA[k].gastos[nc]=val;});
+        DATA[k].totalGastos=Object.values(DATA[k].gastos).reduce((a,b)=>a+b,0);
+        DATA[k].totalLimpios=Object.values(DATA[k].ingresos).reduce((a,b)=>a+b,0)-DATA[k].totalGastos;
+      }
     });
-  } catch(e) {
-    console.log('Sheet no disponible, usando base local');
-  }
+  }catch(e){console.log('Sheet no disponible, usando base local');}
 
-  allYears = [...new Set(Object.keys(DATA).map(k => parseKey(k).anio))].sort();
-  const currentYear = String(now.getFullYear());
-  const defaultYear = allYears.includes(currentYear) ? currentYear : allYears[allYears.length - 1];
-  activeYears = new Set([defaultYear]);
+  allYears=[...new Set(Object.keys(DATA).map(k=>parseKey(k).anio))].sort();
+  const cy=String(now.getFullYear()),dy=allYears.includes(cy)?cy:allYears[allYears.length-1];
+  activeYears=new Set([dy]);
 
-  const yb = document.getElementById('yearBtns');
-  allYears.forEach(y => {
-    const btn = document.createElement('button');
-    btn.className    = 'year-btn' + (activeYears.has(y) ? ' active' : '');
-    btn.textContent  = y;
-    btn.dataset.year = y;
-    btn.onclick = () => toggleYear(y, btn);
-    yb.appendChild(btn);
-  });
+  const yb=document.getElementById('yearBtns');
+  allYears.forEach(y=>{const btn=document.createElement('button');btn.className='year-btn'+(activeYears.has(y)?' active':'');btn.textContent=y;btn.dataset.year=y;btn.onclick=()=>toggleYear(y,btn);yb.appendChild(btn);});
 
-  const allMonthsSet = new Set(Object.keys(DATA).map(k => parseKey(k).mes));
-  const mb = document.getElementById('monthBtns');
-  MESES_ORDER.forEach((m, idx) => {
-    if (!allMonthsSet.has(m)) return;
-    const btn = document.createElement('button');
-    btn.className     = 'month-btn';
-    btn.textContent   = MESES_FULL[idx];
-    btn.dataset.month = m;
-    btn.onclick = () => toggleMonth(m, btn);
-    mb.appendChild(btn);
-  });
+  const ams=new Set(Object.keys(DATA).map(k=>parseKey(k).mes));
+  const mb=document.getElementById('monthBtns');
+  MESES_ORDER.forEach((m,idx)=>{if(!ams.has(m))return;const btn=document.createElement('button');btn.className='month-btn';btn.textContent=MESES_FULL[idx];btn.dataset.month=m;btn.onclick=()=>toggleMonth(m,btn);mb.appendChild(btn);});
 
-  selectAllMonths();
-  render();
+  selectAllMonths();render();
   document.getElementById('loader').classList.add('hidden');
 }
 
-function toggleYear(y, btn) {
-  if (activeYears.has(y) && activeYears.size === 1) return;
-  activeYears.has(y) ? activeYears.delete(y) : activeYears.add(y);
-  btn.classList.toggle('active');
-  rebuildMonthButtons();
-  render();
-}
-
-function toggleMonth(m, btn) {
-  if (activeMonths.has(m) && activeMonths.size === 1) return;
-  activeMonths.has(m) ? activeMonths.delete(m) : activeMonths.add(m);
-  btn.classList.toggle('active');
-  render();
-}
-
-function toggleAllMonths() {
-  document.querySelectorAll('.month-btn').forEach(btn => {
-    if (btn.style.display !== 'none') { activeMonths.add(btn.dataset.month); btn.classList.add('active'); }
-  });
-  render();
-}
-
-function rebuildMonthButtons() {
-  const disponibles = new Set();
-  Object.keys(DATA).forEach(k => {
-    const { mes, anio } = parseKey(k);
-    if (activeYears.has(anio)) disponibles.add(mes);
-  });
+function toggleYear(y,btn){if(activeYears.has(y)&&activeYears.size===1)return;activeYears.has(y)?activeYears.delete(y):activeYears.add(y);btn.classList.toggle('active');rebuildMonthButtons();render();}
+function toggleMonth(m,btn){if(activeMonths.has(m)&&activeMonths.size===1)return;activeMonths.has(m)?activeMonths.delete(m):activeMonths.add(m);btn.classList.toggle('active');render();}
+function toggleAllMonths(){document.querySelectorAll('.month-btn').forEach(b=>{if(b.style.display!=='none'){activeMonths.add(b.dataset.month);b.classList.add('active');}});render();}
+function rebuildMonthButtons(){
+  const disp=new Set();Object.keys(DATA).forEach(k=>{const{mes,anio}=parseKey(k);if(activeYears.has(anio))disp.add(mes);});
   activeMonths.clear();
-  document.querySelectorAll('.month-btn').forEach(btn => {
-    const m = btn.dataset.month;
-    if (disponibles.has(m)) { btn.style.display=''; activeMonths.add(m); btn.classList.add('active'); }
-    else { btn.style.display='none'; btn.classList.remove('active'); }
+  document.querySelectorAll('.month-btn').forEach(b=>{const m=b.dataset.month;if(disp.has(m)){b.style.display='';activeMonths.add(m);b.classList.add('active');}else{b.style.display='none';b.classList.remove('active');}});
+}
+function selectAllMonths(){rebuildMonthButtons();}
+function getFilteredData(){return Object.entries(DATA).filter(([k])=>{const{mes,anio}=parseKey(k);return activeYears.has(anio)&&activeMonths.has(mes);});}
+function calcTotals(f){
+  let ing=0,limp=0;const cm={};
+  f.forEach(([,d])=>{ing+=Object.values(d.ingresos||{}).reduce((a,b)=>a+b,0);limp+=(d.totalLimpios||0);Object.entries(d.gastos||{}).forEach(([c,v])=>{if(v>0)cm[c]=(cm[c]||0)+v;});});
+  return{ingresos:ing,egresos:Object.values(cm).reduce((a,b)=>a+b,0),limpios:limp,catMap:cm};
+}
+function fmt(n){const abs=Math.abs(n),s=n<0?'-':'';if(abs>=1e6)return s+'$'+(abs/1e6).toFixed(1)+'M';if(abs>=1e3)return s+'$'+Math.round(abs/1e3)+'K';return s+'$'+Math.round(abs).toLocaleString('es-AR');}
+function render(){
+  const f=getFilteredData();if(!f.length)return;
+  const{ingresos,egresos,limpios,catMap}=calcTotals(f);
+  const tasa=ingresos>0?(limpios/ingresos*100):0;
+  document.getElementById('kpiIngresos').textContent=fmt(ingresos);
+  document.getElementById('kpiIngSub').textContent=f.length+' mes'+(f.length>1?'es':'')+' seleccionados';
+  document.getElementById('kpiEgresos').textContent=fmt(egresos);
+  document.getElementById('kpiEgrSub').textContent=Object.keys(catMap).length+' categorias';
+  document.getElementById('kpiLimpios').textContent=fmt(limpios);
+  document.getElementById('kpiLimpiosDelta').innerHTML=`<span class="kpi-delta ${limpios>=0?'pos':'neg'}">${limpios>=0?'▲':'▼'} ${Math.abs(tasa).toFixed(1)}% tasa ahorro</span>`;
+  document.getElementById('kpiTasa').textContent=tasa.toFixed(1)+'%';
+  renderDonut(ingresos,egresos);renderCats(catMap);renderTable(catMap,egresos);
+}
+function destroyChart(id){if(charts[id]){charts[id].destroy();delete charts[id];}}
+function isDark(){return!document.documentElement.classList.contains('light');}
+function lc(){return isDark()?'#8a95ad':'#4a5878';}
+function renderDonut(ing,egr){
+  destroyChart('donut');const ctx=document.getElementById('chartDonut').getContext('2d');
+  charts.donut=new Chart(ctx,{type:'doughnut',data:{labels:['Ingresos','Egresos'],datasets:[{data:[ing,egr],backgroundColor:['#22c55e','#ef4444'],borderColor:isDark()?'#0f1420':'#ffffff',borderWidth:3,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{position:'bottom',labels:{color:lc(),font:{size:11},padding:16,boxWidth:10}},tooltip:{callbacks:{label:c=>' '+fmt(c.raw)+' ('+(c.raw/(ing+egr)*100).toFixed(1)+'%)'}}}}}  );
+}
+function renderCats(cm){
+  destroyChart('cats');const s=Object.entries(cm).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const ctx=document.getElementById('chartCats').getContext('2d');
+  charts.cats=new Chart(ctx,{type:'doughnut',data:{labels:s.map(([k])=>k),datasets:[{data:s.map(([,v])=>v),backgroundColor:CAT_COLORS,borderColor:isDark()?'#0f1420':'#ffffff',borderWidth:2,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'right',labels:{color:lc(),font:{size:10},padding:8,boxWidth:8}},tooltip:{callbacks:{label:c=>' '+fmt(c.raw)}}}}}  );
+}
+function renderTable(cm,total){
+  const s=Object.entries(cm).sort((a,b)=>b[1]-a[1]);
+  const tb=document.getElementById('tableBody');tb.innerHTML='';
+  s.forEach(([cat,val],i)=>{
+    const pct=total>0?val/total*100:0,color=CAT_COLORS[i%CAT_COLORS.length];
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td><span class="cat-badge"><span class="cat-dot" style="background:${color}"></span>${cat}</span></td><td>${fmt(val)}</td><td><div class="pct-bar-wrap"><div class="pct-bar"><div class="pct-bar-fill" style="width:${Math.min(pct,100)}%;background:${color}"></div></div><span style="color:var(--t2);font-size:11px;min-width:36px;text-align:right">${pct.toFixed(1)}%</span></div></td>`;
+    tb.appendChild(tr);
   });
 }
-
-function selectAllMonths() { rebuildMonthButtons(); }
-
-function getFilteredData() {
-  return Object.entries(DATA).filter(([k]) => {
-    const { mes, anio } = parseKey(k);
-    return activeYears.has(anio) && activeMonths.has(mes);
-  });
-}
-
-function calcTotals(filtered) {
-  let ingresos = 0, limpios = 0;
-  const catMap = {};
-  filtered.forEach(([,d]) => {
-    ingresos += Object.values(d.ingresos||{}).reduce((a,b)=>a+b, 0);
-    limpios  += (d.totalLimpios||0);
-    Object.entries(d.gastos||{}).forEach(([c,v]) => { if(v>0) catMap[c] = (catMap[c]||0)+v; });
-  });
-  const egresos = Object.values(catMap).reduce((a,b)=>a+b, 0);
-  return { ingresos, egresos, limpios, catMap };
-}
-
-function fmt(n) {
-  const abs = Math.abs(n);
-  const sign = n < 0 ? '-' : '';
-  if (abs>=1e6) return sign+'$'+(abs/1e6).toFixed(1)+'M';
-  if (abs>=1e3) return sign+'$'+Math.round(abs/1e3)+'K';
-  return sign+'$'+Math.round(abs).toLocaleString('es-AR');
-}
-
-function render() {
-  const filtered = getFilteredData();
-  if (!filtered.length) return;
-  const { ingresos, egresos, limpios, catMap } = calcTotals(filtered);
-  const tasa = ingresos > 0 ? (limpios/ingresos*100) : 0;
-
-  document.getElementById('kpiIngresos').textContent = fmt(ingresos);
-  document.getElementById('kpiIngSub').textContent   = filtered.length + ' mes' + (filtered.length>1?'es':'') + ' seleccionados';
-  document.getElementById('kpiEgresos').textContent  = fmt(egresos);
-  document.getElementById('kpiEgrSub').textContent   = Object.keys(catMap).length + ' categorías';
-  document.getElementById('kpiLimpios').textContent  = fmt(limpios);
-  document.getElementById('kpiLimpiosDelta').innerHTML = `<span class="kpi-delta ${limpios>=0?'pos':'neg'}">${limpios>=0?'▲':'▼'} ${Math.abs(tasa).toFixed(1)}% tasa ahorro</span>`;
-  document.getElementById('kpiTasa').textContent = tasa.toFixed(1) + '%';
-
-  renderDonut(ingresos, egresos);
-  renderCats(catMap);
-  renderTable(catMap, egresos);
-}
-
-function destroyChart(id) { if(charts[id]){charts[id].destroy();delete charts[id];} }
-function isDark()      { return !document.documentElement.classList.contains('light'); }
-function legendColor() { return isDark() ? '#8a95ad' : '#4a5878'; }
-function gridColor()   { return isDark() ? '#263043' : '#d0d8ea'; }
-function tickColor()   { return isDark() ? '#4f5e78' : '#8a95ad'; }
-
-function renderDonut(ing, egr) {
-  destroyChart('donut');
-  const ctx = document.getElementById('chartDonut').getContext('2d');
-  charts.donut = new Chart(ctx, {
-    type:'doughnut',
-    data:{ labels:['Ingresos','Egresos'], datasets:[{ data:[ing,egr], backgroundColor:['#22c55e','#ef4444'], borderColor:isDark()?'#0f1420':'#ffffff', borderWidth:3, hoverOffset:6 }] },
-    options:{ responsive:true, maintainAspectRatio:false, cutout:'65%',
-      plugins:{ legend:{position:'bottom',labels:{color:legendColor(),font:{size:11},padding:16,boxWidth:10}},
-        tooltip:{callbacks:{label:ctx=>' '+fmt(ctx.raw)+' ('+(ctx.raw/(ing+egr)*100).toFixed(1)+'%)'}} } }
-  });
-}
-
-function renderCats(catMap) {
-  destroyChart('cats');
-  const sorted = Object.entries(catMap).sort((a,b)=>b[1]-a[1]).slice(0,10);
-  const ctx = document.getElementById('chartCats').getContext('2d');
-  charts.cats = new Chart(ctx, {
-    type:'doughnut',
-    data:{ labels:sorted.map(([k])=>k), datasets:[{ data:sorted.map(([,v])=>v), backgroundColor:CAT_COLORS, borderColor:isDark()?'#0f1420':'#ffffff', borderWidth:2, hoverOffset:6 }] },
-    options:{ responsive:true, maintainAspectRatio:false, cutout:'55%',
-      plugins:{ legend:{position:'right',labels:{color:legendColor(),font:{size:10},padding:8,boxWidth:8}},
-        tooltip:{callbacks:{label:ctx=>' '+fmt(ctx.raw)}} } }
-  });
-}
-
-function renderTable(catMap, total) {
-  const sorted = Object.entries(catMap).sort((a,b)=>b[1]-a[1]);
-  const tbody  = document.getElementById('tableBody');
-  tbody.innerHTML = '';
-  sorted.forEach(([cat,val],i) => {
-    const pct   = total > 0 ? val/total*100 : 0;
-    const color = CAT_COLORS[i % CAT_COLORS.length];
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td><span class="cat-badge"><span class="cat-dot" style="background:${color}"></span>${cat}</span></td>
-      <td>${fmt(val)}</td>
-      <td><div class="pct-bar-wrap"><div class="pct-bar"><div class="pct-bar-fill" style="width:${Math.min(pct,100)}%;background:${color}"></div></div><span style="color:var(--t2);font-size:11px;min-width:36px;text-align:right">${pct.toFixed(1)}%</span></div></td>`;
-    tbody.appendChild(tr);
-  });
-}
-
-function toggleTheme() {
+function toggleTheme(){
   document.documentElement.classList.toggle('light');
-  document.querySelector('.theme-btn').textContent = document.documentElement.classList.contains('light') ? '🌙' : '☀️';
-  const filtered = getFilteredData();
-  if (filtered.length) { const { ingresos, egresos, catMap } = calcTotals(filtered); renderDonut(ingresos, egresos); renderCats(catMap); }
+  document.querySelector('.theme-btn').textContent=document.documentElement.classList.contains('light')?'🌙':'☀️';
+  const f=getFilteredData();if(f.length){const{ingresos,egresos,catMap}=calcTotals(f);renderDonut(ingresos,egresos);renderCats(catMap);}
 }
-
-window.onload = init;
+window.onload=init;
 </script>
 </body>
 </html>
