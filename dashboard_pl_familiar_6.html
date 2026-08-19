@@ -188,7 +188,15 @@ async function init(){
   const mb=document.getElementById('monthBtns');
   MESES_ORDER.forEach((m,idx)=>{if(!ams.has(m))return;const btn=document.createElement('button');btn.className='month-btn';btn.textContent=MESES_FULL[idx];btn.dataset.month=m;btn.onclick=()=>toggleMonth(m,btn);mb.appendChild(btn);});
 
-  selectAllMonths();render();
+  // Activar solo el mes actual por defecto
+  const mesActual = MESES_ORDER[now.getMonth()];
+  activeMonths.clear();
+  document.querySelectorAll('.month-btn').forEach(b => {
+    if(b.dataset.month === mesActual) { activeMonths.add(b.dataset.month); b.classList.add('active'); }
+  });
+  // Si el mes actual no tiene datos, activar todos
+  if(activeMonths.size === 0) selectAllMonths();
+  render();
   document.getElementById('loader').classList.add('hidden');
 }
 
