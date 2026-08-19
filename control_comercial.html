@@ -652,6 +652,7 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
       </div>
     </div>
     <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap" id="chartFTEPerfSelector"></div>
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap" id="puestosFTEPerfSelector"></div>
 
     <div class="chart-card">
       <div class="chart-legend" id="chartFTEPerfLegend"></div>
@@ -715,6 +716,7 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
       </div>
     </div>
     <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap" id="chartFTESocialSelector"></div>
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap" id="puestosFTESocialSelector"></div>
 
 
 
@@ -1728,6 +1730,42 @@ const COLORES_PUESTOS = ['#4488ff','#00c853','#f5c400','#ff4455','#aa44ff','#00b
 let chartFTESocialInstance = null;
 let chartFTEPerfInstance   = null;
 
+// Puestos seleccionados para el gráfico FTE Vendido vs Real (multi-select, por sección — no por cliente)
+let PUESTOS_FTE_PERF_SELECCIONADOS   = [];
+let PUESTOS_FTE_SOCIAL_SELECCIONADOS = [];
+
+function _puestosFTE(tipo) {
+  const todos = tipo==='social' ? Object.keys(TABLA_COSTOS_SOCIAL) : Object.keys(TABLA_COSTOS_PERF);
+  return tipo==='perf' ? todos.filter(p => p !== 'Performance MKT Manager') : todos;
+}
+
+function renderPillsPuestosFTE(tipo) {
+  const contId = tipo==='social' ? 'puestosFTESocialSelector' : 'puestosFTEPerfSelector';
+  const cont = document.getElementById(contId);
+  if (!cont) return;
+  const puestos = _puestosFTE(tipo);
+  const sel = tipo==='social' ? PUESTOS_FTE_SOCIAL_SELECCIONADOS : PUESTOS_FTE_PERF_SELECCIONADOS;
+  // Si no hay selección todavía (primera carga), arrancar con todos seleccionados
+  if (sel.length === 0) puestos.forEach(p => sel.push(p));
+  cont.innerHTML = puestos.map((p,i) => {
+    const activo = sel.includes(p);
+    const color = COLORES_PUESTOS[i % COLORES_PUESTOS.length];
+    return `<button class="rent-tab${activo?' active':''}" style="${activo?`border-color:${color};color:${color}`:''}" onclick="togglePuestoFTE('${p}','${tipo}')">${p}</button>`;
+  }).join('');
+}
+
+function togglePuestoFTE(puesto, tipo) {
+  const sel = tipo==='social' ? PUESTOS_FTE_SOCIAL_SELECCIONADOS : PUESTOS_FTE_PERF_SELECCIONADOS;
+  const i = sel.indexOf(puesto);
+  if (i >= 0) { if (sel.length > 1) sel.splice(i, 1); } // no permitir deseleccionar el último
+  else { sel.push(puesto); }
+  renderPillsPuestosFTE(tipo);
+  const selId = tipo==='social' ? 'chartFTESocialSelector' : 'chartFTEPerfSelector';
+  const clienteActivo = document.querySelector(`#${selId} .dir-btn.active`)?.textContent;
+  const clientes = tipo==='social' ? Object.keys(DIRECTORES_SOCIAL) : Object.keys(DIRECTORES_PERF);
+  renderChartFTE(clienteActivo || clientes[0], tipo);
+}
+
 function renderFTEVendidoInputs(cliente, tipo) {
   const todosPuestos = tipo==='social' ? Object.keys(TABLA_COSTOS_SOCIAL) : Object.keys(TABLA_COSTOS_PERF);
   const puestos = tipo==='perf'
@@ -1770,6 +1808,7 @@ function renderChartFTESelector(tipo) {
   cont.innerHTML = clientes.map(c =>
     `<button class="dir-btn${c===first?' active':''}" onclick="selectClienteFTEChart('${c}','${tipo}',this)">${c}</button>`
   ).join('');
+  renderPillsPuestosFTE(tipo);
   renderChartFTE(first, tipo);
 }
 
@@ -1788,9 +1827,11 @@ function renderChartFTE(cliente, tipo) {
   const todosPuestosChart = tipo==='social'
     ? Object.keys(TABLA_COSTOS_SOCIAL)
     : Object.keys(TABLA_COSTOS_PERF);
-  const puestos = tipo==='perf'
+  const puestosDisponibles = tipo==='perf'
     ? todosPuestosChart.filter(p => p !== 'Performance MKT Manager')
     : todosPuestosChart;
+  const seleccionPuestos = tipo==='social' ? PUESTOS_FTE_SOCIAL_SELECCIONADOS : PUESTOS_FTE_PERF_SELECCIONADOS;
+  const puestos = seleccionPuestos.length ? puestosDisponibles.filter(p => seleccionPuestos.includes(p)) : puestosDisponibles;
 
   // Meses con datos reales
   const mesesConDatos = MESES_2026.filter(m => m!=='Total' &&
@@ -1809,7 +1850,8 @@ function renderChartFTE(cliente, tipo) {
 
   // Datasets: una línea real + una vendida por puesto
   const datasets = [];
-  puestos.forEach((puesto, i) => {
+  puestos.forEach((puesto) => {
+    const i = puestosDisponibles.indexOf(puesto);
     const color = COLORES_PUESTOS[i % COLORES_PUESTOS.length];
     // Real
     datasets.push({
@@ -1870,8 +1912,8 @@ function renderChartFTE(cliente, tipo) {
   // Legend manual
   const legendEl = document.getElementById(tipo==='social'?'chartFTESocialLegend':'chartFTEPerfLegend');
   if(legendEl) {
-    legendEl.innerHTML = puestos.map((p,i) => {
-      const c = COLORES_PUESTOS[i%COLORES_PUESTOS.length];
+    legendEl.innerHTML = puestos.map((p) => {
+      const c = COLORES_PUESTOS[puestosDisponibles.indexOf(p)%COLORES_PUESTOS.length];
       return `<span class="legend-item">
         <span style="display:inline-block;width:18px;height:2px;background:${c};vertical-align:middle;margin-right:4px"></span>${p} Real
         &nbsp;<span style="display:inline-block;width:18px;height:2px;background:${c};opacity:.6;vertical-align:middle;margin-right:4px;border-top:2px dashed ${c};background:none"></span>${p} Vendido
