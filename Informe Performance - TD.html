@@ -1,0 +1,2700 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Control Comercial · Ignis</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0e0e0e; --surface: #161616; --surface2: #1f1f1f; --border: #2a2a2a;
+  --red: #e8001c; --red-soft: rgba(232,0,28,0.12);
+  --yellow: #f5c400; --yellow-soft: rgba(245,196,0,0.12);
+  --green: #00c853; --green-soft: rgba(0,200,83,0.10);
+  --purple: #aa44ff; --purple-soft: rgba(170,68,255,0.10);
+  --blue: #4488ff; --blue-soft: rgba(68,136,255,0.10);
+  --text: #f0f0f0; --text-muted: #606060; --radius: 14px; --radius-sm: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: 'Poppins', sans-serif; font-size: 15px; min-height: 100vh; overflow-x: hidden; }
+body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(232,0,28,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(232,0,28,0.03) 1px,transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
+.wrap { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 0 24px 60px; }
+
+/* HEADER */
+.header { display: flex; align-items: center; justify-content: space-between; padding: 28px 0 20px; border-bottom: 1px solid var(--border); margin-bottom: 0; gap: 16px; flex-wrap: wrap; }
+.header-left { display: flex; align-items: center; gap: 20px; }
+.logo-mark { width: 42px; height: 42px; border-radius: 10px; overflow: hidden; flex-shrink: 0; background: #000; display: flex; align-items: center; justify-content: center; }
+.logo-mark img { width: 42px; height: 42px; object-fit: contain; }
+.header-title h1 { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 2px; color: var(--text); line-height: 1; }
+.header-title p { font-size: 13px; color: var(--text-muted); margin-top: 3px; }
+.header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.period-badge { background: var(--surface2); border: 1px solid var(--border); border-radius: 100px; padding: 7px 14px; font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+.period-badge span { color: var(--text); font-weight: 500; }
+.live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: blink 2s infinite; }
+@keyframes blink { 0%,100%{opacity:1}50%{opacity:0.3} }
+
+/* PAGE TABS */
+.page-tabs { display: flex; gap: 2px; margin: 20px 0 28px; border-bottom: 1px solid var(--border); }
+.page-tab { padding: 12px 24px; background: transparent; border: none; border-bottom: 2px solid transparent; color: var(--text-muted); font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; letter-spacing: 0.3px; margin-bottom: -1px; white-space: nowrap; }
+.page-tab:hover { color: var(--text); }
+.page-tab.active { color: var(--text); border-bottom-color: var(--red); font-weight: 600; }
+.page-tab .tab-badge { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; background: var(--red-soft); color: var(--red); border-radius: 50%; font-size: 10px; font-weight: 700; margin-left: 7px; }
+
+.page { display: none; }
+.page.active { display: block; }
+
+/* SHARED COMPONENTS */
+.director-filter { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; align-items: center; }
+.filter-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); font-weight: 600; margin-right: 4px; }
+.dir-btn { padding: 8px 18px; border-radius: 100px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+.dir-btn:hover { border-color: var(--text-muted); color: var(--text); }
+.dir-btn.active { background: var(--red); border-color: var(--red); color: white; font-weight: 600; }
+
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 28px; }
+.kpi { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; position: relative; overflow: hidden; transition: border-color 0.2s; }
+.kpi:hover { border-color: var(--red); }
+.kpi-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); font-weight: 600; margin-bottom: 10px; }
+.kpi-value { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 1px; line-height: 1; margin-bottom: 4px; }
+.kpi-sub { font-size: 11px; color: var(--text-muted); }
+.kpi-accent { position: absolute; bottom: 0; left: 0; right: 0; height: 2px; }
+
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; margin-top: 32px; }
+.section-title { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px; color: var(--text); }
+.section-sub { font-size: 11px; color: var(--text-muted); }
+
+.table-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow-x: auto; margin-bottom: 12px; }
+table { width: 100%; min-width: 1100px; border-collapse: collapse; }
+thead tr { background: var(--surface2); border-bottom: 1px solid var(--border); }
+th { padding: 10px 14px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text-muted); white-space: nowrap; }
+th.num { text-align: right; }
+td { padding: 12px 14px; border-bottom: 1px solid rgba(42,42,42,0.6); font-size: 13px; vertical-align: middle; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr:last-child td { border-bottom: none; }
+tbody tr { transition: background 0.15s; }
+tbody tr:hover td { background: rgba(255,255,255,0.02); }
+.client-name { font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+.client-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 100px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+.badge.red { background: var(--red-soft); color: #ff4455; }
+.badge.yellow { background: var(--yellow-soft); color: var(--yellow); }
+.badge.green { background: var(--green-soft); color: var(--green); }
+.badge.purple { background: var(--purple-soft); color: var(--purple); }
+.badge.blue { background: var(--blue-soft); color: var(--blue); }
+.badge.neutral { background: var(--surface2); color: var(--text-muted); }
+.progress-wrap { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+.progress-bg { width: 80px; height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; flex-shrink: 0; }
+.progress-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+.progress-fill.low { background: var(--green); }
+.progress-fill.mid { background: var(--yellow); }
+.progress-fill.high { background: var(--red); }
+.progress-pct { font-size: 12px; min-width: 32px; text-align: right; font-variant-numeric: tabular-nums; color: var(--text-muted); }
+.fte-delta { display: flex; align-items: center; gap: 4px; font-size: 12px; }
+.fte-delta.up { color: var(--red); }
+.fte-delta.down { color: var(--green); }
+.fte-delta.flat { color: var(--text-muted); }
+.total-row td { background: var(--surface2) !important; font-weight: 700; border-top: 1px solid var(--border); font-size: 14px; }
+.loading-row td { text-align: center; color: var(--text-muted); padding: 40px; }
+.alert-panel { background: rgba(232,0,28,0.06); border: 1px solid rgba(232,0,28,0.2); border-radius: var(--radius); padding: 16px 20px; margin-bottom: 28px; display: none; }
+.alert-panel.visible { display: block; }
+.alert-panel-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--red); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+.alert-items { display: flex; flex-wrap: wrap; gap: 8px; }
+.alert-item { background: var(--red-soft); border: 1px solid rgba(232,0,28,0.2); border-radius: var(--radius-sm); padding: 8px 12px; font-size: 13px; color: #ff4455; }
+.alert-item strong { color: white; }
+.bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 32px; }
+.mini-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+.mini-card-title { font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 16px; }
+.dir-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+.dir-row:last-child { border-bottom: none; }
+.dir-row-name { font-weight: 500; }
+.dir-row-clients { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.slack-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: transparent; color: var(--text-muted); font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+.slack-btn:hover { border-color: var(--green); color: var(--green); }
+
+/* ── RENTABILIDAD PAGE ── */
+.rent-section { margin-bottom: 32px; }
+.rent-tabs { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+.rent-tab { padding: 8px 18px; border-radius: 100px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+.rent-tab:hover { border-color: var(--text-muted); color: var(--text); }
+.rent-tab.active { background: var(--purple); border-color: var(--purple); color: white; font-weight: 600; }
+
+.cm-bar-wrap { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+.cm-bar-bg { width: 60px; height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+.cm-bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+
+/* Tabla Costo Compañía maestra */
+.costo-cia-wrap { overflow-x: auto; }
+.costo-cia-wrap table th { min-width: 110px; }
+.costo-cia-wrap table td { min-width: 110px; }
+.puesto-col { min-width: 200px !important; font-weight: 500; }
+.costo-cell { font-variant-numeric: tabular-nums; font-size: 12px; color: #aaa; text-align: right; padding: 10px 14px; }
+.costo-cell.vigente { color: var(--yellow); font-weight: 600; }
+.costo-cell.editable { cursor: pointer; transition: background 0.15s; }
+.costo-cell.editable:hover { background: rgba(255,255,255,0.04); }
+.fte-inline-input { background:transparent; border:none; border-bottom:1px solid var(--border); color:var(--text); font-family:'Poppins',sans-serif; font-size:12px; width:62px; text-align:right; outline:none; padding:2px 4px; }
+.fte-inline-input:focus { border-bottom-color:var(--purple); }
+.fte-inline-input::placeholder { color:#404040; }
+.cell-input { background: transparent; border: none; border-bottom: 1px solid var(--red); color: var(--text); font-family: 'Poppins', sans-serif; font-size: 12px; width: 100%; text-align: right; outline: none; padding: 2px 0; }
+.mes-header { text-align: right; white-space: nowrap; }
+.mes-header.vigente-col { color: var(--yellow) !important; }
+
+/* Detalle por cliente */
+.cliente-selector { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+.cli-btn { padding: 7px 16px; border-radius: 100px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); font-family: 'Poppins', sans-serif; font-size: 12px; cursor: pointer; transition: all 0.2s; }
+.cli-btn:hover { border-color: var(--text-muted); color: var(--text); }
+.cli-btn.active { border-color: transparent; color: white; font-weight: 600; }
+
+/* Ranking visual */
+.ranking-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.rank-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; }
+.rank-card-title { font-family: 'Bebas Neue', sans-serif; font-size: 14px; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 14px; }
+.rank-item { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--border); }
+.rank-item:last-child { border-bottom: none; }
+.rank-num { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: var(--text-muted); min-width: 26px; }
+.rank-name { flex: 1; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+.rank-val { font-size: 13px; font-variant-numeric: tabular-nums; font-weight: 600; }
+
+/* Chart wrapper */
+.chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 16px; }
+.chart-legend { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 14px; font-size: 11px; color: var(--text-muted); }
+.legend-item { display: flex; align-items: center; gap: 5px; }
+.legend-sq { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+/* Info banner vigencia */
+.vigencia-banner { display: flex; align-items: center; gap: 12px; background: rgba(245,196,0,0.07); border: 1px solid rgba(245,196,0,0.2); border-radius: var(--radius-sm); padding: 10px 16px; margin-bottom: 20px; font-size: 12px; color: var(--yellow); }
+.vigencia-banner strong { color: #ffe066; }
+
+/* Botones acción */
+.btn-action { display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: transparent; color: var(--text-muted); font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+.btn-action:hover { border-color: var(--red); color: var(--red); }
+.btn-action.primary { background: var(--red); border-color: var(--red); color: white; }
+.btn-action.primary:hover { opacity: 0.85; }
+
+@media (max-width: 768px) {
+  .bottom-grid, .ranking-grid { grid-template-columns: 1fr; }
+  .kpis { grid-template-columns: repeat(2,1fr); }
+  table { font-size: 12px; }
+  th,td { padding: 8px 10px; }
+  .progress-bg { width: 50px; }
+  .page-tab { padding: 10px 14px; font-size: 12px; }
+}
+
+/* ── MODAL CARGA DATOS ── */
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:1000; display:none; align-items:center; justify-content:center; padding:20px; }
+.modal-overlay.open { display:flex; }
+.modal-box { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); width:100%; max-width:860px; max-height:90vh; overflow-y:auto; padding:28px 32px; position:relative; }
+.modal-box::-webkit-scrollbar { width:6px; } .modal-box::-webkit-scrollbar-track { background:transparent; } .modal-box::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+.modal-title { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:2px; margin-bottom:4px; }
+.modal-sub { font-size:12px; color:var(--text-muted); margin-bottom:24px; }
+.modal-close { position:absolute; top:18px; right:20px; background:transparent; border:none; color:var(--text-muted); font-size:20px; cursor:pointer; line-height:1; }
+.modal-close:hover { color:var(--text); }
+.modal-section { margin-bottom:28px; }
+.modal-section-title { font-family:'Bebas Neue',sans-serif; font-size:15px; letter-spacing:1.5px; color:var(--red); margin-bottom:14px; padding-bottom:6px; border-bottom:1px solid var(--border); }
+.modal-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; }
+.modal-field { display:flex; flex-direction:column; gap:4px; }
+.modal-field label { font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); font-weight:600; }
+.modal-field input { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:8px 10px; color:var(--text); font-family:'Poppins',sans-serif; font-size:13px; outline:none; transition:border-color .2s; }
+.modal-field input:focus { border-color:var(--red); }
+.modal-client-header { display:flex; align-items:center; gap:8px; font-weight:600; font-size:13px; margin-bottom:10px; margin-top:18px; }
+.modal-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:24px; padding-top:18px; border-top:1px solid var(--border); }
+.modal-mes-selector { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:20px; }
+.modal-mes-btn { padding:6px 14px; border-radius:100px; border:1px solid var(--border); background:transparent; color:var(--text-muted); font-family:'Poppins',sans-serif; font-size:11px; font-weight:500; cursor:pointer; transition:all .2s; }
+.modal-mes-btn:hover { border-color:var(--text-muted); color:var(--text); }
+.modal-mes-btn.active { background:var(--red); border-color:var(--red); color:white; font-weight:600; }
+.modal-saved-badge { display:none; align-items:center; gap:6px; font-size:12px; color:var(--green); }
+.modal-saved-badge.show { display:flex; }
+
+<style>
+.gauge-section{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
+.gauge-grid{display:flex;flex-direction:row;gap:0;justify-content:center;width:100%;margin-bottom:4px}
+.cards-kpi{display:flex;flex-direction:row;gap:1px;width:100%;background:rgba(255,255,255,0.06);border-radius:8px;overflow:hidden}
+.ck{background:var(--surface);padding:10px 14px;flex:1;min-width:80px}
+.ck-label{font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.ck-val{font-size:13px;font-weight:500;color:var(--text)}
+
+
+</style>
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <div class="logo-mark"><img src="Captura de pantalla 2026-05-13 103522.png" alt="Ignis"></div>
+      <div class="header-title">
+        <h1>Performance · Análisis de Cuentas</h1>
+        <p>Ignis Media Agency · Para Tomás Domínguez</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="period-badge">
+        <div class="live-dot"></div>
+        Período: <span id="periodoLabel">Cargando...</span>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- PAGE 1: CONTROL COMERCIAL                 -->
+  <!-- ══════════════════════════════════════════ -->
+
+<div id="page-performance" class="page active">
+
+  <div id="perf-consolidado" class="rent-section" style="display:block">
+    <div class="mes-selector-row">
+      <span class="mes-label">MES DE ANÁLISIS</span>
+      <div id="mesSelectorPerf" class="mes-btns"></div>
+    </div>
+    <div id="kpisPerf" class="kpis"></div>
+
+    <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+      <button id="btnOHPerf" onclick="toggleOH('perf')" style="background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:6px 18px;color:var(--text-muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:.5px">Con OH</button>
+    </div>
+    <div class="section-header">
+      <div><div class="section-title">Tabla Consolidada · Performance</div><div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <div class="section-sub">Fee − Costo de Equipo · CMO % = CMO $ / Fee</div>
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+          <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#666;white-space:nowrap"><div style="width:8px;height:8px;border-radius:50%;background:#ff4455;flex-shrink:0"></div>CMO % ≤ 0%</div>
+          <div style="width:1px;height:12px;background:#333"></div>
+          <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#666;white-space:nowrap"><div style="width:8px;height:8px;border-radius:50%;background:#f5c400;flex-shrink:0"></div>0% – 25%</div>
+          <div style="width:1px;height:12px;background:#333"></div>
+          <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#666;white-space:nowrap"><div style="width:8px;height:8px;border-radius:50%;background:#00c853;flex-shrink:0"></div>≥ 25%</div>
+        </div>
+      </div></div>
+    </div>
+    <div class="table-card">
+      <table>
+        <thead><tr>
+          <th>Cliente</th><th class="num">Fee</th><th class="num">Costo Equipo</th>
+          <th class="num">CMO $</th><th class="num">CMO %</th><th>Con OH</th>
+        </tr></thead>
+        <tbody id="tbodyPerfConsolidado"></tbody>
+      </table>
+    </div>
+
+    <div class="ranking-grid">
+      <div class="rank-card">
+        <div class="rank-card-title">Ranking · CMO $ (mayor a menor)</div>
+        <div id="rankingPerfCM"></div>
+      </div>
+      <div class="rank-card">
+        <div class="rank-card-title">Ranking · CMO % (mayor a menor)</div>
+        <div id="rankingPerfPct"></div>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-legend">
+        <span class="legend-item"><span class="legend-sq" style="background:#4488ff"></span>CMB</span>
+        <span class="legend-item"><span class="legend-sq" style="background:#f5c400"></span>Costo Equipo</span>
+        <span class="legend-item"><span class="legend-sq" style="background:#00c853"></span>CM $</span>
+      </div>
+      <div style="position:relative;width:100%;height:270px">
+        <canvas id="chartPerf"></canvas>
+      </div>
+    </div>
+
+    <!-- FTE VENDIDO VS REAL -->
+    <div class="section-header" style="margin-top:16px">
+      <div>
+        <div class="section-title">FTE Vendido vs Real</div>
+        <div class="section-sub">Línea punteada = vendido · Línea sólida = real cargado</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap" id="chartFTEPerfSelector"></div>
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap" id="puestosFTEPerfSelector"></div>
+
+    <div class="chart-card">
+      <div class="chart-legend" id="chartFTEPerfLegend"></div>
+      <div style="position:relative;width:100%;height:320px">
+        <canvas id="chartFTEPerf"></canvas>
+      </div>
+    </div>
+
+  </div><!-- /perf-consolidado -->
+
+</div><!-- /page-performance -->
+
+
+
+<!-- ══════════════════════════════════════════ -->
+<!-- MODAL CARGA DATOS CONTROL COMERCIAL       -->
+<!-- ══════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalCarga" onclick="cerrarModalSiOverlay(event)">
+  <div class="modal-box">
+    <button class="modal-close" onclick="cerrarModalCarga()">✕</button>
+    <div class="modal-title">📥 Cargar datos del mes</div>
+    <div class="modal-sub">Completá los campos y guardá — el dashboard se actualiza automáticamente</div>
+
+    <!-- Selector de mes -->
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+      <span class="filter-label">Mes</span>
+      <div class="modal-mes-selector" id="modalMesSelector"></div>
+    </div>
+
+    <!-- Clientes Big Seven -->
+    <div class="modal-section">
+      <div class="modal-section-title">Clientes · Big Seven</div>
+      <div id="modalClientesForm"></div>
+    </div>
+
+    <!-- Bagó por marca -->
+    <div class="modal-section">
+      <div class="modal-section-title">Unidades de Negocio · Bagó</div>
+      <div id="modalBagoForm"></div>
+    </div>
+
+    <div class="modal-actions">
+      <div class="modal-saved-badge" id="modalSavedBadge">✅ Guardado correctamente</div>
+      <button class="btn-action" onclick="cerrarModalCarga()">Cancelar</button>
+      <button class="btn-action primary" onclick="guardarDatosComercial()">✓ Guardar y actualizar</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════
+   DATOS & CONFIGURACIÓN
+═══════════════════════════════════════════════════════════ */
+const API_URL    = 'https://script.google.com/macros/s/AKfycbyJ7ziLiqqBqpld84Rjybve2ZCMIasb2SRUFu2hLAKPHhoazEyLuD3Sq0SRMPffuX22yQ/exec'; // Script Control Comercial
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyQ0ksmHnLh-7_U45q7aj2Q28JqX-usXT53lKlCTIN62GL7gO0AJkcK-lsgNttjwP3qxg/exec'; // Script Rentabilidad (GET+POST)
+const WEBHOOK_URL = '';
+
+const OH_EQUIPO = 1.23;   // Overhead Rentabilidad de Equipo (123%)
+const OH_PERF   = 0.68;   // Overhead Rentabilidad Performance (68%)
+let   ohActivoEquipo = false;
+let   ohActivoPerf   = false;
+
+const DIRECTORES_PERF = {
+  'ITBA':                { color: '#ff6b35' },
+  'Parts Vu':            { color: '#aa44ff' },
+  'Bagó':                { color: '#e8001c' },
+  'Banco Patagonia':     { color: '#4444ff' },
+  'Yamaha O.P.':         { color: '#00c853' },
+  'Violetta':            { color: '#ff44aa' },
+  'Belgrano Day School': { color: '#f5c400' },
+  'TH Marine':           { color: '#00bcd4' },
+  'Hendel':              { color: '#ff9800' },
+};
+
+let TABLA_COSTOS_PERF = {
+  'Performance MKT Manager':     { 'Diciembre': 4631260, 'Febrero': 5001761 },
+  'Performance MKT Coordinator': { 'Diciembre': 3844153, 'Febrero': 4151686 },
+  'Performance MKT Specialist':  { 'Diciembre': 3051127, 'Febrero': 3295217 },
+  'Performance MKT Analyst':     { 'Diciembre': 2433049, 'Febrero': 2632804 },
+};
+
+let CLIENTES_FTE_PERF = {
+  'ITBA':                {}, 'Parts Vu': {}, 'Bagó': {},
+  'Banco Patagonia':     {}, 'Yamaha O.P.': {}, 'Violetta': {},
+  'Belgrano Day School': {},
+  'TH Marine': {},
+  'Hendel': {},
+};
+
+// FTE Vendido por cliente/puesto (se carga una vez, linea punteada)
+let FTE_VENDIDO_PERF = {
+  'ITBA': {}, 'Parts Vu': {}, 'Bagó': {}, 'Banco Patagonia': {},
+  'Yamaha O.P.': {}, 'Violetta': {}, 'Belgrano Day School': {},
+  'TH Marine': {}, 'Hendel': {},
+};
+
+let INVERSION = {
+  'Bagó': {}, 'Banco Patagonia': {}, 'La Paulina': {}, 'Pfizer': {},
+  'McCain': {}, 'Escorial': {}, 'Universal Assistance': {},
+};
+
+let INGRESOS_PERF = {
+  'ITBA': {}, 'Parts Vu': {}, 'Bagó': {}, 'Banco Patagonia': {},
+  'Yamaha O.P.': {}, 'Violetta': {}, 'Belgrano Day School': {},
+  'TH Marine': {},
+  'Hendel': {},
+};
+
+// Diferencial Programmatic por cliente/mes (se suma a Ingresos Netos)
+let DIFERENCIAL_PERF = {
+  'ITBA': {}, 'Parts Vu': {}, 'Bagó': {}, 'Banco Patagonia': {},
+  'Yamaha O.P.': {}, 'Violetta': {}, 'Belgrano Day School': {},
+  'TH Marine': {},
+  'Hendel': {},
+};
+
+let MES_VIGENTE_PERF = 'Julio';
+
+/* ═══════════════════════════════════════════════════════════
+   SOCIAL
+═══════════════════════════════════════════════════════════ */
+const OH_SOCIAL = 0.68;
+
+const DIRECTORES_SOCIAL = {
+  'Escorial':  { color: '#9c27b0' },
+  'CAAM':      { color: '#2196f3' },
+  'Ignis M&C': { color: '#ff9800' },
+  'Hendel':    { color: '#00bcd4' },
+};
+
+let TABLA_COSTOS_SOCIAL = {
+  'Digital Strategy Lead':  { 'Diciembre': 0, 'Febrero': 0, 'Julio': 0 },
+  'Social Media Specialist':{ 'Diciembre': 0, 'Febrero': 0, 'Julio': 0 },
+  'Social Media Analyst':   { 'Diciembre': 0, 'Febrero': 0, 'Julio': 0 },
+};
+
+let CLIENTES_FTE_SOCIAL = {
+  'Escorial': {}, 'CAAM': {}, 'Ignis M&C': {},
+};
+
+// FTE Vendido por cliente/puesto (se carga una vez, linea punteada)
+let FTE_VENDIDO_SOCIAL = {
+  'Escorial':  {}, 'CAAM': {}, 'Ignis M&C': {},
+};
+
+/* ===== CONTROL COMERCIAL — datos reales desde Tabla_Plana_Comercial ===== */
+let CONTROL_RAW    = {}; // { cliente: { 'anio-mes': {inv, cmb, ingresos} } }
+let PRESUP_VENTA   = {}; // { cliente: { Enero: valor, ..., TOTAL: valor } }
+let PRESUP_CMB     = {}; // { cliente: { Enero: valor, ..., TOTAL: valor } }
+const MES_NUM = { Enero:1, Febrero:2, Marzo:3, Abril:4, Mayo:5, Junio:6, Julio:7, Agosto:8, Septiembre:9, Octubre:10, Noviembre:11, Diciembre:12 };
+let MESES_CC_SELECCIONADOS = ['Junio']; // default — se ajusta en initMesesCC() a Enero→mes anterior al actual
+let MESES_BAGO_SELECCIONADOS = ['Junio']; // idem, independiente — se ajusta en initMesesBago()
+let BAGO_MARCAS_INV    = {}; // { PRODUCTO: { 'anio-mes': inv } }
+let BAGO_MARCAS_PRESUP = {}; // { PRODUCTO: { Enero: valor, ..., TOTAL: valor } }
+
+let INGRESOS_SOCIAL = {
+  'Escorial': {}, 'CAAM': {}, 'Ignis M&C': {},
+};
+
+const MAPA_MES_COSTO_SOCIAL = {
+  'Total':'Julio','Enero':'Diciembre','Febrero':'Febrero','Marzo':'Febrero','Abril':'Febrero',
+  'Mayo':'Febrero','Junio':'Febrero','Julio':'Julio','Agosto':'Julio','Septiembre':'Julio',
+  'Octubre':'Julio','Noviembre':'Julio','Diciembre':'Julio'
+};
+let MES_VIGENTE_SOCIAL = 'Julio';
+let MES_ACTIVO_SOCIAL  = 'Total';
+let ohActivoSocial     = false;
+let clienteDetalleActivoSocial = 'Escorial';
+
+const MAPA_MES_COSTO_PERF = {
+  'Total':'Julio','Enero':'Diciembre','Febrero':'Febrero','Marzo':'Febrero','Abril':'Febrero',
+  'Mayo':'Febrero','Junio':'Febrero','Julio':'Julio','Agosto':'Julio','Septiembre':'Julio',
+  'Octubre':'Julio','Noviembre':'Julio','Diciembre':'Julio',
+};
+let clienteDetalleActivoPerf = 'ITBA';
+let MES_ACTIVO_PERF = 'Total';
+
+const DIRECTORES = {
+  'Bagó':                 { dir:'mechi', color:'#e8001c', nombre:'Mechi' },
+  'Banco Patagonia':      { dir:'dani',  color:'#4444ff', nombre:'Dani' },
+  'La Paulina':           { dir:'dani',  color:'#4444ff', nombre:'Dani' },
+  'Pfizer':               { dir:'dani',  color:'#4444ff', nombre:'Dani' },
+  'McCain':               { dir:'jp',    color:'#00c853', nombre:'JP' },
+  'Escorial':             { dir:'jp',    color:'#00c853', nombre:'JP' },
+  'Universal Assistance': { dir:'jp',    color:'#00c853', nombre:'JP' },
+};
+
+// ── TABLA MAESTRA COSTO COMPAÑÍA ──
+// Solo Diciembre (base para Enero 2026) y Febrero (aumento vigente).
+// Cuando RRHH pase nuevos datos, agregás una columna nueva con "+ Nuevo mes de RRHH".
+let TABLA_COSTOS = {
+  'Accounts Director':           { 'Diciembre':4887312,   'Febrero':5278296   },
+  'SR Branding Coordinator':     { 'Diciembre':4904810,   'Febrero':5297195   },
+  'Branding Coordinator':        { 'Diciembre':4124492,   'Febrero':4454451   },
+  'SR Media Planner':            { 'Diciembre':2587003,   'Febrero':2793963   },
+  'JR Media Planner':            { 'Diciembre':2134601,   'Febrero':2305369   },
+  'SR Branding Analyst':         { 'Diciembre':1698083,   'Febrero':1833930   },
+  'Branding Assistant':          { 'Diciembre':1657163,   'Febrero':1789736   },
+};
+
+// ── FTE POR CLIENTE / MES ──
+// Estructura: { cliente: { mes: { puesto: fte, ... }, ... } }
+// Enero usa costos de Diciembre. A partir de Febrero usa los de Febrero.
+// Cargás los FTE en "Detalle por Cliente" → el mes activo se selecciona con el selector de mes.
+let CLIENTES_FTE = {
+  'Bagó':                 { 'Enero':{}, 'Febrero':{}, 'Marzo':{}, 'Abril':{}, 'Mayo':{}, 'Junio':{}, 'Julio':{}, 'Agosto':{}, 'Septiembre':{}, 'Octubre':{}, 'Noviembre':{}, 'Diciembre':{} },
+  'Banco Patagonia':      { 'Enero':{}, 'Febrero':{}, 'Marzo':{}, 'Abril':{}, 'Mayo':{}, 'Junio':{}, 'Julio':{}, 'Agosto':{}, 'Septiembre':{}, 'Octubre':{}, 'Noviembre':{}, 'Diciembre':{} },
+  'La Paulina':           { 'Enero':{}, 'Febrero':{}, 'Marzo':{}, 'Abril':{}, 'Mayo':{}, 'Junio':{}, 'Julio':{}, 'Agosto':{}, 'Septiembre':{}, 'Octubre':{}, 'Noviembre':{}, 'Diciembre':{} },
+  'Pfizer':               { 'Enero':{}, 'Febrero':{}, 'Marzo':{}, 'Abril':{}, 'Mayo':{}, 'Junio':{}, 'Julio':{}, 'Agosto':{}, 'Septiembre':{}, 'Octubre':{}, 'Noviembre':{}, 'Diciembre':{} },
+  'McCain':               { 'Enero':{}, 'Febrero':{}, 'Marzo':{}, 'Abril':{}, 'Mayo':{}, 'Junio':{}, 'Julio':{}, 'Agosto':{}, 'Septiembre':{}, 'Octubre':{}, 'Noviembre':{}, 'Diciembre':{} },
+  'Escorial':             { 'Enero':{}, 'Febrero':{}, 'Marzo':{}, 'Abril':{}, 'Mayo':{}, 'Junio':{}, 'Julio':{}, 'Agosto':{}, 'Septiembre':{}, 'Octubre':{}, 'Noviembre':{}, 'Diciembre':{} },
+  'Universal Assistance': { 'Enero':{}, 'Febrero':{}, 'Marzo':{}, 'Abril':{}, 'Mayo':{}, 'Junio':{}, 'Julio':{}, 'Agosto':{}, 'Septiembre':{}, 'Octubre':{}, 'Noviembre':{}, 'Diciembre':{} },
+};
+
+// Ingresos netos por cliente / mes (en miles) — cargás vos mensualmente
+let INGRESOS = {
+  'Bagó':                 { 'Enero':0,'Febrero':0,'Marzo':0,'Abril':0,'Mayo':0,'Junio':0,'Julio':0,'Agosto':0,'Septiembre':0,'Octubre':0,'Noviembre':0,'Diciembre':0 },
+  'Banco Patagonia':      { 'Enero':0,'Febrero':0,'Marzo':0,'Abril':0,'Mayo':0,'Junio':0,'Julio':0,'Agosto':0,'Septiembre':0,'Octubre':0,'Noviembre':0,'Diciembre':0 },
+  'La Paulina':           { 'Enero':0,'Febrero':0,'Marzo':0,'Abril':0,'Mayo':0,'Junio':0,'Julio':0,'Agosto':0,'Septiembre':0,'Octubre':0,'Noviembre':0,'Diciembre':0 },
+  'Pfizer':               { 'Enero':0,'Febrero':0,'Marzo':0,'Abril':0,'Mayo':0,'Junio':0,'Julio':0,'Agosto':0,'Septiembre':0,'Octubre':0,'Noviembre':0,'Diciembre':0 },
+  'McCain':               { 'Enero':0,'Febrero':0,'Marzo':0,'Abril':0,'Mayo':0,'Junio':0,'Julio':0,'Agosto':0,'Septiembre':0,'Octubre':0,'Noviembre':0,'Diciembre':0 },
+  'Escorial':             { 'Enero':0,'Febrero':0,'Marzo':0,'Abril':0,'Mayo':0,'Junio':0,'Julio':0,'Agosto':0,'Septiembre':0,'Octubre':0,'Noviembre':0,'Diciembre':0 },
+  'Universal Assistance': { 'Enero':0,'Febrero':0,'Marzo':0,'Abril':0,'Mayo':0,'Junio':0,'Julio':0,'Agosto':0,'Septiembre':0,'Octubre':0,'Noviembre':0,'Diciembre':0 },
+};
+
+// Lógica de costos: para un mes dado, ¿qué columna de TABLA_COSTOS usar?
+// Enero 2026 → Diciembre. Febrero en adelante → columna del mes RRHH más reciente anterior o igual.
+const MESES_2026 = ['Total', 'Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+// columna RRHH asignada a cada mes de 2026 (se actualiza al agregar nuevas columnas RRHH)
+let MAPA_MES_COSTO = {
+  'Enero':'Diciembre', 'Febrero':'Febrero', 'Marzo':'Febrero', 'Abril':'Febrero',
+  'Mayo':'Febrero', 'Junio':'Febrero', 'Julio':'Julio', 'Agosto':'Julio',
+  'Septiembre':'Julio', 'Octubre':'Julio', 'Noviembre':'Julio', 'Diciembre':'Julio',
+};
+
+let MES_ACTIVO = 'Enero'; // mes de análisis seleccionado actualmente
+let MES_VIGENTE = 'Febrero'; // última columna RRHH con datos cargados
+let DATA = null;
+let directorActivo = 'todos';
+let clienteDetalleActivo = 'Bagó';
+let chartRentInstance = null;
+
+/* ═══════════════════════════════════════════════════════════
+   UTILIDADES
+═══════════════════════════════════════════════════════════ */
+function fmt(v) {
+  if (v === null || v === undefined || v === '') return '<span style="color:#404040">—</span>';
+  const n = parseFloat(v);
+  if (isNaN(n)) return '<span style="color:#404040">—</span>';
+  return '<span style="color:#ccc">$' + n.toLocaleString('es-AR',{minimumFractionDigits:1,maximumFractionDigits:1}) + '</span>';
+}
+function fmtFte(v) {
+  if (!v && v !== 0) return '<span style="color:#404040">—</span>';
+  const n = parseFloat(v);
+  if (isNaN(n) || n === 0) return '<span style="color:#404040">—</span>';
+  return '<span style="color:#ccc">' + n.toFixed(2) + '</span>';
+}
+function fmtVsMes(v) {
+  if (!v && v !== 0) return '<span class="fte-delta flat">—</span>';
+  const n = parseFloat(String(v).replace('%','').replace(',','.'));
+  if (isNaN(n)) return '<span class="fte-delta flat">—</span>';
+  if (Math.abs(n) < 0.01) return '<span class="fte-delta flat">→ Sin cambio</span>';
+  if (n > 0) return '<span class="fte-delta up">▲ +' + n.toFixed(1) + '%</span>';
+  return '<span class="fte-delta down">▼ ' + n.toFixed(1) + '%</span>';
+}
+function getVsBadge(raw) {
+  if (!raw && raw !== 0) return '<span class="badge neutral">—</span>';
+  const v = parseFloat(String(raw).replace('%','').replace(',','.'));
+  if (isNaN(v)) return '<span class="badge neutral">—</span>';
+  // Si es exactamente 0: guión blanco
+  if (v === 0) return '<span class="badge neutral">— 0,0%</span>';
+  // Mayor a 0: flechita arriba, verde, con +
+  if (v > 0) return `<span class="badge green">▲ ${v.toFixed(1)}%</span>`;
+  // Menor a 0: flechita abajo, rojo
+  return `<span class="badge red">▼ ${Math.abs(v).toFixed(1)}%</span>`;
+}
+function getProgressBar(raw) {
+  if (!raw && raw !== 0) return '<span style="color:var(--text-muted)">—</span>';
+  const v = parseFloat(String(raw).replace('%','').replace(',','.'));
+  if (isNaN(v)) return '<span style="color:var(--text-muted)">—</span>';
+  const pct = Math.min(v, 100);
+  // 0-35% rojo, 35-70% amarillo, >70% verde
+  const color = pct > 70 ? '#00c853' : pct > 35 ? '#f5c400' : '#ff4455';
+  return `<div class="progress-wrap"><div class="progress-bg"><div class="progress-fill" style="width:${pct}%;background:${color}"></div></div><span class="progress-pct" style="color:${color}">${v.toFixed(0)}%</span></div>`;
+}
+function getSemaforoOH(pct, esPerf = false) {
+  // Barra siempre al 100% de ancho — el color indica el semáforo
+  const ancho = 100;
+  let color;
+  if (esPerf) {
+    // Performance: Verde ≥25%, Amarillo 0%–24.99%, Rojo ≤0%
+    color = pct >= 25 ? '#00c853' : pct > 0 ? '#f5c400' : '#ff4455';
+  } else {
+    // Equipo: Verde >35%, Amarillo 30%–35%, Rojo <30%
+    color = pct > 35 ? '#00c853' : pct >= 30 ? '#f5c400' : '#ff4455';
+  }
+  return `<div style="width:100%;height:10px;background:rgba(255,255,255,0.08);border-radius:4px;overflow:hidden"><div style="width:${ancho}%;height:100%;background:${color};border-radius:4px;transition:width .3s"></div></div>`;
+}
+
+function getSemaforo(pct) {
+  if (pct >= 40) return '<span class="badge green">Excelente</span>';
+  if (pct >= 20) return '<span class="badge purple">Bueno</span>';
+  if (pct >= 5)  return '<span class="badge yellow">Ajustado</span>';
+  return '<span class="badge red">Crítico</span>';
+}
+function fmtCosto(v) {
+  // Para tabla detalle FTE: valores en pesos enteros
+  const n = parseFloat(v);
+  if (!n && n !== 0) return '—';
+  if (Math.abs(n) >= 1000000) return '$' + (n/1000000).toLocaleString('es-AR', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' M';
+  if (Math.abs(n) >= 1000)    return '$' + (n/1000).toLocaleString('es-AR', {minimumFractionDigits:1, maximumFractionDigits:1}) + ' k';
+  return '$' + n.toFixed(0);
+}
+function fmtM(v) {
+  // Para Clientes Big 7: valores en millones → formato $1.883,7 M
+  const n = parseFloat(v);
+  if (isNaN(n)) return '—';
+  if (n === 0) return '$0,0 M';
+  return '$' + n.toLocaleString('es-AR', {minimumFractionDigits:1, maximumFractionDigits:2}) + ' M';
+}
+function fmtCC(v) {
+  // Control Comercial: valor interno en MILES → se muestra en MILLONES, 2 decimales, sin sufijo
+  // (ej: 1.500.450 miles → "$1.500,45")
+  if (v === null || v === undefined || v === '') return '<span style="color:#404040">—</span>';
+  const n = parseFloat(v);
+  if (isNaN(n)) return '<span style="color:#404040">—</span>';
+  return '<span style="color:#ccc">$' + (n/1000).toLocaleString('es-AR', {minimumFractionDigits:2, maximumFractionDigits:2}) + '</span>';
+}
+
+/* ═══════════════════════════════════════════════════════════
+   NAVEGACIÓN ENTRE PÁGINAS
+═══════════════════════════════════════════════════════════ */
+function switchPage(page, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.page-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  btn.classList.add('active');
+  if (page === 'rentabilidad') {
+    if (window._rentDataReady) {
+      renderRentabilidadCompleto();
+    } else {
+      document.getElementById('kpisRent').innerHTML = '<div style="color:var(--text-muted);padding:20px;font-size:13px">⏳ Cargando datos del Sheet...</div>';
+      const waitRent = setInterval(() => {
+        if (window._rentDataReady) { clearInterval(waitRent); renderRentabilidadCompleto(); }
+      }, 300);
+    }
+  }
+  if (page === 'performance') {
+    if (window._perfDataReady) {
+      renderPerfCompleto();
+    } else {
+      document.getElementById('kpisPerf').innerHTML = '<div style="color:var(--text-muted);padding:20px;font-size:13px">⏳ Cargando datos del Sheet...</div>';
+      const waitPerf = setInterval(() => {
+        if (window._perfDataReady) { clearInterval(waitPerf); renderPerfCompleto(); }
+      }, 300);
+    }
+  }
+  if (page === 'social') {
+    renderSocialCompleto();
+  }
+}
+function switchRentTab(tab, btn) {
+  document.querySelectorAll('.rent-section').forEach(s => s.style.display = 'none');
+  document.querySelectorAll('.rent-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('rent-' + tab).style.display = 'block';
+  btn.classList.add('active');
+  if (tab === 'costos') renderTablaCostoCia();
+  if (tab === 'detalle') { renderDetalle(clienteDetalleActivo); }
+  if (tab === 'consolidado') { const rows = calcRentabilidad(); renderKPIsRent(rows); renderConsolidado(rows); renderRanking(rows); setTimeout(() => renderChart(rows), 50); }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CONTROL COMERCIAL (página 1) — lógica original
+═══════════════════════════════════════════════════════════ */
+function filtrarDirector(dir, btn) {
+  directorActivo = dir;
+  document.querySelectorAll('.dir-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const showBago = dir === 'todos' || dir === 'mechi';
+  document.getElementById('bagoSection').style.display = showBago ? '' : 'none';
+  document.getElementById('bagoCard').style.display = showBago ? '' : 'none';
+  if (DATA) renderTablas(DATA);
+}
+
+function renderKPIsAgencia(ag) {
+  if (!ag) return;
+  renderKPIsGauge(ag, 'ag');
+}
+
+function renderKPIsComercial(clientes) {
+  let tInv=0, tPresup=0, tCmb=0, tCmbPresup=0;
+  clientes.forEach(r => { tInv += parseFloat(r.inv)||0; tPresup += parseFloat(r.presup)||0; tCmb += parseFloat(r.cmb)||0; tCmbPresup += parseFloat(r.cmbPresup||0); });
+  const avgVs = tPresup > 0 ? ((tInv - tPresup)/tPresup)*100 : 0;
+  const dif = tInv - tPresup;
+  // IDs actualizados — Big7 ahora usa donuts con IDs b7*
+  const _set = (id, val) => { const e=document.getElementById(id); if(e) e.textContent=val; };
+  const _setColor = (id, color) => { const e=document.getElementById(id); if(e) e.style.color=color; };
+  _set('kpiInv',    '$' + (tInv/1000).toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2}));
+  _set('kpiPresup', '$' + (tPresup/1000).toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2}));
+  _set('kpiVs',     (avgVs>0?'+':'') + avgVs.toFixed(1) + '%');
+  _setColor('kpiVs', avgVs < -10 ? '#ff4455' : avgVs < 0 ? '#f5c400' : '#00c853');
+  _set('kpiDif',    (dif>=0?'+$':'-$') + Math.abs(dif/1000).toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2}));
+  _setColor('kpiDif', dif >= 0 ? '#00c853' : '#ff4455');
+  _set('kpiCmb',    '$' + (tCmb/1000).toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2}));
+  if (document.getElementById('kpiCmbPresup')) {
+    document.getElementById('kpiCmbPresup').textContent = tCmbPresup > 0 ? '$' + (tCmbPresup/1000).toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—';
+    const vsCmb = tCmbPresup > 0 ? ((tCmb - tCmbPresup) / tCmbPresup) * 100 : null;
+    const vsCmbEl = document.getElementById('kpiVsCmb');
+    if (vsCmbEl) {
+      vsCmbEl.textContent = vsCmb != null ? (vsCmb >= 0 ? '+' : '') + vsCmb.toFixed(1) + '%' : '—';
+      vsCmbEl.style.color = vsCmb == null ? '' : vsCmb >= 0 ? '#00c853' : '#ff4455';
+    }
+    const vsCmbPctEl = document.getElementById('kpiVsCmbPct');
+    if (vsCmbPctEl) {
+      vsCmbPctEl.textContent = vsCmb != null ? (vsCmb >= 0 ? '+' : '') + vsCmb.toFixed(1) + '%' : '—';
+      vsCmbPctEl.style.color = vsCmb == null ? '' : vsCmb >= 0 ? '#00c853' : '#ff4455';
+    }
+  }
+
+  // Render Big7 donuts — usar variables disponibles en este scope
+  const b7vsPct = tPresup > 0 ? ((tInv - tPresup) / tPresup) * 100 : null;
+  const b7vsCmb = tCmbPresup > 0 ? ((tCmb - tCmbPresup) / tCmbPresup) * 100 : null;
+  const b7cmbPct = tInv > 0 ? (tCmb / tInv) * 100 : null;
+  const b7cons = clientes.length > 0
+    ? clientes.reduce((a,r) => a + (parseFloat(r.consumidoAnual)||0), 0) / clientes.length
+    : null;
+  const b7presupAnual = clientes.reduce((a,r) => a + (parseFloat(r.presupAnual)||0), 0);
+  renderKPIsGauge({
+    inv: tInv, presup: tPresup,
+    vs: b7vsPct!=null ? b7vsPct.toFixed(1) : null,
+    consumidoAnual: b7cons!=null ? b7cons.toFixed(1) : null,
+    presupAnual: b7presupAnual, cmb: tCmb,
+    cmbPct: b7cmbPct!=null ? b7cmbPct.toFixed(1)+'%' : null,
+    cmbPresup: tCmbPresup,
+    vsCmb: b7vsCmb!=null ? b7vsCmb.toFixed(1)+'%' : null
+  }, 'b7');
+
+  const alertas = clientes.filter(r => { const v=parseFloat(String(r.vs||'').replace('%','').replace(',','.')); return !isNaN(v)&&v<-10; });
+  const panel = document.getElementById('alertPanel');
+  const badge = document.getElementById('alertBadge');
+  if (alertas.length > 0) {
+    panel.classList.add('visible');
+    badge.style.display = 'inline-flex';
+    document.getElementById('alertItems').innerHTML = alertas.map(r => {
+      const v = parseFloat(String(r.vs).replace('%','').replace(',','.'));
+      return `<div class="alert-item"><strong>${r.nombre}</strong>: Vs Presup. ${v.toFixed(1)}% · Inv $${(parseFloat(r.inv||0)/1000).toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2})} vs Presup $${(parseFloat(r.presup||0)/1000).toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>`;
+    }).join('');
+  } else { panel.classList.remove('visible'); badge.style.display='none'; }
+}
+
+function renderTablas(data) {
+  const clientes = data.clientes || [];
+  const bago     = data.bago || [];
+  const filt     = directorActivo === 'todos' ? clientes : clientes.filter(r => DIRECTORES[r.nombre]?.dir === directorActivo);
+  renderKPIsComercial(filt);
+
+  const tbody = document.getElementById('tbodyClientes');
+  if (!filt.length) {
+    tbody.innerHTML = '<tr class="loading-row"><td colspan="15" style="color:var(--text-muted)">Sin datos para este director</td></tr>';
+  } else {
+    let html = filt.map(r => {
+      const d = DIRECTORES[r.nombre] || {};
+      return `<tr>
+        <td><div class="client-name"><div class="client-dot" style="background:${d.color||'#606060'}"></div>${r.nombre}</div></td>
+        <td style="color:var(--text-muted);font-size:12px">${d.nombre||'—'}</td>
+        <td class="num">${fmtCC(r.inv)}</td><td class="num">${fmtCC(r.presup)}</td>
+        <td>${getVsBadge(r.vs)}</td><td>${getProgressBar(r.consumidoAnual)}</td>
+        <td class="num">${fmtCC(r.presupAnual)}</td><td class="num">${fmtCC(r.cmb)}</td>
+        <td class="num" style="color:#ccc">${r.cmbPct||'—'}</td>
+        <td class="num" style="color:var(--text-muted)">${r.cmbPresup!=null?fmtCC(r.cmbPresup):'—'}</td>
+        <td class="num" style="color:${r.vsCmb!=null?(parseFloat(r.vsCmb)>=0?'#00c853':'#ff4455'):'var(--text-muted)'}">${r.vsCmb!=null?(parseFloat(r.vsCmb)>=0?'+':'')+parseFloat(r.vsCmb).toFixed(1)+'%':'—'}</td>
+        <td class="num">${fmtFte(r.fteAnt)}</td><td class="num">${fmtFte(r.fteAct)}</td>
+        <td>${fmtVsMes(r.vsMes)}</td><td class="num">${fmtFte(r.fteTotal)}</td>
+      </tr>`;
+    }).join('');
+    let tI=0,tP=0,tF=0,tCmbTot=0,tCmbPresupTot=0;
+    filt.forEach(r => { tI+=parseFloat(r.inv||0); tP+=parseFloat(r.presup||0); tF+=parseFloat(r.fteAct||0); tCmbTot+=parseFloat(r.cmb||0); tCmbPresupTot+=parseFloat(r.cmbPresup||0); });
+    html += `<tr class="total-row"><td colspan="2">TOTAL</td><td class="num">${fmtCC(tI)}</td><td class="num">${fmtCC(tP)}</td><td colspan="2"></td><td></td><td class="num">${fmtCC(tCmbTot)}</td><td></td><td class="num">${fmtCC(tCmbPresupTot)}</td><td></td><td></td><td class="num"><span style="color:#ccc">${tF.toFixed(2)}</span></td><td colspan="2"></td></tr>`;
+    tbody.innerHTML = html;
+  }
+
+  const tbB = document.getElementById('tbodyBago');
+  tbB.innerHTML = bago.length ? bago.map(r => `<tr>
+    <td><div class="client-name"><div class="client-dot" style="background:#e8001c"></div>${r.nombre}</div></td>
+    <td class="num">${fmtCC(r.inv)}</td><td class="num">${fmtCC(r.presup)}</td>
+    <td>${getVsBadge(r.vs)}</td><td>${getProgressBar(r.consumidoAnual)}</td>
+    <td class="num">${fmtCC(r.presupAnual)}</td>
+    <td class="num" style="color:#ccc">${r.soi||'—'}</td>
+    <td class="num">${fmtFte(r.fteAnt)}</td><td class="num">${fmtFte(r.fteAct)}</td>
+    <td>${fmtVsMes(r.vsMes)}</td><td class="num">${fmtFte(r.fteTotal)}</td>
+  </tr>`).join('') : '<tr class="loading-row"><td colspan="11" style="color:var(--text-muted)">Sin datos</td></tr>';
+}
+
+async function enviarAlertas() {
+  if (!DATA) return;
+  const alertas = (DATA.clientes||[]).filter(r => { const v=parseFloat(String(r.vs||'').replace('%','').replace(',','.')); return !isNaN(v)&&v<-10; });
+  if (!alertas.length) { alert('✅ No hay clientes con desvío mayor al -10%'); return; }
+  const msg = '🚨 *Alerta Comercial — Control de Presupuesto*\n\n' +
+    alertas.map(r => { const v=parseFloat(String(r.vs).replace('%','').replace(',','.')); const d=DIRECTORES[r.nombre]; return `*${r.nombre}* (${d?.nombre||'—'}): Vs Presupuesto en *${v.toFixed(1)}%* · Inv $${parseFloat(r.inv||0).toFixed(1)} | Presup $${parseFloat(r.presup||0).toFixed(1)}`; }).join('\n')
+    + '\n\n_Revisá el Control Comercial para más detalle._';
+  try {
+    await fetch(WEBHOOK_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:msg,channel:'#mail-counter'})});
+    alert('✅ Alertas enviadas a Slack');
+  } catch(e) { alert('❌ Error al enviar: '+e.message); }
+}
+
+
+function renderGauge(svgId, pct, color, negative) {
+  const svg = document.getElementById(svgId);
+  if (!svg) return;
+  // SVGs are 80x80, r=30, center=40,40
+  const r = 30, cx = 40;
+  const circ = 2 * Math.PI * r;
+  const absPct = Math.min(Math.abs(isNaN(pct)?0:pct), 100);
+  const dash = (absPct / 100) * circ;
+  const offset = circ - dash;
+  const arc = svg.querySelector('.gauge-arc');
+  const arcWrap = svg.querySelector('.gauge-arc-wrap');
+  if (!arc) return;
+  arc.setAttribute('stroke', color);
+  arc.setAttribute('stroke-dasharray', circ.toFixed(1));
+  arc.setAttribute('stroke-dashoffset', offset.toFixed(1));
+  // Positive: start at 12, go RIGHT → rotate(-90) around center
+  // Negative: start at 12, go LEFT → mirror + rotate(-90)
+  arc.setAttribute('transform', 'rotate(-90 40 40)');
+  if (arcWrap) {
+    arcWrap.setAttribute('transform', negative ? 'translate(80,0) scale(-1,1)' : '');
+  }
+}
+
+function getGaugeColor(val, type) {
+  if (type === 'pct_deviation') {
+    // Vs Presup, Vs CMB Presup
+    const v = parseFloat(val);
+    if (isNaN(v)) return '#606060';
+    return v <= -10 ? '#ff4455' : v <= -1 ? '#f5c400' : '#00c853';
+  }
+  if (type === 'cmb_pct') {
+    const v = parseFloat(String(val).replace('%',''));
+    if (isNaN(v)) return '#606060';
+    return v <= 30 ? '#ff4455' : v <= 35 ? '#f5c400' : '#00c853';
+  }
+  if (type === 'consumido') return '#888780';
+  return '#888780';
+}
+
+function renderKPIsGauge(data, prefix) {
+  // data: {inv, presup, vs, consumidoAnual, presupAnual, cmb, cmbPct, cmbPresup, vsCmb}
+  const fmt = (v) => v != null ? '$' + (parseFloat(v)/1000).toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—';
+  const fmtPct = (v) => v != null ? (parseFloat(v)>=0?'+':'')+parseFloat(v).toFixed(1)+'%' : '—';
+
+  // Cards
+  const setEl = (id, val) => { const e=document.getElementById(id); if(e) e.textContent=val; };
+  setEl(prefix+'Inv',    fmt(data.inv));
+  setEl(prefix+'Presup', fmt(data.presup));
+  setEl(prefix+'PresupAnual', fmt(data.presupAnual));
+  setEl(prefix+'Cmb',    fmt(data.cmb));
+  setEl(prefix+'CmbPresup', fmt(data.cmbPresup));
+
+  // Helper: set text inside SVG and color
+  const setGaugeText = (svgId, txt, color) => {
+    const svg = document.getElementById(svgId);
+    if (!svg) return;
+    const t = svg.querySelector('.gauge-val-text');
+    if (t) { t.textContent = txt; t.setAttribute('fill', color); }
+  };
+
+  // Gauge: Vs Presup
+  const vs = parseFloat(data.vs);
+  const vsColor = getGaugeColor(vs, 'pct_deviation');
+  renderGauge(prefix+'GaugeVs', vs, vsColor, vs < 0);
+  setGaugeText(prefix+'GaugeVs', fmtPct(vs), vsColor);
+
+  // Gauge: CMB %
+  const cmbP = parseFloat(String(data.cmbPct||'').replace('%',''));
+  const cmbColor = getGaugeColor(cmbP, 'cmb_pct');
+  renderGauge(prefix+'GaugeCmbPct', cmbP, cmbColor, false);
+  setGaugeText(prefix+'GaugeCmbPct', isNaN(cmbP)?'—':cmbP.toFixed(1)+'%', cmbColor);
+
+  // Gauge: Vs CMB Presup
+  const vsCmb = parseFloat(String(data.vsCmb||'').replace('%','').replace(',','.'));
+  const vsCmbColor = getGaugeColor(vsCmb, 'pct_deviation');
+  renderGauge(prefix+'GaugeVsCmb', vsCmb, vsCmbColor, vsCmb < 0);
+  setGaugeText(prefix+'GaugeVsCmb', fmtPct(vsCmb), vsCmbColor);
+
+  // Gauge: Consumido Anual (siempre derecha, gris)
+  const cons = parseFloat(data.consumidoAnual);
+  renderGauge(prefix+'GaugeCons', cons, '#888780', false);
+  setGaugeText(prefix+'GaugeCons', isNaN(cons)?'—':cons.toFixed(1)+'%', '#888780');
+}
+
+async function fetchConRetry(url, intentos=3, delay=1500) {
+  for (let i=0; i<intentos; i++) {
+    try {
+      const res = await fetch(url, { redirect: 'follow' });
+      if (!res.ok) throw new Error('HTTP '+res.status);
+      return await res.json();
+    } catch(e) {
+      if (i < intentos-1) await new Promise(r => setTimeout(r, delay));
+      else throw e;
+    }
+  }
+}
+
+
+
+
+function enviarResumenEjecutivo() {
+  if (!DATA || !DATA.clientes) {
+    alert('Los datos aún no cargaron. Esperá un momento y volvé a intentar.');
+    return;
+  }
+
+  const periodo = DATA.periodo || 'Período actual';
+  const ag      = DATA.agencia || {};
+  const clientes = DATA.clientes || [];
+
+  // ── HELPERS ──
+  const fmt    = v => v != null ? '$' + parseFloat(v).toLocaleString('es-AR',{minimumFractionDigits:1,maximumFractionDigits:1}) + ' M' : '—';
+  const fmtN   = v => v != null ? parseFloat(v).toLocaleString('es-AR',{minimumFractionDigits:1,maximumFractionDigits:1}) : '—';
+  const arrow  = v => parseFloat(v) >= 0 ? '▲' : '▼';
+  const bar    = (v, max=100) => { const n=Math.round(Math.min(Math.abs(parseFloat(v)||0),max)/max*8); return '█'.repeat(n)+'░'.repeat(8-n); };
+  const sfB7   = v => parseFloat(v)>35?'🟢':parseFloat(v)>=30?'🟡':'🔴';
+  const sfPerf = v => parseFloat(v)>=25?'🟢':parseFloat(v)>0?'🟡':'🔴';
+
+  // ── TOTAL AGENCIA ──
+  const agVs     = parseFloat(ag.vs||0);
+  const agVsCmb  = parseFloat(String(ag.vsCmb||'0').replace('%',''));
+  const agCmbPct = parseFloat(String(ag.cmbPct||'0').replace('%',''));
+  const agCons   = parseFloat(ag.consumidoAnual||0);
+
+  // ── BIG 7 ──
+  const rowsB7 = calcRentabilidad();
+
+  // Facturación
+  const facLines = clientes.map(c => {
+    const vsP = parseFloat(c.vs||0);
+    return `${c.nombre.padEnd(22)}: ${fmt(c.inv)}  |  ${arrow(vsP)} ${Math.abs(vsP).toFixed(1)}%`;
+  }).join('\n');
+
+  // CMB y CMO sin OH
+  const cmbLines = rowsB7.map(r => {
+    const cd     = clientes.find(c=>c.nombre===r.nombre)||{};
+    const cmbPct = parseFloat(String(cd.cmbPct||'0').replace('%',''));
+    const vsCmb  = parseFloat(String(cd.vsCmb||'0').replace('%',''));
+    const cmoPct = r.inv>0 ? (r.cm/r.inv)*100 : 0; // Sin OH: cm ya es cmb-costoEq sin OH
+    return `${r.nombre.padEnd(22)}: CMB ${cmbPct.toFixed(1)}%  ${arrow(vsCmb)} ${Math.abs(vsCmb).toFixed(1)}%  |  CMO ${cmoPct.toFixed(1)}% ${sfB7(cmoPct)}`;
+  }).join('\n');
+
+  // FTE último mes y total
+  const fteLines = clientes.map(c => {
+    const fteAnt = parseFloat(c.fteAnt||0);
+    const fteAct = parseFloat(c.fteAct||0);
+    const fteTot = parseFloat(c.fteTotal||0);
+    const ftePct = fteAnt>0 ? ((fteAct-fteAnt)/fteAnt)*100 : 0;
+    return `${c.nombre.padEnd(22)}: ${fteAct.toFixed(2)}  ${arrow(ftePct)} ${Math.abs(ftePct).toFixed(1)}%  |  Total: ${fteTot.toFixed(2)}`;
+  }).join('\n');
+
+  // ── PERFORMANCE con OH ──
+  const rowsPerf = calcRentabilidadPerf();
+  const perfData = rowsPerf.filter(r=>r.ingresos>0).map(r => {
+    const costoOH = r.costoEq*(1+OH_PERF);
+    const cmoOH   = r.ingresos - costoOH;
+    const pctOH   = r.ingresos>0 ? (cmoOH/r.ingresos)*100 : 0;
+    return {nombre:r.nombre, cmoOH, pctOH};
+  }).sort((a,b)=>b.pctOH-a.pctOH);
+
+  const perfLines = perfData.length > 0
+    ? perfData.map(r => `${r.nombre.padEnd(22)}: ${fmt(r.cmoOH)}  |  ${r.pctOH.toFixed(1)}% ${sfPerf(r.pctOH)}`).join('\n')
+    : '  Sin datos de Fee cargados en esta sesión.';
+
+  // ── CONSTRUIR MENSAJE ──
+  const msg = [
+    `*RESUMEN EJECUTIVO — Enero a ${periodo}*`,
+    `Ignis Media Agency · Control Comercial`,
+    ``,
+    `*TOTAL AGENCIA*`,
+    `────────────────────────────`,
+    `Inversión:       ${fmt(ag.inv)}  ${arrow(agVs)} ${Math.abs(agVs).toFixed(1)}% vs Presup`,
+    `CMB:             ${fmt(ag.cmb)}  ${arrow(agVsCmb)} ${Math.abs(agVsCmb).toFixed(1)}% vs Presup`,
+    `Consumido anual: ${agCons.toFixed(1)}%  ${bar(agCons)}`,
+    ``,
+    `*CLIENTES BIG 7*`,
+    ``,
+    `FACTURACIÓN (Vs Presupuesto)`,
+    `────────────────────────────`,
+    `\`\`\``,
+    facLines,
+    `\`\`\``,
+    ``,
+    `CMB y CMO (Vs Presupuesto, Sin OH)`,
+    `────────────────────────────`,
+    `\`\`\``,
+    cmbLines,
+    `\`\`\``,
+    ``,
+    `FTE último mes y Total`,
+    `────────────────────────────`,
+    `\`\`\``,
+    fteLines,
+    `\`\`\``,
+    ``,
+    `*PERFORMANCE — CMO $ y CMO % (Con OH)*`,
+    `────────────────────────────`,
+    `\`\`\``,
+    perfLines,
+    `\`\`\``,
+    ``,
+    `────────────────────────────`,
+    `_Generado automáticamente · Control Comercial Ignis_`
+  ].join('\n');
+
+  const SLACK_PROXY = 'https://script.google.com/macros/s/AKfycbwdEWqrT2eb9S_UN5v0y716-GUvfxvaaK5ERCqhGQ-EqSe0KQ4pMRiiqQguWTUjfx9QTg/exec';
+  fetch(SLACK_PROXY, {
+    method: 'POST',
+    headers: {'Content-Type': 'text/plain'},
+    body: JSON.stringify({ type: 'slack_resumen', mensaje: msg })
+  })
+  .then(r => {
+    if (r.ok) alert('✅ Resumen enviado a Slack.');
+    else alert('❌ Error al enviar.');
+  })
+  .catch(() => alert('❌ Error de conexión con Slack.'));
+}
+
+
+
+/* ── SOCIAL FUNCTIONS ── */
+function getColCostoSocial(mes) { return MAPA_MES_COSTO_SOCIAL[mes] || MES_VIGENTE_SOCIAL; }
+function getCostoPuestoSocial(puesto, mes) { const col=getColCostoSocial(mes); return (TABLA_COSTOS_SOCIAL[puesto]&&TABLA_COSTOS_SOCIAL[puesto][col])||0; }
+
+function calcCostoEquipoSocial(cliente, mes) {
+  if (mes==='Total') return MESES_2026.filter(m=>m!=='Total').reduce((a,m)=>a+calcCostoEquipoSocial(cliente,m),0);
+  const puestos=(CLIENTES_FTE_SOCIAL[cliente]&&CLIENTES_FTE_SOCIAL[cliente][mes])||{};
+  let total=0;
+  for (const [p,fte] of Object.entries(puestos)) total+=getCostoPuestoSocial(p,mes)*fte;
+  return total/1000000;
+}
+
+let MESES_SOCIAL_SELECCIONADOS = [];
+function initMesesSocial() {
+  MESES_SOCIAL_SELECCIONADOS = _mesesPorDefecto();
+  renderPillsMesesSocial();
+}
+function toggleMesSocial(mes) {
+  const i = MESES_SOCIAL_SELECCIONADOS.indexOf(mes);
+  if (i >= 0) { if (MESES_SOCIAL_SELECCIONADOS.length > 1) MESES_SOCIAL_SELECCIONADOS.splice(i, 1); }
+  else { MESES_SOCIAL_SELECCIONADOS.push(mes); }
+  renderPillsMesesSocial();
+  const rows = calcRentabilidadSocial();
+  renderKPIsSocial(rows); renderSocialConsolidado(rows); renderRankingSocial(rows);
+  setTimeout(() => renderChartSocial(rows), 50);
+}
+function renderPillsMesesSocial() {
+  const cont = document.getElementById('mesSelectorSocial');
+  if (!cont) return;
+  cont.innerHTML = MESES_COMERCIAL.map(m => {
+    const activo = MESES_SOCIAL_SELECCIONADOS.includes(m);
+    return `<button class="rent-tab${activo ? ' active' : ''}" onclick="toggleMesSocial('${m}')">${m.slice(0,3)}</button>`;
+  }).join('');
+}
+
+function calcRentabilidadSocial() {
+  const meses = MESES_SOCIAL_SELECCIONADOS.length ? MESES_SOCIAL_SELECCIONADOS : _mesesPorDefecto();
+  return Object.keys(DIRECTORES_SOCIAL).map(nombre => {
+    let totalCosto=0, totalFte=0, fee=0;
+    meses.forEach(m=>{
+      totalCosto+=calcCostoEquipoSocial(nombre,m);
+      const p=(CLIENTES_FTE_SOCIAL[nombre]&&CLIENTES_FTE_SOCIAL[nombre][m])||{};
+      totalFte+=Object.values(p).reduce((a,b)=>a+b,0);
+      fee+=(INGRESOS_SOCIAL[nombre]&&INGRESOS_SOCIAL[nombre][m])||0;
+    });
+    const cm=fee-totalCosto; const cmPct=fee>0?(cm/fee)*100:0;
+    return {nombre,ingresos:fee,costoEq:totalCosto,cm,cmPct,fte:totalFte};
+  });
+}
+
+function renderKPIsSocial(rows) {
+  const tIng=rows.reduce((a,r)=>a+r.ingresos,0);
+  const tCosto=ohActivoSocial?rows.reduce((a,r)=>a+r.costoEq*(1+OH_SOCIAL),0):rows.reduce((a,r)=>a+r.costoEq,0);
+  const tCM=tIng-tCosto; const tPct=tIng>0?(tCM/tIng)*100:0;
+  document.getElementById('kpisSocial').innerHTML=`
+    <div class="kpi"><div class="kpi-label">Fees</div><div class="kpi-value" style="font-size:26px">${fmtM(tIng)}</div><div class="kpi-sub">Fee facturado al cliente</div><div class="kpi-accent" style="background:#4488ff"></div></div>
+    <div class="kpi"><div class="kpi-label">Costo Equipo Total</div><div class="kpi-value" style="font-size:26px">${fmtM(tCosto)}</div><div class="kpi-sub">FTE x Costo Compania${ohActivoSocial?' (con OH)':''}</div><div class="kpi-accent" style="background:var(--yellow)"></div></div>
+    <div class="kpi"><div class="kpi-label">CMO Total</div><div class="kpi-value" style="font-size:26px;color:${tCM>=0?'#00c853':'#ff4455'}">${fmtM(tCM)}</div><div class="kpi-sub">Fee − Costo Equipo</div><div class="kpi-accent" style="background:var(--green)"></div></div>
+    <div class="kpi"><div class="kpi-label">CMO % Promedio</div><div class="kpi-value" style="font-size:26px;color:${tPct>=20?'#00c853':tPct>=5?'#f5c400':'#ff4455'}">${tPct.toFixed(1)}%</div><div class="kpi-sub">CMO $ / Fee Total</div><div class="kpi-accent" style="background:var(--purple)"></div></div>`;
+}
+
+function renderSocialConsolidado(rows) {
+  const maxCM=Math.max(...rows.map(r=>r.cm),0.01);
+  let html=rows.map(r=>{
+    const d=DIRECTORES_SOCIAL[r.nombre]||{};
+    const costoD=ohActivoSocial?r.costoEq*(1+OH_SOCIAL):r.costoEq;
+    const cmD=r.ingresos-costoD;
+    const pctD=r.ingresos>0?(cmD/r.ingresos)*100:0;
+    const pct=Math.max(0,Math.min(100,(cmD/maxCM)*100));
+    const barColor=pctD>=25?'#00c853':pctD>0?'#f5c400':'#ff4455';
+    return `<tr>
+      <td><div class="client-name"><div class="client-dot" style="background:${d.color||'#606060'}"></div>${r.nombre}</div></td>
+      <td class="num" style="color:#aaa">${fmtM(r.ingresos)}</td>
+      <td class="num" style="color:var(--yellow)">${fmtM(costoD)}</td>
+      <td class="num"><div class="cm-bar-wrap"><div class="cm-bar-bg"><div class="cm-bar-fill" style="width:${pct.toFixed(0)}%;background:${barColor}"></div></div><span style="min-width:65px;text-align:right;color:${cmD>=0?'#f0f0f0':'#ff4455'}">${fmtM(cmD)}</span></div></td>
+      <td class="num" style="color:${pctD>=25?'#00c853':pctD>0?'#f5c400':'#ff4455'};font-weight:600">${pctD.toFixed(1)}%</td>
+      <td>${ohActivoSocial?getSemaforoOH(pctD,true):''}</td></tr>`;
+  }).join('');
+  const tI=rows.reduce((a,r)=>a+r.ingresos,0);
+  const tC=ohActivoSocial?rows.reduce((a,r)=>a+r.costoEq*(1+OH_SOCIAL),0):rows.reduce((a,r)=>a+r.costoEq,0);
+  const tM=tI-tC; const tP=tI>0?(tM/tI)*100:0;
+  html+=`<tr class="total-row"><td>TOTAL</td><td class="num">${fmtM(tI)}</td><td class="num">${fmtM(tC)}</td><td class="num" style="color:${tM>=0?'#f0f0f0':'#ff4455'}">${fmtM(tM)}</td><td class="num" style="color:${tP>=25?'#00c853':tP>0?'#f5c400':'#ff4455'}">${tP.toFixed(1)}%</td><td></td></tr>`;
+  document.getElementById('tbodySocialConsolidado').innerHTML=html;
+}
+
+function renderRankingSocial(rows) {
+  const medals=['🥇','🥈','🥉'];
+  const rowsD=rows.map(r=>{const costoD=ohActivoSocial?r.costoEq*(1+OH_SOCIAL):r.costoEq;const cmD=r.ingresos-costoD;const pctD=r.ingresos>0?(cmD/r.ingresos)*100:0;return{...r,cmD,pctD};});
+  const byCM=[...rowsD].sort((a,b)=>b.cmD-a.cmD);
+  const byPct=[...rowsD].sort((a,b)=>b.pctD-a.pctD);
+  document.getElementById('rankingSocialCM').innerHTML=byCM.map((r,i)=>{const d=DIRECTORES_SOCIAL[r.nombre]||{};return`<div class="rank-item"><div class="rank-num">${medals[i]||(i+1)}</div><div class="rank-name"><div class="client-dot" style="background:${d.color||'#606060'};display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;vertical-align:middle"></div>${r.nombre}</div><div class="rank-val" style="color:${r.cmD>=0?'#00c853':'#ff4455'}">${fmtM(r.cmD)}</div></div>`;}).join('');
+  document.getElementById('rankingSocialPct').innerHTML=byPct.map((r,i)=>`<div class="rank-item"><div class="rank-num">${medals[i]||(i+1)}</div><div class="rank-name">${r.nombre}</div><div class="rank-val" style="color:${r.pctD>=25?'#00c853':r.pctD>0?'#f5c400':'#ff4455'}">${r.pctD.toFixed(1)}%</div></div>`).join('');
+}
+
+let chartSocialInstance = null;
+function renderChartSocial(rows) {
+  const ctx=document.getElementById('chartSocial');
+  if(!ctx) return;
+  if(chartSocialInstance){chartSocialInstance.destroy();chartSocialInstance=null;}
+  chartSocialInstance=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:rows.map(r=>r.nombre),
+      datasets:[
+        {label:'Fee',data:rows.map(r=>parseFloat(r.ingresos.toFixed(2))),backgroundColor:'rgba(68,136,255,0.7)',borderColor:'#4488ff',borderWidth:1,borderRadius:4},
+        {label:'Costo Equipo',data:rows.map(r=>parseFloat((ohActivoSocial?r.costoEq*(1+OH_SOCIAL):r.costoEq).toFixed(2))),backgroundColor:'rgba(245,196,0,0.65)',borderColor:'#f5c400',borderWidth:1,borderRadius:4},
+        {label:'CMO $',data:rows.map(r=>parseFloat((r.ingresos-(ohActivoSocial?r.costoEq*(1+OH_SOCIAL):r.costoEq)).toFixed(2))),backgroundColor:'rgba(0,200,83,0.65)',borderColor:'#00c853',borderWidth:1,borderRadius:4},
+      ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#aaa',font:{family:'Poppins',size:11}}}},
+      scales:{x:{ticks:{color:'#606060',font:{family:'Poppins',size:11}},grid:{color:'rgba(255,255,255,0.03)'}},
+              y:{ticks:{color:'#606060',font:{family:'Poppins',size:11},callback:v=>'$'+v+' M'},grid:{color:'rgba(255,255,255,0.05)'}}}}
+  });
+}
+
+function renderSocialCompleto() {
+  if (!MESES_SOCIAL_SELECCIONADOS.length) initMesesSocial(); else renderPillsMesesSocial();
+  const rows=calcRentabilidadSocial();
+  renderKPIsSocial(rows); renderSocialConsolidado(rows); renderRankingSocial(rows);
+  setTimeout(()=>renderChartFTESelector('social'),80);
+}
+
+function renderMesSelectorSocial() {
+  const cont=document.getElementById('mesSelectorSocial');
+  const cont2=document.getElementById('mesSelectorSocialDetalle');
+  const btns=MESES_2026.map(m=>`<button class="dir-btn${m===MES_ACTIVO_SOCIAL?' active':''}" onclick="setMesActivoSocial('${m}',this)">${m}</button>`).join('');
+  if(cont) cont.innerHTML=btns;
+  if(cont2) cont2.innerHTML=btns.replace(/onclick="setMesActivoSocial/g,'onclick="setMesActivoSocial');
+}
+
+function setMesActivoSocial(mes,btn) {
+  MES_ACTIVO_SOCIAL=mes;
+  document.querySelectorAll('#mesSelectorSocial .dir-btn, #mesSelectorSocialDetalle .dir-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll(`#mesSelectorSocial .dir-btn, #mesSelectorSocialDetalle .dir-btn`).forEach(b=>{if(b.textContent===mes)b.classList.add('active');});
+  const rows=calcRentabilidadSocial();
+  renderKPIsSocial(rows); renderSocialConsolidado(rows); renderRankingSocial(rows);
+  setTimeout(()=>renderChartFTE(Object.keys(DIRECTORES_SOCIAL).find(c=>document.querySelector('#chartFTESocialSelector .dir-btn.active')?.textContent===c)||Object.keys(DIRECTORES_SOCIAL)[0],'social'),60);
+}
+
+function renderClienteSelectorSocial() {
+  const cont=document.getElementById('clienteSelectorSocial');
+  if(!cont) return;
+  cont.innerHTML=Object.keys(DIRECTORES_SOCIAL).map(c=>`<button class="dir-btn${c===clienteDetalleActivoSocial?' active':''}" onclick="selectClienteSocial('${c}',this)">${c}</button>`).join('');
+}
+
+function selectClienteSocial(cliente,btn) {
+  clienteDetalleActivoSocial=cliente;
+  document.querySelectorAll('#clienteSelectorSocial .dir-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderDetalleSocial(cliente);
+}
+
+function renderDetalleSocial(cliente) {
+  const mes=MES_ACTIVO_SOCIAL;
+  const colCosto=getColCostoSocial(mes);
+  const vigEl=document.getElementById('vigenciaMesSocial');
+  if(vigEl) vigEl.textContent=colCosto;
+  const fteActual=(CLIENTES_FTE_SOCIAL[cliente]&&CLIENTES_FTE_SOCIAL[cliente][mes])||{};
+  const ingActual=(INGRESOS_SOCIAL[cliente]&&INGRESOS_SOCIAL[cliente][mes])||0;
+  const ingEl=document.getElementById('ingresosEditableSocial');
+  if(ingEl) ingEl.value=ingActual||'';
+  renderFTEVendidoInputs(cliente,'social');
+  const puestos=Object.keys(TABLA_COSTOS_SOCIAL);
+  const totalCostoRaw=puestos.reduce((acc,p)=>{const fte=fteActual[p]||0;return acc+getCostoPuestoSocial(p,mes)*fte;},0);
+  const totalCosto=totalCostoRaw/1000000;
+  let html=puestos.map(puesto=>{
+    const costoUnit=getCostoPuestoSocial(puesto,mes),fteVal=fteActual[puesto]||0,costoMes=(costoUnit*fteVal)/1000000;
+    const pct=totalCosto>0?(costoMes/totalCosto)*100:0;
+    const barW=Math.min(pct,100).toFixed(0);
+    return `<tr>
+      <td style="color:${fteVal>0?'var(--text)':'#404040'}">${puesto}</td>
+      <td class="num"><input type="number" step="0.01" min="0" value="${fteVal?(fteVal*100).toFixed(2):''}" placeholder="0"
+        style="background:transparent;border:none;border-bottom:1px solid ${fteVal>0?'var(--purple)':'var(--border)'};color:var(--text);font-family:'Poppins',sans-serif;font-size:13px;width:80px;text-align:right;outline:none;padding:2px 4px"
+        onchange="saveFTESocial('${cliente}','${mes}','${puesto}',this.value)"
+        onfocus="this.style.borderBottomColor='var(--purple)'" onblur="this.style.borderBottomColor=this.value?'var(--purple)':'var(--border)'">
+      </td>
+      <td class="num" style="color:${fteVal>0?'var(--yellow)':'#404040'}">${fmtCosto(costoUnit)}</td>
+      <td class="num" style="color:${fteVal>0?'#f0f0f0':'#404040'};font-size:12px">${fteVal>0?fmtM(costoMes):'—'}</td>
+      <td class="num"><div style="display:flex;align-items:center;gap:6px">
+        <div style="flex:1;height:4px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden">
+          <div style="width:${barW}%;height:100%;background:var(--purple);border-radius:2px"></div></div>
+        <span style="font-size:11px;color:#606060;min-width:32px;text-align:right">${fteVal>0?pct.toFixed(1)+'%':''}</span>
+      </div></td></tr>`;
+  }).join('');
+  html+=`<tr class="total-row"><td colspan="2">TOTAL - ${cliente} - ${mes}</td><td style="color:var(--text-muted);font-size:11px">Col: ${colCosto}</td><td class="num" style="color:var(--yellow)">${fmtM(totalCosto)}</td><td class="num" style="color:#aaa">100%</td></tr>`;
+  document.getElementById('tbodySocialDetalle').innerHTML=html;
+}
+
+function saveFTESocial(cliente,mes,puesto,valor) {
+  // Usuario ingresa en % absoluto (ej: 25.35) → guardar como decimal (0.2535)
+  const pct=parseFloat(valor)||0;
+  const v=pct/100;
+  if(!CLIENTES_FTE_SOCIAL[cliente]) CLIENTES_FTE_SOCIAL[cliente]={};
+  if(!CLIENTES_FTE_SOCIAL[cliente][mes]) CLIENTES_FTE_SOCIAL[cliente][mes]={};
+  if(!isNaN(v)&&v>0){CLIENTES_FTE_SOCIAL[cliente][mes][puesto]=v;postSheet('fte_social',{cliente,mes,puesto,fte:v});}
+  else{delete CLIENTES_FTE_SOCIAL[cliente][mes][puesto];postSheet('fte_social',{cliente,mes,puesto,fte:0});}
+  renderDetalleSocial(cliente);
+  const rows=calcRentabilidadSocial();
+  renderKPIsSocial(rows);renderSocialConsolidado(rows);renderRankingSocial(rows);
+}
+
+function saveIngresosSocial(cliente,mes,valor) {
+  const val=parseFloat(valor)||0;
+  if(!INGRESOS_SOCIAL[cliente]) INGRESOS_SOCIAL[cliente]={};
+  INGRESOS_SOCIAL[cliente][mes]=val;
+  postSheet('ingresos_social',{cliente,mes,valor:val*1000});
+  renderDetalleSocial(cliente);
+  const rows=calcRentabilidadSocial();
+  renderKPIsSocial(rows);renderSocialConsolidado(rows);renderRankingSocial(rows);
+}
+
+function getColsRRHHSocial() {
+  const set=new Set(['Diciembre']);
+  Object.values(TABLA_COSTOS_SOCIAL).forEach(row=>Object.keys(row).forEach(k=>set.add(k)));
+  return [...set];
+}
+function renderCostosCiaSocial() {
+  const cols=getColsRRHHSocial();
+  const vigEl=document.getElementById('colVigenteLabelSocial');
+  if(vigEl) vigEl.textContent=MES_VIGENTE_SOCIAL;
+  const head=document.getElementById('headCostoCiaSocial');
+  const body=document.getElementById('bodyCostoCiaSocial');
+  if(!head||!body) return;
+  head.innerHTML=`<tr><th style="min-width:210px">Puesto</th>${cols.map(m=>`<th class="mes-header num${m===MES_VIGENTE_SOCIAL?' vigente-col':''}">${m}${m==='Diciembre'?' (base Ene)':''}${m===MES_VIGENTE_SOCIAL?' ⚡':''}</th>`).join('')}</tr>`;
+  body.innerHTML=Object.entries(TABLA_COSTOS_SOCIAL).map(([puesto,costos])=>
+    `<tr><td class="puesto-col">${puesto}</td>${cols.map(m=>{const v=costos[m],isVig=m===MES_VIGENTE_SOCIAL;return`<td class="costo-cell${isVig?' vigente':''} editable" ondblclick="editCellSocial(this,'${puesto}','${m}')" title="Doble click para editar">${v?fmtCosto(v):'—'}</td>`;}).join('')}</tr>`
+  ).join('');
+}
+function editCellSocial(td,puesto,mes) {
+  const cur=TABLA_COSTOS_SOCIAL[puesto]?.[mes]||0;
+  td.innerHTML=`<input class="cell-input" type="number" value="${cur}" onblur="saveCellSocial(this,'${puesto}','${mes}')" onkeydown="if(event.key==='Enter')this.blur();">`;
+  td.querySelector('input').focus(); td.querySelector('input').select();
+}
+function saveCellSocial(input,puesto,mes) {
+  const v=parseFloat(String(input.value).replace(',','.'));
+  if(!isNaN(v)&&v>=0){if(!TABLA_COSTOS_SOCIAL[puesto]) TABLA_COSTOS_SOCIAL[puesto]={};TABLA_COSTOS_SOCIAL[puesto][mes]=v;postSheet('costos_social',{puesto,mes,valor:v});}
+  renderCostosCiaSocial();
+}
+
+function agregarMesSocial() {
+  const nombre=prompt('Nombre del mes (ej: Mayo):');
+  if(!nombre||!nombre.trim()) return;
+  const mesKey=nombre.trim();
+  Object.keys(TABLA_COSTOS_SOCIAL).forEach(p=>{TABLA_COSTOS_SOCIAL[p][mesKey]=0;});
+  let found=false;
+  MESES_2026.forEach(m=>{if(m===mesKey)found=true;if(found)MAPA_MES_COSTO_SOCIAL[m]=mesKey;});
+  renderCostosCiaSocial();
+}
+
+function guardarCostosSocial() {
+  const cols=getColsRRHHSocial().filter(m=>m!=='Diciembre');
+  for(let i=cols.length-1;i>=0;i--){if(Object.values(TABLA_COSTOS_SOCIAL).some(r=>(r[cols[i]]||0)>0)){MES_VIGENTE_SOCIAL=cols[i];break;}}
+  renderSocialCompleto();
+  document.querySelectorAll('#page-social .rent-section').forEach(s=>s.style.display='none');
+  document.querySelectorAll('#page-social .rent-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('social-consolidado').style.display='block';
+  document.querySelector('#page-social .rent-tab').classList.add('active');
+  setTimeout(()=>renderChartSocial(calcRentabilidadSocial()),80);
+}
+
+function switchSocialTab(tab, btn) {
+  document.querySelectorAll('#page-social .rent-section').forEach(s=>s.style.display='none');
+  document.querySelectorAll('#page-social .rent-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById(tab).style.display='block';
+  if(btn) btn.classList.add('active');
+  if(tab==='social-consolidado') {
+    const rows=calcRentabilidadSocial();
+    renderKPIsSocial(rows); renderSocialConsolidado(rows); renderRankingSocial(rows);
+    setTimeout(()=>renderChartFTESelector('social'),80);
+  }
+  if(tab==='social-detalle') {
+    renderClienteSelectorSocial();
+    renderDetalleSocial(clienteDetalleActivoSocial);
+  }
+  if(tab==='social-costos') renderCostosCiaSocial();
+}
+
+
+/* ── FTE VENDIDO VS REAL ── */
+const COLORES_PUESTOS = ['#4488ff','#00c853','#f5c400','#ff4455','#aa44ff','#00bcd4','#ff9800'];
+
+let chartFTESocialInstance = null;
+let chartFTEPerfInstance   = null;
+
+// Puestos seleccionados para el gráfico FTE Vendido vs Real (multi-select, por sección — no por cliente)
+let PUESTOS_FTE_PERF_SELECCIONADOS   = [];
+let PUESTOS_FTE_SOCIAL_SELECCIONADOS = [];
+
+function _puestosFTE(tipo) {
+  const todos = tipo==='social' ? Object.keys(TABLA_COSTOS_SOCIAL) : Object.keys(TABLA_COSTOS_PERF);
+  return tipo==='perf' ? todos.filter(p => p !== 'Performance MKT Manager') : todos;
+}
+
+function renderPillsPuestosFTE(tipo) {
+  const contId = tipo==='social' ? 'puestosFTESocialSelector' : 'puestosFTEPerfSelector';
+  const cont = document.getElementById(contId);
+  if (!cont) return;
+  const puestos = _puestosFTE(tipo);
+  const sel = tipo==='social' ? PUESTOS_FTE_SOCIAL_SELECCIONADOS : PUESTOS_FTE_PERF_SELECCIONADOS;
+  // Si no hay selección todavía (primera carga), arrancar con todos seleccionados
+  if (sel.length === 0) puestos.forEach(p => sel.push(p));
+  cont.innerHTML = puestos.map((p,i) => {
+    const activo = sel.includes(p);
+    const color = COLORES_PUESTOS[i % COLORES_PUESTOS.length];
+    return `<button class="rent-tab${activo?' active':''}" style="${activo?`border-color:${color};color:${color}`:''}" onclick="togglePuestoFTE('${p}','${tipo}')">${p}</button>`;
+  }).join('');
+}
+
+function togglePuestoFTE(puesto, tipo) {
+  const sel = tipo==='social' ? PUESTOS_FTE_SOCIAL_SELECCIONADOS : PUESTOS_FTE_PERF_SELECCIONADOS;
+  const i = sel.indexOf(puesto);
+  if (i >= 0) { if (sel.length > 1) sel.splice(i, 1); } // no permitir deseleccionar el último
+  else { sel.push(puesto); }
+  renderPillsPuestosFTE(tipo);
+  const selId = tipo==='social' ? 'chartFTESocialSelector' : 'chartFTEPerfSelector';
+  const clienteActivo = document.querySelector(`#${selId} .dir-btn.active`)?.textContent;
+  const clientes = tipo==='social' ? Object.keys(DIRECTORES_SOCIAL) : Object.keys(DIRECTORES_PERF);
+  renderChartFTE(clienteActivo || clientes[0], tipo);
+}
+
+function renderFTEVendidoInputs(cliente, tipo) {
+  const todosPuestos = tipo==='social' ? Object.keys(TABLA_COSTOS_SOCIAL) : Object.keys(TABLA_COSTOS_PERF);
+  const puestos = tipo==='perf'
+    ? todosPuestos.filter(p => p !== 'Performance MKT Manager')
+    : todosPuestos;
+  const vendido = tipo==='social' ? FTE_VENDIDO_SOCIAL : FTE_VENDIDO_PERF;
+  const containerId = tipo==='social' ? 'fteVendidoSocialInputs' : 'fteVendidoPerfInputs';
+  const cont = document.getElementById(containerId);
+  if (!cont) return;
+
+  cont.innerHTML = puestos.map(p => {
+    const val = (vendido[cliente]&&vendido[cliente][p]) || '';
+    return `<div style="display:flex;flex-direction:column;gap:4px;min-width:160px">
+      <span style="font-size:10px;color:var(--text-muted)">${p}</span>
+      <input type="number" step="0.01" placeholder="%" value="${val}"
+        style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:var(--text);font-size:12px;width:100%"
+        onchange="saveFTEVendido('${cliente}','${p}',this.value,'${tipo}')"
+        onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--border)'">
+    </div>`;
+  }).join('');
+}
+
+function saveFTEVendido(cliente, puesto, valor, tipo) {
+  const val = parseFloat(valor)||0;
+  const vendido = tipo==='social' ? FTE_VENDIDO_SOCIAL : FTE_VENDIDO_PERF;
+  if (!vendido[cliente]) vendido[cliente]={};
+  vendido[cliente][puesto] = val;
+  postSheet('fte_vendido_'+tipo, {cliente, puesto, valor:val});
+  renderChartFTE(cliente, tipo);
+}
+
+function renderChartFTESelector(tipo) {
+  const clientes = tipo==='social'
+    ? Object.keys(DIRECTORES_SOCIAL)
+    : Object.keys(DIRECTORES_PERF);
+  const selId = tipo==='social' ? 'chartFTESocialSelector' : 'chartFTEPerfSelector';
+  const cont = document.getElementById(selId);
+  if (!cont) return;
+  const first = clientes[0];
+  cont.innerHTML = clientes.map(c =>
+    `<button class="dir-btn${c===first?' active':''}" onclick="selectClienteFTEChart('${c}','${tipo}',this)">${c}</button>`
+  ).join('');
+  renderPillsPuestosFTE(tipo);
+  renderChartFTE(first, tipo);
+}
+
+function selectClienteFTEChart(cliente, tipo, btn) {
+  const selId = tipo==='social' ? 'chartFTESocialSelector' : 'chartFTEPerfSelector';
+  document.querySelectorAll(`#${selId} .dir-btn`).forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderChartFTE(cliente, tipo);
+}
+
+function renderChartFTE(cliente, tipo) {
+  const ftePorMes = tipo==='social' ? CLIENTES_FTE_SOCIAL[cliente] : CLIENTES_FTE_PERF[cliente];
+  const vendidoCliente = tipo==='social'
+    ? (FTE_VENDIDO_SOCIAL[cliente]||{})
+    : (FTE_VENDIDO_PERF[cliente]||{});
+  const todosPuestosChart = tipo==='social'
+    ? Object.keys(TABLA_COSTOS_SOCIAL)
+    : Object.keys(TABLA_COSTOS_PERF);
+  const puestosDisponibles = tipo==='perf'
+    ? todosPuestosChart.filter(p => p !== 'Performance MKT Manager')
+    : todosPuestosChart;
+  const seleccionPuestos = tipo==='social' ? PUESTOS_FTE_SOCIAL_SELECCIONADOS : PUESTOS_FTE_PERF_SELECCIONADOS;
+  const puestos = seleccionPuestos.length ? puestosDisponibles.filter(p => seleccionPuestos.includes(p)) : puestosDisponibles;
+
+  // Meses con datos reales — corte: nunca más allá de Julio 2026
+  const mesesConDatos = MESES_2026.filter(m => m!=='Total' &&
+    MESES_COMERCIAL.slice(0,7).includes(m) &&
+    ftePorMes && ftePorMes[m] && Object.keys(ftePorMes[m]).length > 0
+  );
+
+  if (mesesConDatos.length === 0) {
+    const canvasId = tipo==='social' ? 'chartFTESocial' : 'chartFTEPerf';
+    const inst = tipo==='social' ? chartFTESocialInstance : chartFTEPerfInstance;
+    if(inst){inst.destroy();}
+    if(tipo==='social') chartFTESocialInstance=null; else chartFTEPerfInstance=null;
+    const legend = document.getElementById(tipo==='social'?'chartFTESocialLegend':'chartFTEPerfLegend');
+    if(legend) legend.innerHTML='<span style="color:var(--text-muted);font-size:12px">Sin datos reales cargados para este cliente.</span>';
+    return;
+  }
+
+  // Datasets: una línea real + una vendida por puesto
+  const datasets = [];
+  puestos.forEach((puesto) => {
+    const i = puestosDisponibles.indexOf(puesto);
+    const color = COLORES_PUESTOS[i % COLORES_PUESTOS.length];
+    // Real
+    datasets.push({
+      label: puesto + ' (Real)',
+      data: mesesConDatos.map(m => ((ftePorMes[m]&&ftePorMes[m][puesto]) || 0) * 100),
+      borderColor: color,
+      backgroundColor: color+'22',
+      borderWidth: 2,
+      pointRadius: 4,
+      tension: 0.3,
+      fill: false,
+    });
+    // Vendido (punteado) — ahora varía por mes (antes era un valor fijo)
+    datasets.push({
+      label: puesto + ' (Vendido)',
+      data: mesesConDatos.map(m => ((vendidoCliente[m]&&vendidoCliente[m][puesto]) || 0) * 100),
+      borderColor: color,
+      backgroundColor: 'transparent',
+      borderWidth: 2,
+      borderDash: [6,4],
+      pointRadius: 0,
+      tension: 0,
+      fill: false,
+    });
+  });
+
+  const canvasId = tipo==='social' ? 'chartFTESocial' : 'chartFTEPerf';
+  const ctx = document.getElementById(canvasId);
+  if(!ctx) return;
+
+  if(tipo==='social'){if(chartFTESocialInstance){chartFTESocialInstance.destroy();chartFTESocialInstance=null;}}
+  else {if(chartFTEPerfInstance){chartFTEPerfInstance.destroy();chartFTEPerfInstance=null;}}
+
+  const inst = new Chart(ctx, {
+    type: 'line',
+    data: { labels: mesesConDatos, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)}%`
+          }
+        }
+      },
+      scales: {
+        x: { ticks:{color:'#606060',font:{family:'Poppins',size:11}}, grid:{color:'rgba(255,255,255,0.03)'} },
+        y: { ticks:{color:'#606060',font:{family:'Poppins',size:11},callback:v=>v+'%'}, grid:{color:'rgba(255,255,255,0.05)'}, title:{display:true,text:'FTE %',color:'#555'} }
+      }
+    }
+  });
+
+  if(tipo==='social') chartFTESocialInstance=inst; else chartFTEPerfInstance=inst;
+
+  // Legend manual
+  const legendEl = document.getElementById(tipo==='social'?'chartFTESocialLegend':'chartFTEPerfLegend');
+  if(legendEl) {
+    legendEl.innerHTML = puestos.map((p) => {
+      const c = COLORES_PUESTOS[puestosDisponibles.indexOf(p)%COLORES_PUESTOS.length];
+      return `<span class="legend-item">
+        <span style="display:inline-block;width:18px;height:2px;background:${c};vertical-align:middle;margin-right:4px"></span>${p} Real
+        &nbsp;<span style="display:inline-block;width:18px;height:2px;background:${c};opacity:.6;vertical-align:middle;margin-right:4px;border-top:2px dashed ${c};background:none"></span>${p} Vendido
+      </span>`;
+    }).join('');
+  }
+}
+
+/* ===== CONTROL COMERCIAL — construir Big 7 + Total Agencia desde CONTROL_RAW ===== */
+// Devuelve ['Enero', ..., mes anterior al actual] (ej: si hoy es Agosto -> Enero..Julio). Si estamos en Enero, devuelve solo ['Enero'].
+function _mesesPorDefecto() {
+  const mesActual = new Date().getMonth() + 1; // 1-12
+  const hasta = Math.max(1, mesActual - 1);
+  return MESES_COMERCIAL.slice(0, hasta);
+}
+
+function initMesesCC() {
+  MESES_CC_SELECCIONADOS = _mesesPorDefecto();
+  renderPillsMesesCC();
+}
+
+function initMesesBago() {
+  MESES_BAGO_SELECCIONADOS = _mesesPorDefecto();
+  renderPillsMesesBago();
+}
+
+function toggleMesCC(mes) {
+  const i = MESES_CC_SELECCIONADOS.indexOf(mes);
+  if (i >= 0) {
+    if (MESES_CC_SELECCIONADOS.length > 1) MESES_CC_SELECCIONADOS.splice(i, 1);
+  } else {
+    MESES_CC_SELECCIONADOS.push(mes);
+  }
+  renderPillsMesesCC();
+  aplicarControlComercialReal();
+  renderTablas(DATA);
+  if (DATA.agencia) renderKPIsAgencia(DATA.agencia);
+}
+
+function renderPillsMesesCC() {
+  const cont = document.getElementById('mesesCCSelector');
+  if (!cont) return;
+  cont.innerHTML = MESES_COMERCIAL.map(m => {
+    const activo = MESES_CC_SELECCIONADOS.includes(m);
+    return `<button class="rent-tab${activo ? ' active' : ''}" onclick="toggleMesCC('${m}')">${m.slice(0,3)}</button>`;
+  }).join('');
+}
+
+function toggleMesBago(mes) {
+  const i = MESES_BAGO_SELECCIONADOS.indexOf(mes);
+  if (i >= 0) {
+    if (MESES_BAGO_SELECCIONADOS.length > 1) MESES_BAGO_SELECCIONADOS.splice(i, 1);
+  } else {
+    MESES_BAGO_SELECCIONADOS.push(mes);
+  }
+  renderPillsMesesBago();
+  aplicarBagoMarcasReal();
+  renderTablas(DATA);
+}
+
+function renderPillsMesesBago() {
+  const cont = document.getElementById('mesesBagoSelector');
+  if (!cont) return;
+  cont.innerHTML = MESES_COMERCIAL.map(m => {
+    const activo = MESES_BAGO_SELECCIONADOS.includes(m);
+    return `<button class="rent-tab${activo ? ' active' : ''}" onclick="toggleMesBago('${m}')">${m.slice(0,3)}</button>`;
+  }).join('');
+}
+
+function _sumarPeriodoCliente(clave) {
+  const raw = CONTROL_RAW[clave] || {};
+  let inv = 0, cmb = 0, ingresos = 0;
+  MESES_CC_SELECCIONADOS.forEach(m => {
+    const k = '2026-' + MES_NUM[m];
+    if (raw[k]) { inv += raw[k].inv || 0; cmb += raw[k].cmb || 0; ingresos += raw[k].ingresos || 0; }
+  });
+  const pv = PRESUP_VENTA[clave] || {};
+  const pc = PRESUP_CMB[clave] || {};
+  let presup = 0, cmbPresup = 0;
+  MESES_CC_SELECCIONADOS.forEach(m => { presup += pv[m] || 0; cmbPresup += pc[m] || 0; });
+  const presupAnual = pv['TOTAL'] || 0;
+
+  // Unidades: Tabla_Plana_Comercial está en pesos → /1000 = miles
+  inv = inv / 1000; cmb = cmb / 1000; ingresos = ingresos / 1000;
+
+  const vs = presup !== 0 ? ((inv - presup) / presup) * 100 : null;
+  const vsCmb = cmbPresup !== 0 ? ((cmb - cmbPresup) / cmbPresup) * 100 : null;
+  const consumidoAnual = presupAnual !== 0 ? (inv / presupAnual) * 100 : 0;
+  const cmbPct = ingresos !== 0 ? (cmb / ingresos) * 100 : 0;
+
+  // cmbPct se guarda como string con "%" — así lo esperan renderTablas/renderKPIsGauge/renderChart, igual que el resto del dashboard
+  return { inv, presup, vs, consumidoAnual, presupAnual, cmb, cmbPresup, vsCmb, cmbPct: cmbPct.toFixed(1) + '%' };
+}
+
+function aplicarControlComercialReal() {
+  if (!CONTROL_RAW || Object.keys(CONTROL_RAW).length === 0) return; // todavía no llegó el Sheet nuevo
+  if (!DATA) DATA = { clientes: [], bago: [] };
+
+  Object.keys(DIRECTORES).forEach(nombre => {
+    const calc = _sumarPeriodoCliente(nombre);
+    let row = (DATA.clientes || []).find(c => c.nombre === nombre);
+    if (!row) { row = { nombre }; DATA.clientes.push(row); }
+    Object.assign(row, calc);
+  });
+
+  DATA.agencia = _sumarPeriodoCliente('Total Agencia');
+  if (MESES_CC_SELECCIONADOS.length === 1) {
+    DATA.periodo = MESES_CC_SELECCIONADOS[0] + ' 2026';
+  } else {
+    DATA.periodo = MESES_CC_SELECCIONADOS.map(m => m.slice(0,3)).join('+') + ' 2026';
+  }
+  if (document.getElementById('periodoLabel')) document.getElementById('periodoLabel').textContent = DATA.periodo;
+
+  aplicarBagoMarcasReal();
+}
+
+/* ===== Unidades de Negocio · Bagó — construir desde BAGO_MARCAS_INV/PRESUP ===== */
+const MARCAS_BAGO_DISPLAY = {
+  'ESOPRAZOL': 'Esoprazol', 'ANAFLEX': 'Anaflex', 'FACIALES': 'Faciales',
+  'CORPORALES': 'Corporales', 'CAPILARES': 'Capilares', 'SOLARES': 'Solares',
+  'BAGO+': 'Bagó+', 'DIOXAFLEX': 'Dioxaflex', 'INSTITUCIONAL': 'Institucional',
+};
+
+function _sumarPeriodoMarca(producto) {
+  const raw = BAGO_MARCAS_INV[producto] || {};
+  let inv = 0;
+  MESES_BAGO_SELECCIONADOS.forEach(m => {
+    const k = '2026-' + MES_NUM[m];
+    inv += raw[k] || 0;
+  });
+  inv = inv / 1000; // pesos → miles
+
+  const pv = BAGO_MARCAS_PRESUP[producto] || {};
+  let presup = 0;
+  MESES_BAGO_SELECCIONADOS.forEach(m => { presup += pv[m] || 0; });
+  const presupAnual = pv['TOTAL'] || 0;
+
+  const vs = presup !== 0 ? ((inv - presup) / presup) * 100 : null;
+  const consumidoAnual = presupAnual !== 0 ? (inv / presupAnual) * 100 : 0;
+
+  return { inv, presup, vs, consumidoAnual, presupAnual, soi: fmtCC(inv) };
+}
+
+function aplicarBagoMarcasReal() {
+  if (!BAGO_MARCAS_INV || Object.keys(BAGO_MARCAS_INV).length === 0) return; // todavía no llegó el Sheet nuevo
+  if (!DATA.bago) DATA.bago = [];
+
+  Object.keys(MARCAS_BAGO_DISPLAY).forEach(producto => {
+    const nombreDisplay = MARCAS_BAGO_DISPLAY[producto];
+    const calc = _sumarPeriodoMarca(producto);
+    if (calc.inv === 0 && calc.presup === 0) return; // sin datos en ningún lado, no mostrar (ej: Institucional sin presup y sin inv en el período)
+    let row = DATA.bago.find(r => r.nombre === nombreDisplay);
+    if (!row) { row = { nombre: nombreDisplay }; DATA.bago.push(row); }
+    Object.assign(row, calc);
+  });
+}
+
+async function loadData() {
+  // (Control Comercial no aplica en este archivo — solo Performance)
+
+  // Rentabilidad (script nuevo - GET)
+  try {
+    const res2 = await fetch(SCRIPT_URL);
+    const json = await res2.json();
+
+    if (json.costos && Object.keys(json.costos).length > 0) {
+      Object.entries(json.costos).forEach(([puesto, meses]) => {
+        if (!TABLA_COSTOS[puesto]) TABLA_COSTOS[puesto] = {};
+        Object.entries(meses).forEach(([mes, valor]) => { TABLA_COSTOS[puesto][mes] = valor; });
+      });
+      const cols = getColsRRHH().filter(m => m !== 'Diciembre');
+      for (let i = cols.length - 1; i >= 0; i--) {
+        if (Object.values(TABLA_COSTOS).some(r => (r[cols[i]] || 0) > 0)) {
+          MES_VIGENTE = cols[i];
+          let found = false;
+          MESES_2026.forEach(m => { if (m === MES_VIGENTE) found = true; if (found) MAPA_MES_COSTO[m] = MES_VIGENTE; });
+          break;
+        }
+      }
+    }
+
+    if (json.fte && Object.keys(json.fte).length > 0) {
+      Object.entries(json.fte).forEach(([cliente, meses]) => {
+        if (!CLIENTES_FTE[cliente]) CLIENTES_FTE[cliente] = {};
+        Object.entries(meses).forEach(([mes, puestos]) => { 
+          CLIENTES_FTE[cliente][mes] = Object.assign({}, CLIENTES_FTE[cliente][mes], puestos);
+        });
+      });
+    }
+
+    if (json.ingresos && Object.keys(json.ingresos).length > 0) {
+      Object.entries(json.ingresos).forEach(([cliente, meses]) => {
+        if (!INGRESOS[cliente]) INGRESOS[cliente] = {};
+        Object.entries(meses).forEach(([mes, valor]) => { INGRESOS[cliente][mes] = valor; });
+      });
+    }
+    if (json.inversion && Object.keys(json.inversion).length > 0) {
+      Object.entries(json.inversion).forEach(([cliente, meses]) => {
+        if (!INVERSION[cliente]) INVERSION[cliente] = {};
+        Object.entries(meses).forEach(([mes, valor]) => { INVERSION[cliente][mes] = valor; });
+      });
+    }
+    // Cargar datos Performance
+    if (json.fte_perf && Object.keys(json.fte_perf).length > 0) {
+      Object.entries(json.fte_perf).forEach(([cliente, meses]) => {
+        if (!CLIENTES_FTE_PERF[cliente]) CLIENTES_FTE_PERF[cliente] = {};
+        Object.entries(meses).forEach(([mes, puestos]) => {
+          CLIENTES_FTE_PERF[cliente][mes] = Object.assign({}, CLIENTES_FTE_PERF[cliente][mes], puestos);
+        });
+      });
+    }
+    if (json.ingresos_perf && Object.keys(json.ingresos_perf).length > 0) {
+      Object.entries(json.ingresos_perf).forEach(([cliente, meses]) => {
+        if (!INGRESOS_PERF[cliente]) INGRESOS_PERF[cliente] = {};
+        // ingresos_perf viene en miles del Sheet → convertir a millones
+        Object.entries(meses).forEach(([mes, valor]) => { INGRESOS_PERF[cliente][mes] = valor / 1000; });
+      });
+    }
+    if (json.fte_vendido_perf && Object.keys(json.fte_vendido_perf).length > 0) {
+      Object.entries(json.fte_vendido_perf).forEach(([cliente, puestos]) => {
+        FTE_VENDIDO_PERF[cliente] = Object.assign({}, FTE_VENDIDO_PERF[cliente], puestos);
+      });
+    }
+    if (json.costos_perf && Object.keys(json.costos_perf).length > 0) {
+      Object.entries(json.costos_perf).forEach(([puesto, meses]) => {
+        if (!TABLA_COSTOS_PERF[puesto]) TABLA_COSTOS_PERF[puesto] = {};
+        Object.entries(meses).forEach(([mes, valor]) => { TABLA_COSTOS_PERF[puesto][mes] = valor; });
+      });
+    }
+    // Cargar datos Social desde Sheet
+    if (json.fte_social && Object.keys(json.fte_social).length > 0) {
+      Object.entries(json.fte_social).forEach(([cliente, meses]) => {
+        if (!CLIENTES_FTE_SOCIAL[cliente]) CLIENTES_FTE_SOCIAL[cliente] = {};
+        Object.entries(meses).forEach(([mes, puestos]) => {
+          CLIENTES_FTE_SOCIAL[cliente][mes] = Object.assign({}, CLIENTES_FTE_SOCIAL[cliente][mes], puestos);
+        });
+      });
+    }
+    if (json.ingresos_social && Object.keys(json.ingresos_social).length > 0) {
+      Object.entries(json.ingresos_social).forEach(([cliente, meses]) => {
+        if (!INGRESOS_SOCIAL[cliente]) INGRESOS_SOCIAL[cliente] = {};
+        // ingresos_social viene en miles del Sheet → convertir a millones
+        Object.entries(meses).forEach(([mes, valor]) => { INGRESOS_SOCIAL[cliente][mes] = valor / 1000; });
+      });
+    }
+    if (json.fte_vendido_social && Object.keys(json.fte_vendido_social).length > 0) {
+      Object.entries(json.fte_vendido_social).forEach(([cliente, puestos]) => {
+        FTE_VENDIDO_SOCIAL[cliente] = Object.assign({}, FTE_VENDIDO_SOCIAL[cliente], puestos);
+      });
+    }
+    if (json.costos_social && Object.keys(json.costos_social).length > 0) {
+      Object.entries(json.costos_social).forEach(([puesto, meses]) => {
+        if (!TABLA_COSTOS_SOCIAL[puesto]) TABLA_COSTOS_SOCIAL[puesto] = {};
+        Object.entries(meses).forEach(([mes, valor]) => { TABLA_COSTOS_SOCIAL[puesto][mes] = valor; });
+      });
+    }
+    if (json.control_raw)       CONTROL_RAW  = json.control_raw;
+    if (json.presupuesto_venta) PRESUP_VENTA = json.presupuesto_venta;
+    if (json.presupuesto_cmb)   PRESUP_CMB   = json.presupuesto_cmb;
+    if (json.bago_marcas_inv)    BAGO_MARCAS_INV    = json.bago_marcas_inv;
+    if (json.bago_marcas_presup) BAGO_MARCAS_PRESUP = json.bago_marcas_presup;
+    if (json.fte_big7_auto)    CLIENTES_FTE  = json.fte_big7_auto;
+    if (json.costos_big7_auto) TABLA_COSTOS  = json.costos_big7_auto;
+    if (json.fte_perf_auto)    CLIENTES_FTE_PERF   = json.fte_perf_auto;
+    if (json.fte_social_auto)  CLIENTES_FTE_SOCIAL = json.fte_social_auto;
+    if (json.costos_perf_auto)   TABLA_COSTOS_PERF   = json.costos_perf_auto;
+    if (json.costos_social_auto) TABLA_COSTOS_SOCIAL = json.costos_social_auto;
+    if (json.fees_perf_auto)   INGRESOS_PERF   = json.fees_perf_auto;
+    if (json.fees_social_auto) INGRESOS_SOCIAL = json.fees_social_auto;
+    if (json.fte_vendido_perf_auto)   FTE_VENDIDO_PERF   = json.fte_vendido_perf_auto;
+    if (json.fte_vendido_social_auto) FTE_VENDIDO_SOCIAL = json.fte_vendido_social_auto;
+    initMesesCC();
+    initMesesBago();
+    aplicarControlComercialReal();
+
+    console.log('Rentabilidad cargada desde Sheet');
+    cargarDatosComercialDesdeSheet(json);
+    window._rentDataReady = true;
+    window._perfDataReady = true;
+    setTimeout(() => { renderPerfCompleto(); }, 100);
+  } catch(e) {
+    console.warn('Rentabilidad sin conexion, usando datos locales:', e.message);
+    window._rentDataReady = true;
+    window._perfDataReady = true;
+    setTimeout(() => { renderPerfCompleto(); }, 100);
+  }
+}
+
+// POST al Sheet - guarda cada cambio en tiempo real
+async function postSheet(tipo, data) {
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ tipo, data })
+    });
+  } catch(e) {
+    console.warn('No se pudo guardar en Sheet:', e.message);
+  }
+}
+
+
+function toggleOH(tipo) {
+  if (tipo === 'equipo') {
+    ohActivoEquipo = !ohActivoEquipo;
+    const btn = document.getElementById('btnOHEquipo');
+    btn.style.background  = ohActivoEquipo ? 'var(--purple)' : 'var(--surface2)';
+    btn.style.borderColor = ohActivoEquipo ? 'var(--purple)' : 'var(--border)';
+    btn.style.color       = ohActivoEquipo ? '#fff' : 'var(--text-muted)';
+    const rows = calcRentabilidad();
+    renderKPIsRent(rows);
+    renderConsolidado(rows);
+    renderRanking(rows);
+    setTimeout(() => renderChart(rows), 60);
+  } else if (tipo === 'perf') {
+    ohActivoPerf = !ohActivoPerf;
+    const btn = document.getElementById('btnOHPerf');
+    btn.style.background  = ohActivoPerf ? 'var(--purple)' : 'var(--surface2)';
+    btn.style.borderColor = ohActivoPerf ? 'var(--purple)' : 'var(--border)';
+    btn.style.color       = ohActivoPerf ? '#fff' : 'var(--text-muted)';
+    const rows = calcRentabilidadPerf();
+    renderKPIsPerf(rows);
+    renderPerfConsolidado(rows);
+    renderRankingPerf(rows);
+    setTimeout(() => renderChartPerf(rows), 60);
+  } else if (tipo === 'social') {
+    ohActivoSocial = !ohActivoSocial;
+    const btn = document.getElementById('btnOHSocial');
+    btn.style.background  = ohActivoSocial ? 'var(--purple)' : 'var(--surface2)';
+    btn.style.borderColor = ohActivoSocial ? 'var(--purple)' : 'var(--border)';
+    btn.style.color       = ohActivoSocial ? '#fff' : 'var(--text-muted)';
+    const rows = calcRentabilidadSocial();
+    renderKPIsSocial(rows);
+    renderSocialConsolidado(rows);
+    renderRankingSocial(rows);
+    setTimeout(() => renderChartFTE(Object.keys(DIRECTORES_SOCIAL).find(c=>document.querySelector('#chartFTESocialSelector .dir-btn.active')?.textContent===c)||Object.keys(DIRECTORES_SOCIAL)[0],'social'), 60);
+  }
+}
+
+function switchPerfTab(tab, btn) {
+  document.querySelectorAll('#page-performance .rent-section').forEach(s => s.style.display='none');
+  document.querySelectorAll('#page-performance .rent-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById(tab).style.display = 'block';
+  btn.classList.add('active');
+  if (tab === 'perf-consolidado') { const rows=calcRentabilidadPerf(); renderKPIsPerf(rows); renderPerfConsolidado(rows); renderRankingPerf(rows); setTimeout(()=>renderChartPerf(rows),80); }
+  if (tab === 'perf-detalle') renderDetallePerf(clienteDetalleActivoPerf);
+  if (tab === 'perf-costos') { renderTablaCostoCiaPerf(); actualizarBannerVigenciaPerf(); }
+}
+
+/* PERFORMANCE - calculos */
+function getColCostoPerf(mes) { return MAPA_MES_COSTO_PERF[mes] || MES_VIGENTE_PERF; }
+function getCostoPuestoPerf(puesto, mes) { const col=getColCostoPerf(mes); return (TABLA_COSTOS_PERF[puesto]&&TABLA_COSTOS_PERF[puesto][col])||0; }
+function calcCostoEquipoPerf(cliente, mes) {
+  if (mes === 'Total') {
+    return MESES_2026.filter(m=>m!=='Total').reduce((acc,m)=>acc+calcCostoEquipoPerf(cliente,m),0);
+  }
+  // TABLA_COSTOS_PERF en pesos enteros → millones
+  const puestos=(CLIENTES_FTE_PERF[cliente]&&CLIENTES_FTE_PERF[cliente][mes])||{};
+  let total=0;
+  for (const [p,fte] of Object.entries(puestos)) total+=getCostoPuestoPerf(p,mes)*fte;
+  return total/1000000;
+}
+function getCmbCliente(nombre, mes) {
+  // Para clientes Big 7: toma CMB del Sheet (DATA.clientes)
+  // Para clientes Performance: toma de INGRESOS_PERF (cargado manualmente en millones)
+  const clienteData = (DATA&&DATA.clientes||[]).find(c=>c.nombre===nombre);
+  let cmbBase;
+  // Siempre usar INGRESOS_PERF para clientes de Performance (aunque existan en Big 7)
+  const esPerfCliente = Object.keys(DIRECTORES_PERF).includes(nombre);
+  if (esPerfCliente) {
+    if (mes === 'Total') {
+      cmbBase = MESES_2026.filter(m=>m!=='Total').reduce((_,m)=>_+((INGRESOS_PERF[nombre]&&INGRESOS_PERF[nombre][m])||0), 0);
+    } else {
+      cmbBase = (INGRESOS_PERF[nombre]&&INGRESOS_PERF[nombre][mes])||0;
+    }
+  } else {
+    // Big 7: toma CMB del Sheet
+    if (mes === 'Total') {
+      cmbBase = clienteData ? (clienteData.cmb||0) : 0;
+    } else {
+      cmbBase = clienteData ? (clienteData.cmb||0) : 0;
+    }
+  }
+  // Sumar diferencial programmatic
+  const dif = (mes==='Total')
+    ? MESES_2026.filter(m=>m!=='Total').reduce((_,m)=>_+((DIFERENCIAL_PERF[nombre]&&DIFERENCIAL_PERF[nombre][m])||0),0)
+    : ((DIFERENCIAL_PERF[nombre]&&DIFERENCIAL_PERF[nombre][mes])||0);
+  return cmbBase + dif;
+}
+
+function getInvCliente(nombre, mes) {
+  // Inv. Período del cliente desde DATA.clientes (Control Comercial)
+  const clienteData = (DATA&&DATA.clientes||[]).find(c=>c.nombre===nombre);
+  if (!clienteData) return 0;
+  // Para Total sumamos todos los meses — pero el Sheet solo trae el período actual
+  // así que usamos el valor disponible en todos los casos
+  return clienteData.inv||0;
+}
+
+let MESES_PERF_SELECCIONADOS = [];
+function initMesesPerf() {
+  // Corte: nunca seleccionar por defecto más allá de Julio 2026, aunque se abra este archivo más adelante en el año
+  MESES_PERF_SELECCIONADOS = _mesesPorDefecto().filter(m => MESES_COMERCIAL.slice(0,7).includes(m));
+  if (!MESES_PERF_SELECCIONADOS.length) MESES_PERF_SELECCIONADOS = MESES_COMERCIAL.slice(0,7);
+  renderPillsMesesPerf();
+}
+function toggleMesPerf(mes) {
+  const i = MESES_PERF_SELECCIONADOS.indexOf(mes);
+  if (i >= 0) { if (MESES_PERF_SELECCIONADOS.length > 1) MESES_PERF_SELECCIONADOS.splice(i, 1); }
+  else { MESES_PERF_SELECCIONADOS.push(mes); }
+  renderPillsMesesPerf();
+  const rows = calcRentabilidadPerf();
+  renderKPIsPerf(rows); renderPerfConsolidado(rows); renderRankingPerf(rows);
+  setTimeout(() => renderChartPerf(rows), 50);
+}
+function renderPillsMesesPerf() {
+  const cont = document.getElementById('mesSelectorPerf');
+  if (!cont) return;
+  const MESES_DISPONIBLES = MESES_COMERCIAL.slice(0, 7); // corte: solo Enero-Julio 2026
+  cont.innerHTML = MESES_DISPONIBLES.map(m => {
+    const activo = MESES_PERF_SELECCIONADOS.includes(m);
+    return `<button class="rent-tab${activo ? ' active' : ''}" onclick="toggleMesPerf('${m}')">${m.slice(0,3)}</button>`;
+  }).join('');
+}
+
+function calcRentabilidadPerf() {
+  const meses = MESES_PERF_SELECCIONADOS.length ? MESES_PERF_SELECCIONADOS : _mesesPorDefecto();
+  return Object.keys(DIRECTORES_PERF).map(nombre => {
+    let totalCosto=0, totalFte=0, fee=0;
+    meses.forEach(m=>{
+      totalCosto+=calcCostoEquipoPerf(nombre,m);
+      const p=(CLIENTES_FTE_PERF[nombre]&&CLIENTES_FTE_PERF[nombre][m])||{};
+      totalFte+=Object.values(p).reduce((a,b)=>a+b,0);
+      fee+=getCmbCliente(nombre,m); // Fee = INGRESOS_PERF + Diferencial
+    });
+    const cm=fee-totalCosto;
+    const cmPct=fee>0?(cm/fee)*100:0;
+    return {nombre,ingresos:fee,costoEq:totalCosto,cm,cmPct,fte:totalFte};
+  });
+}
+
+/* PERFORMANCE - render */
+function actualizarBannerVigenciaPerf() {
+  const col=getColCostoPerf(MES_ACTIVO_PERF);
+  const el=document.getElementById('vigenciaMesPerf'); if(el) el.textContent=col+(MES_ACTIVO_PERF==='Enero'?' (Enero usa costos de Diciembre)':'');
+  const el2=document.getElementById('colVigenteLabelPerf'); if(el2) el2.textContent=MES_VIGENTE_PERF;
+}
+function renderPerfCompleto() {
+  if (!MESES_PERF_SELECCIONADOS.length) initMesesPerf(); else renderPillsMesesPerf();
+  const rows=calcRentabilidadPerf();
+  renderKPIsPerf(rows); renderPerfConsolidado(rows); renderRankingPerf(rows);
+  setTimeout(()=>renderChartPerf(rows),80);
+  setTimeout(()=>renderChartFTESelector('perf'),80);
+  renderClienteSelectorPerf();
+  actualizarBannerVigenciaPerf();
+}
+function setMesActivoPerf(mes,btn) {
+  MES_ACTIVO_PERF=mes;
+  document.querySelectorAll('#mesSelectorPerf .dir-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  const rows=calcRentabilidadPerf();
+  renderKPIsPerf(rows); renderPerfConsolidado(rows); renderRankingPerf(rows);
+  setTimeout(()=>renderChartPerf(rows),60);
+  setTimeout(()=>renderChartFTE(Object.keys(DIRECTORES_PERF).find(c=>document.querySelector('#chartFTEPerfSelector .dir-btn.active')?.textContent===c)||Object.keys(DIRECTORES_PERF)[0],'perf'),60);
+  actualizarBannerVigenciaPerf();
+}
+function renderKPIsPerf(rows) {
+  const tIng  = rows.reduce((a,r)=>a+r.ingresos, 0);
+  // Aplicar OH igual que la tabla
+  const tCosto = ohActivoPerf
+    ? rows.reduce((a,r)=>a+r.costoEq*(1+OH_PERF), 0)
+    : rows.reduce((a,r)=>a+r.costoEq, 0);
+  const tCM  = tIng - tCosto;
+  const tPct = tIng>0 ? (tCM/tIng)*100 : 0;
+  document.getElementById('kpisPerf').innerHTML=`
+    <div class="kpi"><div class="kpi-label">Fees</div><div class="kpi-value" style="font-size:26px">${fmtM(tIng)}</div><div class="kpi-sub">Fee facturado al cliente</div><div class="kpi-accent" style="background:#4488ff"></div></div>
+    <div class="kpi"><div class="kpi-label">Costo Equipo Total</div><div class="kpi-value" style="font-size:26px">${fmtM(tCosto)}</div><div class="kpi-sub">FTE x Costo Compania${ohActivoPerf?' (con OH)':''}</div><div class="kpi-accent" style="background:var(--yellow)"></div></div>
+    <div class="kpi"><div class="kpi-label">CMO Total</div><div class="kpi-value" style="font-size:26px;color:${tCM>=0?'#00c853':'#ff4455'}">${fmtM(tCM)}</div><div class="kpi-sub">Fee − Costo Equipo</div><div class="kpi-accent" style="background:var(--green)"></div></div>
+    <div class="kpi"><div class="kpi-label">CMO % Promedio</div><div class="kpi-value" style="font-size:26px;color:${tPct>=20?'#00c853':tPct>=5?'#f5c400':'#ff4455'}">${tPct.toFixed(1)}%</div><div class="kpi-sub">CMO $ / Fee Total</div><div class="kpi-accent" style="background:var(--purple)"></div></div>`;
+}
+function renderPerfConsolidado(rows) {
+  const maxCM=Math.max(...rows.map(r=>r.cm));
+  let html=rows.map(r=>{
+    const d=DIRECTORES_PERF[r.nombre]||{};
+    // Con OH: costo se multiplica por (1+OH), sin OH: costo base
+    const costoDisplay = ohActivoPerf ? r.costoEq*(1+OH_PERF) : r.costoEq;
+    const cmDisplay = r.ingresos - costoDisplay;
+    // CMO% = CMO$ / Fee (r.ingresos)
+    const cmPctDisplay = r.ingresos>0 ? (cmDisplay/r.ingresos)*100 : 0;
+    const pct=maxCM>0?Math.max(0,Math.min(100,(cmDisplay/maxCM)*100)):0;
+    const barColor=cmPctDisplay>35?'#00c853':cmPctDisplay>=30?'#f5c400':'#ff4455';
+    return `<tr>
+      <td><div class="client-name"><div class="client-dot" style="background:${d.color||'#606060'}"></div>${r.nombre}</div></td>
+      <td class="num" style="color:#aaa">${fmtM(r.ingresos)}</td>
+      <td class="num" style="color:var(--yellow)">${fmtM(costoDisplay)}</td>
+      <td class="num"><div class="cm-bar-wrap"><div class="cm-bar-bg"><div class="cm-bar-fill" style="width:${pct.toFixed(0)}%;background:${barColor}"></div></div><span style="min-width:65px;text-align:right;color:${cmDisplay>=0?'#f0f0f0':'#ff4455'}">${fmtM(cmDisplay)}</span></div></td>
+      <td class="num" style="color:${cmPctDisplay>=25?'#00c853':cmPctDisplay>0?'#f5c400':'#ff4455'};font-weight:600">${cmPctDisplay.toFixed(1)}%</td>
+      <td>${ohActivoPerf ? getSemaforoOH(cmPctDisplay, true) : ''}</td></tr>`;
+  }).join('');
+  const tI=rows.reduce((a,r)=>a+r.ingresos,0);
+  const tC=ohActivoPerf ? rows.reduce((a,r)=>a+r.costoEq*(1+OH_PERF),0) : rows.reduce((a,r)=>a+r.costoEq,0);
+  const tM=tI-tC;
+  const tP=tI>0?(tM/tI)*100:0;
+  html+=`<tr class="total-row"><td>TOTAL</td><td class="num">${fmtM(tI)}</td><td class="num">${fmtM(tC)}</td><td class="num" style="color:${tM>=0?'#f0f0f0':'#ff4455'}">${fmtM(tM)}</td><td class="num" style="color:${tP>=25?'#00c853':tP>0?'#f5c400':'#ff4455'}">${tP.toFixed(1)}%</td><td></td></tr>`;
+  document.getElementById('tbodyPerfConsolidado').innerHTML=html;
+}
+function renderRankingPerf(rows) {
+  const medals=['🥇','🥈','🥉'];
+  // Aplicar OH al momento del render igual que la tabla
+  const rowsDisplay = rows.map(r => {
+    const costoD = ohActivoPerf ? r.costoEq*(1+OH_PERF) : r.costoEq;
+    const cmD    = r.ingresos - costoD;
+    const pctD   = r.ingresos>0 ? (cmD/r.ingresos)*100 : 0;
+    return {...r, cmD, pctD};
+  });
+  const byCM  = [...rowsDisplay].sort((a,b)=>b.cmD-a.cmD);
+  const byPct = [...rowsDisplay].sort((a,b)=>b.pctD-a.pctD);
+  document.getElementById('rankingPerfCM').innerHTML=byCM.map((r,i)=>{const d=DIRECTORES_PERF[r.nombre]||{};return`<div class="rank-item"><div class="rank-num">${medals[i]||(i+1)}</div><div class="rank-name"><div class="client-dot" style="background:${d.color||'#606060'};display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;vertical-align:middle"></div>${r.nombre}</div><div class="rank-val" style="color:${r.cmD>=0?'#00c853':'#ff4455'}">${fmtM(r.cmD)}</div></div>`;}).join('');
+  document.getElementById('rankingPerfPct').innerHTML=byPct.map((r,i)=>`<div class="rank-item"><div class="rank-num">${medals[i]||(i+1)}</div><div class="rank-name">${r.nombre}</div><div class="rank-val" style="color:${r.pctD>35?'#00c853':r.pctD>=30?'#f5c400':'#ff4455'}">${r.pctD.toFixed(1)}%</div></div>`).join('');
+}
+let chartPerfInstance=null;
+function renderChartPerf(rows) {
+  if(!rows) rows=calcRentabilidadPerf();
+  if(chartPerfInstance){chartPerfInstance.destroy();chartPerfInstance=null;}
+  const labels=rows.map(r=>r.nombre.length>9?r.nombre.substring(0,9)+'...':r.nombre);
+  chartPerfInstance=new Chart(document.getElementById('chartPerf'),{
+    type:'bar',
+    data:{labels,datasets:[
+      {label:'Fee',         data:rows.map(r=>parseFloat(r.ingresos.toFixed(2))),backgroundColor:'rgba(68,136,255,0.7)',borderColor:'#4488ff',borderWidth:1,borderRadius:4},
+      {label:'Costo Equipo', data:rows.map(r=>parseFloat((ohActivoPerf?r.costoEq*(1+OH_PERF):r.costoEq).toFixed(2))),backgroundColor:'rgba(245,196,0,0.65)',borderColor:'#f5c400',borderWidth:1,borderRadius:4},
+      {label:'CMO $',        data:rows.map(r=>parseFloat((r.ingresos-(ohActivoPerf?r.costoEq*(1+OH_PERF):r.costoEq)).toFixed(2))),backgroundColor:'rgba(0,200,83,0.65)',borderColor:'#00c853',borderWidth:1,borderRadius:4},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#aaa',font:{family:'Poppins',size:11}}}},
+      scales:{x:{ticks:{color:'#606060',font:{family:'Poppins',size:11}},grid:{color:'rgba(255,255,255,0.03)'}},
+              y:{ticks:{color:'#606060',font:{family:'Poppins',size:11},callback:v=>'$'+v+' M'},grid:{color:'rgba(255,255,255,0.05)'}}}}
+  });
+}
+function renderClienteSelectorPerf() {
+  const cont=document.getElementById('clienteSelectorPerf');
+  if(!cont) return;
+  cont.innerHTML=Object.keys(DIRECTORES_PERF).map(nombre=>{
+    const d=DIRECTORES_PERF[nombre]||{}, isActive=nombre===clienteDetalleActivoPerf;
+    return `<button class="cli-btn${isActive?' active':''}" style="${isActive?'background:'+d.color+';border-color:'+d.color+';color:white':''}" onclick="selectClientePerf('${nombre}',this,'${d.color||'#606060'}')">${nombre}</button>`;
+  }).join('');
+}
+function selectClientePerf(nombre,btn,color) {
+  clienteDetalleActivoPerf=nombre;
+  document.querySelectorAll('#clienteSelectorPerf .cli-btn').forEach(b=>{b.classList.remove('active');b.style.background='';b.style.borderColor='';b.style.color='';});
+  btn.classList.add('active'); btn.style.background=color; btn.style.borderColor=color; btn.style.color='white';
+  renderDetallePerf(nombre);
+}
+function renderDetallePerf(cliente) {
+  // Mes selector detalle
+  const cont=document.getElementById('mesSelectorPerfDetalle');
+  if(cont) cont.innerHTML=MESES_2026.map(m=>`<button class="dir-btn${m===MES_ACTIVO_PERF?' active':''}" style="font-size:11px;padding:6px 13px" onclick="setMesPerfDetalleActivo('${m}',this)">${m}</button>`).join('');
+  actualizarBannerVigenciaPerf();
+  const mes=MES_ACTIVO_PERF, puestos=Object.keys(TABLA_COSTOS_PERF);
+  const fteActual=(CLIENTES_FTE_PERF[cliente]&&CLIENTES_FTE_PERF[cliente][mes])||{};
+  // INGRESOS_PERF y DIFERENCIAL_PERF en millones; TABLA_COSTOS_PERF en pesos enteros → /1.000.000
+  const ingActual=(INGRESOS_PERF[cliente]&&INGRESOS_PERF[cliente][mes])||0;
+  const difActual=(DIFERENCIAL_PERF[cliente]&&DIFERENCIAL_PERF[cliente][mes])||0;
+  const ingEl=document.getElementById('ingresosEditablePerf');
+  if(ingEl) ingEl.value=ingActual||'';
+  renderFTEVendidoInputs(cliente,'perf');
+  const difEl=document.getElementById('diferencialPerfInput');
+  if(difEl) difEl.value=difActual||'';
+  const totalIngLabel=document.getElementById('totalIngresosPerf');
+  if(totalIngLabel){
+    const totalIng=ingActual+difActual;
+    totalIngLabel.textContent=totalIng>0?'Total: '+fmtM(totalIng):'';
+  }
+  const totalCostoRaw=puestos.reduce((acc,p)=>{const fte=fteActual[p]||0;return acc+getCostoPuestoPerf(p,mes)*fte;},0);
+  const totalCosto=totalCostoRaw/1000000; // pesos enteros → millones
+  let html=puestos.map(puesto=>{
+    const costoUnit=getCostoPuestoPerf(puesto,mes), fteVal=fteActual[puesto]||0, costoMes=(costoUnit*fteVal)/1000000;
+    const pcTot=totalCosto>0?(costoMes/totalCosto)*100:0, rowStyle=fteVal>0?'':'opacity:0.35';
+    return `<tr style="${rowStyle}">
+      <td style="font-weight:500;font-size:13px">${puesto}</td>
+      <td class="num"><input type="number" class="fte-inline-input" value="${fteVal?(fteVal*100).toFixed(2):''}" placeholder="100" min="0" step="0.01" onchange="saveFTEPerf('${cliente}','${mes}','${puesto}',this.value)"></td>
+      <td class="num" style="color:var(--yellow);font-size:12px">${fmtCosto(costoUnit)}</td>
+      <td class="num" style="color:${fteVal>0?'#f0f0f0':'#404040'};font-size:12px">${fteVal>0?fmtM(costoMes):'—'}</td>
+      <td class="num">${fteVal>0?`<div class="cm-bar-wrap"><div class="cm-bar-bg"><div class="cm-bar-fill" style="width:${Math.min(pcTot,100).toFixed(0)}%;background:var(--purple)"></div></div><span style="min-width:36px;text-align:right;color:#aaa;font-size:11px">${pcTot.toFixed(1)}%</span></div>`:'<span style="color:#303030;font-size:11px">—</span>'}</td>
+    </tr>`;
+  }).join('');
+  html+=`<tr class="total-row"><td colspan="2">TOTAL - ${cliente} - ${mes}</td><td style="color:var(--text-muted);font-size:11px">Col: ${getColCostoPerf(mes)}</td><td class="num" style="color:var(--yellow)">${fmtM(totalCosto)}</td><td class="num" style="color:#aaa">100%</td></tr>`;
+  document.getElementById('tbodyPerfDetalle').innerHTML=html;
+}
+function setMesPerfDetalleActivo(mes,btn) {
+  MES_ACTIVO_PERF=mes;
+  document.querySelectorAll('#mesSelectorPerfDetalle .dir-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  document.querySelectorAll('#mesSelectorPerf .dir-btn').forEach(b=>{b.classList.toggle('active',b.textContent===mes);});
+  actualizarBannerVigenciaPerf();
+  renderDetallePerf(clienteDetalleActivoPerf);
+}
+function saveFTEPerf(cliente,mes,puesto,valor) {
+  const vPct=parseFloat(valor), v=vPct/100;
+  if(!CLIENTES_FTE_PERF[cliente]) CLIENTES_FTE_PERF[cliente]={};
+  if(!CLIENTES_FTE_PERF[cliente][mes]) CLIENTES_FTE_PERF[cliente][mes]={};
+  if(!isNaN(v)&&v>0){CLIENTES_FTE_PERF[cliente][mes][puesto]=v; postSheet('fte_perf',{cliente,mes,puesto,fte:v});}
+  else{delete CLIENTES_FTE_PERF[cliente][mes][puesto]; postSheet('fte_perf',{cliente,mes,puesto,fte:0});}
+  renderDetallePerf(cliente);
+}
+function saveIngresosPerf(cliente,mes,valor) {
+  // Usuario ingresa en millones; guardamos en millones internamente, en miles en el Sheet
+  const val=parseFloat(valor)||0;
+  if(!INGRESOS_PERF[cliente]) INGRESOS_PERF[cliente]={};
+  INGRESOS_PERF[cliente][mes]=val;
+  postSheet('ingresos_perf',{cliente,mes,valor:val*1000});
+  renderDetallePerf(cliente);
+}
+function saveDiferencialPerf(cliente,mes,valor) {
+  // Usuario ingresa en millones; guardamos en millones internamente, en miles en el Sheet
+  const val=parseFloat(valor)||0;
+  if(!DIFERENCIAL_PERF[cliente]) DIFERENCIAL_PERF[cliente]={};
+  DIFERENCIAL_PERF[cliente][mes]=val;
+  postSheet('diferencial_perf',{cliente,mes,valor:val*1000});
+  renderDetallePerf(cliente);
+  // Actualizar consolidado si está visible
+  const tab=document.getElementById('perf-consolidado');
+  if(tab&&tab.style.display!=='none'){
+    const rows=calcRentabilidadPerf();
+    renderKPIsPerf(rows); renderPerfConsolidado(rows); renderRankingPerf(rows);
+  }
+}
+function getColsRRHHPerf() {
+  const set=new Set();
+  Object.values(TABLA_COSTOS_PERF).forEach(row=>Object.keys(row).forEach(m=>set.add(m)));
+  const orden=['Diciembre',...MESES_2026.filter(m=>m!=='Diciembre'&&m!=='Total')];
+  return orden.filter(m=>set.has(m));
+}
+function renderTablaCostoCiaPerf() {
+  const cols=getColsRRHHPerf();
+  document.getElementById('colVigenteLabelPerf').textContent=MES_VIGENTE_PERF;
+  document.getElementById('headCostoCiaPerf').innerHTML=`<tr><th style="min-width:210px">Puesto</th>${cols.map(m=>`<th class="mes-header num${m===MES_VIGENTE_PERF?' vigente-col':''}">${m}${m==='Diciembre'?' (base Ene)':''}${m===MES_VIGENTE_PERF?' ⚡':''}</th>`).join('')}</tr>`;
+  document.getElementById('bodyCostoCiaPerf').innerHTML=Object.entries(TABLA_COSTOS_PERF).map(([puesto,costos])=>`<tr><td class="puesto-col">${puesto}</td>${cols.map(m=>{const v=costos[m],isVig=m===MES_VIGENTE_PERF;return`<td class="costo-cell${isVig?' vigente':''} editable" ondblclick="editCellPerf(this,'${puesto}','${m}')" title="Doble click para editar">${v?fmtCosto(v):'—'}</td>`;}).join('')}</tr>`).join('');
+}
+function editCellPerf(td,puesto,mes) {
+  const cur=TABLA_COSTOS_PERF[puesto]?.[mes]||0;
+  td.innerHTML=`<input class="cell-input" type="number" value="${cur}" onblur="saveCellPerf(this,'${puesto}','${mes}')" onkeydown="if(event.key==='Enter')this.blur();">`;
+  td.querySelector('input').focus(); td.querySelector('input').select();
+}
+function saveCellPerf(input,puesto,mes) {
+  const v=parseFloat(String(input.value).replace(',','.'));
+  if(!isNaN(v)&&v>=0){if(!TABLA_COSTOS_PERF[puesto]) TABLA_COSTOS_PERF[puesto]={};TABLA_COSTOS_PERF[puesto][mes]=v;postSheet('costos_perf',{puesto,mes,valor:v});}
+  renderTablaCostoCiaPerf();
+}
+function agregarMesPerf() {
+  const nombre=prompt('Nombre del mes (ej: Mayo):');
+  if(!nombre||!nombre.trim()) return;
+  const mesKey=nombre.trim();
+  Object.keys(TABLA_COSTOS_PERF).forEach(p=>{TABLA_COSTOS_PERF[p][mesKey]=0;});
+  let found=false;
+  MESES_2026.forEach(m=>{if(m===mesKey)found=true;if(found)MAPA_MES_COSTO_PERF[m]=mesKey;});
+  renderTablaCostoCiaPerf();
+}
+function guardarCostosPerf() {
+  const cols=getColsRRHHPerf().filter(m=>m!=='Diciembre');
+  for(let i=cols.length-1;i>=0;i--){if(Object.values(TABLA_COSTOS_PERF).some(r=>(r[cols[i]]||0)>0)){MES_VIGENTE_PERF=cols[i];break;}}
+  renderPerfCompleto();
+  document.querySelectorAll('#page-performance .rent-section').forEach(s=>s.style.display='none');
+  document.querySelectorAll('#page-performance .rent-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('perf-consolidado').style.display='block';
+  document.querySelector('#page-performance .rent-tab').classList.add('active');
+  setTimeout(()=>renderChartPerf(),80);
+}
+
+/* RENTABILIDAD - calculos */
+function getColCosto(mes) { return MAPA_MES_COSTO[mes] || MES_VIGENTE; }
+function getCostoPuesto(puesto, mes) { const col = getColCosto(mes); return (TABLA_COSTOS[puesto] && TABLA_COSTOS[puesto][col]) || 0; }
+function getCostoConOH(costoBase, esPerf) {
+  const oh = esPerf ? OH_PERF : OH_EQUIPO;
+  return costoBase * (1 + oh);
+}
+
+function calcCostoEquipoCliente(cliente, mes) {
+  // TABLA_COSTOS en pesos enteros → dividir por 1.000 → miles (misma escala que cmb/inv, que vienen de CONTROL_RAW en miles)
+  const puestos = (CLIENTES_FTE[cliente] && CLIENTES_FTE[cliente][mes]) || {};
+  let total = 0;
+  for (const [p, fte] of Object.entries(puestos)) total += getCostoPuesto(p, mes) * fte;
+  return total / 1000;
+}
+let MESES_RENT_SELECCIONADOS = []; // independiente de MESES_CC_SELECCIONADOS — se inicializa en initMesesRent()
+
+function initMesesRent() {
+  MESES_RENT_SELECCIONADOS = _mesesPorDefecto();
+  renderPillsMesesRent();
+}
+
+function toggleMesRent(mes) {
+  const i = MESES_RENT_SELECCIONADOS.indexOf(mes);
+  if (i >= 0) {
+    if (MESES_RENT_SELECCIONADOS.length > 1) MESES_RENT_SELECCIONADOS.splice(i, 1);
+  } else {
+    MESES_RENT_SELECCIONADOS.push(mes);
+  }
+  renderPillsMesesRent();
+  const rows = calcRentabilidad();
+  renderKPIsRent(rows); renderConsolidado(rows); renderRanking(rows);
+  setTimeout(() => renderChart(rows), 50);
+}
+
+function renderPillsMesesRent() {
+  const cont = document.getElementById('mesSelectorRent');
+  if (!cont) return;
+  cont.style.display = 'flex';
+  cont.style.flexWrap = 'wrap';
+  cont.style.gap = '6px';
+  cont.innerHTML = MESES_COMERCIAL.map(m => {
+    const activo = MESES_RENT_SELECCIONADOS.includes(m);
+    return `<button class="rent-tab${activo ? ' active' : ''}" onclick="toggleMesRent('${m}')">${m.slice(0,3)}</button>`;
+  }).join('');
+}
+
+// cmb/inv independientes de DATA.clientes (que está atado a las pills de Control Comercial) — se calculan
+// directo desde CONTROL_RAW sumando los meses seleccionados acá, en Clientes Big 7.
+function _cmbInvSobreMeses(nombre, meses) {
+  const raw = CONTROL_RAW[nombre] || {};
+  let inv = 0, cmb = 0;
+  meses.forEach(m => {
+    const k = '2026-' + MES_NUM[m];
+    if (raw[k]) { inv += raw[k].inv || 0; cmb += raw[k].cmb || 0; }
+  });
+  return { inv: inv / 1000, cmb: cmb / 1000 };
+}
+
+function calcRentabilidad() {
+  const meses = MESES_RENT_SELECCIONADOS.length ? MESES_RENT_SELECCIONADOS : _mesesPorDefecto();
+  return Object.keys(DIRECTORES).map(nombre => {
+    let totalCosto = 0, totalFte = 0;
+    meses.forEach(m => {
+      totalCosto += calcCostoEquipoCliente(nombre, m);
+      const puestos = (CLIENTES_FTE[nombre] && CLIENTES_FTE[nombre][m]) || {};
+      totalFte += Object.values(puestos).reduce((a,b) => a+b, 0);
+    });
+    const { inv, cmb } = (CONTROL_RAW && Object.keys(CONTROL_RAW).length)
+      ? _cmbInvSobreMeses(nombre, meses)
+      : { inv: getInvEquipoCliente(nombre), cmb: getCmbEquipoCliente(nombre) }; // fallback si todavía no llegó el Sheet nuevo
+    const cm    = cmb - totalCosto;
+    const cmPct = inv > 0 ? (cm / inv) * 100 : 0;
+    return { nombre, cmb, costoEq: totalCosto, cm, cmPct, fte: totalFte, inv };
+  });
+}
+
+function getCmbEquipoCliente(nombre) {
+  const cd = (DATA&&DATA.clientes||[]).find(c=>c.nombre===nombre);
+  return (cd&&cd.cmb)||0;
+}
+function getInvEquipoCliente(nombre) {
+  const cd = (DATA&&DATA.clientes||[]).find(c=>c.nombre===nombre);
+  return (cd&&cd.inv)||0;
+}
+
+/* RENTABILIDAD - render */
+function renderMesSelector() {
+  // Selector oculto — siempre Total
+  MES_ACTIVO = 'Total';
+}
+function setMesActivo(mes, btn) {
+  // No-op — siempre Total
+}
+function actualizarBannerVigencia() {
+  const col = getColCosto(MES_ACTIVO);
+  const el = document.getElementById('vigenciaMes');
+  if (el) el.textContent = col + (MES_ACTIVO === 'Enero' ? ' (Enero usa costos de Diciembre)' : '');
+  const el2 = document.getElementById('colVigenteLabel');
+  if (el2) el2.textContent = MES_VIGENTE;
+}
+function renderRentabilidadCompleto() {
+  if (!MESES_RENT_SELECCIONADOS.length) initMesesRent(); else renderPillsMesesRent();
+  const rows = calcRentabilidad();
+  renderKPIsRent(rows); renderConsolidado(rows); renderRanking(rows);
+  setTimeout(() => renderChart(rows), 80);
+  renderClienteSelector();
+  actualizarBannerVigencia();
+}
+function renderKPIsRent(rows) {
+  const tCmb  = rows.reduce((a,r)=>a+r.cmb, 0);
+  const tInv  = rows.reduce((a,r)=>a+(r.inv||0), 0);
+  // Aplicar OH igual que la tabla
+  const tCosto = ohActivoEquipo
+    ? rows.reduce((a,r)=>a+r.costoEq*(1+OH_EQUIPO), 0)
+    : rows.reduce((a,r)=>a+r.costoEq, 0);
+  const tCM  = tCmb - tCosto;
+  const tPct = tInv>0 ? (tCM/tInv)*100 : 0;
+  document.getElementById('kpisRent').innerHTML = `
+    <div class="kpi"><div class="kpi-label">CMB Total</div><div class="kpi-value" style="font-size:26px">${fmtM(tCmb/1000)}</div><div class="kpi-sub">CMB del período (desde Control Comercial)</div><div class="kpi-accent" style="background:#4488ff"></div></div>
+    <div class="kpi"><div class="kpi-label">Costo Equipo Total</div><div class="kpi-value" style="font-size:26px">${fmtM(tCosto/1000)}</div><div class="kpi-sub">FTE x Costo Compania${ohActivoEquipo?' (con OH)':''}</div><div class="kpi-accent" style="background:var(--yellow)"></div></div>
+    <div class="kpi"><div class="kpi-label">CMO Total</div><div class="kpi-value" style="font-size:26px;color:${tCM>=0?'#00c853':'#ff4455'}">${fmtM(tCM/1000)}</div><div class="kpi-sub">CMB − Costo Equipo</div><div class="kpi-accent" style="background:var(--green)"></div></div>
+    <div class="kpi"><div class="kpi-label">CMO % Promedio</div><div class="kpi-value" style="font-size:26px;color:${tPct>=20?'#00c853':tPct>=5?'#f5c400':'#ff4455'}">${tPct.toFixed(1)}%</div><div class="kpi-sub">CMO $ / Inv. Período</div><div class="kpi-accent" style="background:var(--purple)"></div></div>`;
+}
+function renderConsolidado(rows) {
+  const maxCM = Math.max(...rows.map(r=>r.cm));
+  let html = rows.map(r => {
+    const d=DIRECTORES[r.nombre]||{};
+    const costoDisplay = ohActivoEquipo ? r.costoEq*(1+OH_EQUIPO) : r.costoEq;
+    const cmoDisplay   = r.cmb - costoDisplay;
+    const inv          = r.inv || 0;
+    const cmoPctDisplay = inv>0 ? (cmoDisplay/inv)*100 : 0;
+    const pct=maxCM>0?Math.max(0,Math.min(100,(cmoDisplay/maxCM)*100)):0;
+    const barColor=cmoPctDisplay>=25?'#00c853':cmoPctDisplay>0?'#f5c400':'#ff4455';
+    return `<tr>
+      <td><div class="client-name"><div class="client-dot" style="background:${d.color||'#606060'}"></div>${r.nombre}</div></td>
+      <td class="num" style="color:#aaa">${fmtM(r.cmb/1000)}</td>
+      <td class="num" style="color:var(--yellow)">${fmtM(costoDisplay/1000)}</td>
+      <td class="num"><div class="cm-bar-wrap"><div class="cm-bar-bg"><div class="cm-bar-fill" style="width:${pct.toFixed(0)}%;background:${barColor}"></div></div><span style="min-width:65px;text-align:right;color:${cmoDisplay>=0?'#f0f0f0':'#ff4455'}">${fmtM(cmoDisplay/1000)}</span></div></td>
+      <td class="num" style="color:${cmoPctDisplay>35?'#00c853':cmoPctDisplay>=30?'#f5c400':'#ff4455'};font-weight:600">${cmoPctDisplay.toFixed(1)}%</td>
+      <td>${ohActivoEquipo ? getSemaforoOH(cmoPctDisplay) : ''}</td></tr>`;
+  }).join('');
+  const tCmb=rows.reduce((a,r)=>a+r.cmb,0);
+  const tC=ohActivoEquipo?rows.reduce((a,r)=>a+r.costoEq*(1+OH_EQUIPO),0):rows.reduce((a,r)=>a+r.costoEq,0);
+  const tM=tCmb-tC;
+  const tInv=rows.reduce((a,r)=>a+(r.inv||0),0);
+  const tP=tInv>0?(tM/tInv)*100:0;
+  html+=`<tr class="total-row"><td>TOTAL</td><td class="num" style="color:#aaa">${fmtM(tCmb/1000)}</td><td class="num" style="color:var(--yellow)">${fmtM(tC/1000)}</td><td class="num" style="color:${tM>=0?'#f0f0f0':'#ff4455'}">${fmtM(tM/1000)}</td><td class="num" style="color:${tP>35?'#00c853':tP>=30?'#f5c400':'#ff4455'}">${tP.toFixed(1)}%</td><td></td></tr>`;
+  document.getElementById('tbodyConsolidado').innerHTML = html;
+}
+function renderRanking(rows) {
+  const medals=['🥇','🥈','🥉'];
+  // Aplicar OH al momento del render
+  const rowsD = rows.map(r => {
+    const costoD = ohActivoEquipo ? r.costoEq*(1+OH_EQUIPO) : r.costoEq;
+    const cmD    = r.cmb - costoD;
+    const pctD   = r.inv>0 ? (cmD/r.inv)*100 : 0;
+    return {...r, cmD, pctD};
+  });
+  const byCM  = [...rowsD].sort((a,b)=>b.cmD-a.cmD);
+  const byPct = [...rowsD].sort((a,b)=>b.pctD-a.pctD);
+  document.getElementById('rankingCM').innerHTML = byCM.map((r,i)=>{const d=DIRECTORES[r.nombre]||{};return`<div class="rank-item"><div class="rank-num">${medals[i]||(i+1)}</div><div class="rank-name"><div class="client-dot" style="background:${d.color||'#606060'};display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;vertical-align:middle"></div>${r.nombre}</div><div class="rank-val" style="color:${r.cmD>=0?'#00c853':'#ff4455'}">${fmtM(r.cmD/1000)}</div></div>`;}).join('');
+  document.getElementById('rankingPct').innerHTML = byPct.map((r,i)=>`<div class="rank-item"><div class="rank-num">${medals[i]||(i+1)}</div><div class="rank-name">${r.nombre}</div><div class="rank-val" style="color:${r.pctD>35?'#00c853':r.pctD>=30?'#f5c400':'#ff4455'}">${r.pctD.toFixed(1)}%</div></div>`).join('');
+}
+function renderChart(rows) {
+  if (!rows) rows = calcRentabilidad();
+  if (chartRentInstance) { chartRentInstance.destroy(); chartRentInstance = null; }
+  const labels=rows.map(r=>r.nombre.length>9?r.nombre.substring(0,9)+'...':r.nombre);
+  chartRentInstance = new Chart(document.getElementById('chartRent'), {
+    type:'bar',
+    data:{ labels, datasets:[
+      {label:'CMB',         data:rows.map(r=>parseFloat((r.cmb/1000).toFixed(2))), backgroundColor:'rgba(68,136,255,0.7)',borderColor:'#4488ff',borderWidth:1,borderRadius:4},
+      {label:'Costo Equipo', data:rows.map(r=>parseFloat(((ohActivoEquipo?r.costoEq*(1+OH_EQUIPO):r.costoEq)/1000).toFixed(2))), backgroundColor:'rgba(245,196,0,0.65)',borderColor:'#f5c400',borderWidth:1,borderRadius:4},
+      {label:'CMO $',        data:rows.map(r=>parseFloat(((r.cmb-(ohActivoEquipo?r.costoEq*(1+OH_EQUIPO):r.costoEq))/1000).toFixed(2))), backgroundColor:'rgba(0,200,83,0.65)',borderColor:'#00c853',borderWidth:1,borderRadius:4},
+    ]},
+    options:{ responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{ticks:{color:'#606060',font:{family:'Poppins',size:11}},grid:{color:'rgba(255,255,255,0.03)'}},
+              y:{ticks:{color:'#606060',font:{family:'Poppins',size:11},callback:v=>'$'+v+' M'},grid:{color:'rgba(255,255,255,0.05)'}}}}
+  });
+}
+
+/* Detalle por cliente */
+function renderClienteSelector() {
+  const cont = document.getElementById('clienteSelector');
+  if (!cont) return;
+  cont.innerHTML = Object.keys(DIRECTORES).map(nombre => {
+    const d=DIRECTORES[nombre]||{}, isActive=nombre===clienteDetalleActivo;
+    return `<button class="cli-btn${isActive?' active':''}" style="${isActive?'background:'+d.color+';border-color:'+d.color+';color:white':''}" onclick="selectCliente('${nombre}',this,'${d.color||'#606060'}')">${nombre}</button>`;
+  }).join('');
+}
+function selectCliente(nombre, btn, color) {
+  clienteDetalleActivo = nombre;
+  document.querySelectorAll('.cli-btn').forEach(b=>{b.classList.remove('active');b.style.background='';b.style.borderColor='';b.style.color='';});
+  btn.classList.add('active'); btn.style.background=color; btn.style.borderColor=color; btn.style.color='white';
+  renderDetalle(nombre);
+}
+function renderMesSelectorDetalle() {
+  const cont = document.getElementById('mesSelectorDetalle');
+  if (!cont) return;
+  cont.innerHTML = MESES_2026.map(m =>
+    `<button class="dir-btn${m===MES_ACTIVO?' active':''}" style="font-size:11px;padding:6px 13px" onclick="setMesDetalleActivo('${m}',this)">${m}</button>`
+  ).join('');
+}
+function setMesDetalleActivo(mes, btn) {
+  MES_ACTIVO = mes;
+  document.querySelectorAll('#mesSelectorDetalle .dir-btn').forEach(b=>b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.querySelectorAll('#mesSelectorRent .dir-btn').forEach(b=>{b.classList.toggle('active',b.textContent===mes);});
+  actualizarBannerVigencia();
+  renderDetalle(clienteDetalleActivo);
+}
+function renderDetalle(cliente) {
+  renderMesSelectorDetalle();
+  actualizarBannerVigencia();
+  const mes=MES_ACTIVO, colCosto=getColCosto(mes), puestos=Object.keys(TABLA_COSTOS);
+  const fteActual=(CLIENTES_FTE[cliente]&&CLIENTES_FTE[cliente][mes])||{};
+  const ingActual=(INGRESOS[cliente]&&INGRESOS[cliente][mes])||0;
+  const invActual=(INVERSION[cliente]&&INVERSION[cliente][mes])||0;
+  const invEl=document.getElementById('inversionEditable');
+  if(invEl) invEl.value=invActual?(invActual*1000):'';
+  const ingEl=document.getElementById('ingresosEditable');
+  if(ingEl) ingEl.value=ingActual?(ingActual*1000):'';
+  const totalCostoRaw=puestos.reduce((acc,p)=>{const fte=fteActual[p]||0;return acc+getCostoPuesto(p,mes)*fte;},0);const totalCosto=totalCostoRaw/1000000;
+  let html=puestos.map(puesto=>{
+    const costoUnit=getCostoPuesto(puesto,mes), fteVal=fteActual[puesto]||0, costoMes=(costoUnit*fteVal)/1000000;
+    const pcTot=totalCosto>0?(costoMes/totalCosto)*100:0, rowStyle=fteVal>0?'':'opacity:0.35';
+    return `<tr style="${rowStyle}">
+      <td style="font-weight:500;font-size:13px">${puesto}</td>
+      <td class="num"><input type="number" class="fte-inline-input" value="${fteVal?(fteVal*100).toFixed(2):''}" placeholder="370.39" min="0" step="0.01" onchange="saveFTE('${cliente}','${mes}','${puesto}',this.value)" title="FTE ${puesto} en ${mes}"></td>
+      <td class="num" style="color:var(--yellow);font-size:12px">${fmtCosto(costoUnit)}</td>
+      <td class="num" style="color:${fteVal>0?'#f0f0f0':'#404040'};font-size:12px">${fteVal>0?fmtM(costoMes):'—'}</td>
+      <td class="num">${fteVal>0?`<div class="cm-bar-wrap"><div class="cm-bar-bg"><div class="cm-bar-fill" style="width:${Math.min(pcTot,100).toFixed(0)}%;background:var(--purple)"></div></div><span style="min-width:36px;text-align:right;color:#aaa;font-size:11px">${pcTot.toFixed(1)}%</span></div>`:'<span style="color:#303030;font-size:11px">—</span>'}</td>
+    </tr>`;
+  }).join('');
+  html+=`<tr class="total-row"><td colspan="2">TOTAL - ${cliente} - ${mes}</td><td style="color:var(--text-muted);font-size:11px">Col: ${colCosto}</td><td class="num" style="color:var(--yellow)">${fmtM(totalCosto)}</td><td class="num" style="color:#aaa">100%</td></tr>`;
+  document.getElementById('tbodyDetalle').innerHTML = html;
+}
+function saveFTE(cliente, mes, puesto, valor) {
+  const vPct=parseFloat(valor);
+  const v=vPct/100; // Convierte % a decimal (370.39% → 3.7039)
+  if(!CLIENTES_FTE[cliente]) CLIENTES_FTE[cliente]={};
+  if(!CLIENTES_FTE[cliente][mes]) CLIENTES_FTE[cliente][mes]={};
+  if(!isNaN(v)&&v>0){CLIENTES_FTE[cliente][mes][puesto]=v; postSheet('fte',{cliente,mes,puesto,fte:v});}
+  else {delete CLIENTES_FTE[cliente][mes][puesto]; postSheet('fte',{cliente,mes,puesto,fte:0});}
+  renderDetalle(cliente);
+  if(document.getElementById('rent-consolidado').style.display!=='none'){const rows=calcRentabilidad();renderKPIsRent(rows);renderConsolidado(rows);renderRanking(rows);}
+}
+function saveInversion(cliente, mes, valor) {
+  const val=(parseFloat(valor)||0)/1000;
+  if(!INVERSION[cliente]) INVERSION[cliente]={};
+  INVERSION[cliente][mes]=val;
+  postSheet('inversion',{cliente,mes,valor:val});
+}
+
+function saveIngresos(cliente, mes, valor) {
+  const val=(parseFloat(valor)||0)/1000;
+  if(!INGRESOS[cliente]) INGRESOS[cliente]={};
+  INGRESOS[cliente][mes]=val;
+  postSheet('ingresos',{cliente,mes,valor:val});
+  renderDetalle(cliente);
+  if(document.getElementById('rent-consolidado').style.display!=='none'){const rows=calcRentabilidad();renderKPIsRent(rows);renderConsolidado(rows);renderRanking(rows);}
+}
+
+/* Tabla Costo Compania */
+function getColsRRHH() {
+  const set=new Set();
+  Object.values(TABLA_COSTOS).forEach(row=>Object.keys(row).forEach(m=>set.add(m)));
+  const orden=['Diciembre',...MESES_2026.filter(m=>m!=='Diciembre')];
+  return orden.filter(m=>set.has(m));
+}
+function renderTablaCostoCia() {
+  const cols=getColsRRHH();
+  document.getElementById('colVigenteLabel').textContent=MES_VIGENTE;
+  document.getElementById('headCostoCia').innerHTML=`<tr><th style="min-width:210px">Puesto</th>${cols.map(m=>`<th class="mes-header num${m===MES_VIGENTE?' vigente-col':''}"><div style="display:flex;align-items:center;justify-content:flex-end;gap:6px"><span>${m}${m==='Diciembre'?' (base Ene)':''}${m===MES_VIGENTE?' ⚡':''}</span>${cols.length>2&&m!=='Diciembre'&&m!=='Febrero'?`<button onclick="eliminarColRRHH('${m}')" style="background:transparent;border:none;color:#404040;cursor:pointer;font-size:12px;padding:0" onmouseover="this.style.color='#ff4455'" onmouseout="this.style.color='#404040'">x</button>`:''}</div></th>`).join('')}</tr>`;
+  document.getElementById('bodyCostoCia').innerHTML=Object.entries(TABLA_COSTOS).map(([puesto,costos])=>`<tr><td class="puesto-col">${puesto}</td>${cols.map(m=>{const v=costos[m],isVig=m===MES_VIGENTE;return`<td class="costo-cell${isVig?' vigente':''} editable" ondblclick="editCell(this,'${puesto}','${m}')" title="Doble click para editar">${v?fmtCosto(v):'—'}</td>`;}).join('')}</tr>`).join('');
+}
+function editCell(td, puesto, mes) {
+  const cur=TABLA_COSTOS[puesto]?.[mes]||0;
+  td.innerHTML=`<input class="cell-input" type="number" value="${cur}" onblur="saveCell(this,'${puesto}','${mes}')" onkeydown="if(event.key==='Enter')this.blur();if(event.key==='Escape')this.blur();">`;
+  td.querySelector('input').focus(); td.querySelector('input').select();
+}
+function saveCell(input, puesto, mes) {
+  const v=parseFloat(String(input.value).replace(',','.'));
+  if(!isNaN(v)&&v>=0){if(!TABLA_COSTOS[puesto]) TABLA_COSTOS[puesto]={};TABLA_COSTOS[puesto][mes]=v;postSheet('costos',{puesto,mes,valor:v});}
+  renderTablaCostoCia();
+}
+function agregarMes() {
+  const nombre=prompt('Nombre del mes del nuevo dato de RRHH (ej: Mayo, Agosto):');
+  if(!nombre||!nombre.trim()) return;
+  const mesKey=nombre.trim();
+  if(Object.values(TABLA_COSTOS)[0][mesKey]!==undefined){alert('Ese mes ya existe.');return;}
+  Object.keys(TABLA_COSTOS).forEach(p=>{TABLA_COSTOS[p][mesKey]=0;});
+  let found=false;
+  MESES_2026.forEach(m=>{if(m===mesKey)found=true;if(found)MAPA_MES_COSTO[m]=mesKey;});
+  renderTablaCostoCia();
+}
+function eliminarColRRHH(mes) {
+  if(!confirm(`Eliminar columna "${mes}"?`)) return;
+  Object.keys(TABLA_COSTOS).forEach(p=>delete TABLA_COSTOS[p][mes]);
+  Object.keys(MAPA_MES_COSTO).forEach(m=>{if(MAPA_MES_COSTO[m]===mes)MAPA_MES_COSTO[m]=MES_VIGENTE;});
+  renderTablaCostoCia();
+}
+function guardarCostos() {
+  const cols=getColsRRHH().filter(m=>m!=='Diciembre');
+  for(let i=cols.length-1;i>=0;i--){if(Object.values(TABLA_COSTOS).some(r=>(r[cols[i]]||0)>0)){MES_VIGENTE=cols[i];break;}}
+  renderRentabilidadCompleto();
+  document.querySelectorAll('.rent-section').forEach(s=>s.style.display='none');
+  document.querySelectorAll('.rent-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('rent-consolidado').style.display='block';
+  document.querySelector('.rent-tab').classList.add('active');
+  setTimeout(()=>renderChart(),80);
+  const btn=event.target,orig=btn.textContent;
+  btn.textContent='Guardado!'; btn.style.background='var(--green)'; btn.style.borderColor='var(--green)';
+  setTimeout(()=>{btn.textContent=orig;btn.style.background='var(--red)';btn.style.borderColor='var(--red)';},2200);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CONTROL COMERCIAL — DATOS EMBEBIDOS + MODAL DE CARGA
+═══════════════════════════════════════════════════════════ */
+
+const CLIENTES_COMERCIAL = ['Bagó','Banco Patagonia','La Paulina','Pfizer','McCain','Escorial','Universal Assistance'];
+const BAGO_MARCAS = ['Esoprazol','Anaflex','Faciales','Corporales','Capilares','Solares','Bagó +','Dioxaflex','Institucional'];
+const MESES_COMERCIAL = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+// Estructura de datos embebidos Control Comercial
+let DATOS_COMERCIAL = {
+  clientes: {},  // { 'Bagó': { 'Enero': { inv, presup, cmb, cmbPresup, fteAnt, fteAct, presupAnual, consumidoAnual, cmbPct, vsCmb, vsMes, fteTotal } } }
+  bago: {}       // { 'Esoprazol': { 'Enero': { inv, presup, presupAnual, consumidoAnual, soi, fteAnt, fteAct, vsMes, fteTotal } } }
+};
+
+let MES_MODAL = 'Mayo'; // mes activo en el modal
+
+function abrirModalCarga() {
+  document.getElementById('modalCarga').classList.add('open');
+  renderModalMesSelector();
+  renderModalForms();
+}
+function cerrarModalCarga() {
+  document.getElementById('modalCarga').classList.remove('open');
+}
+function cerrarModalSiOverlay(e) {
+  if (e.target === document.getElementById('modalCarga')) cerrarModalCarga();
+}
+
+function renderModalMesSelector() {
+  const cont = document.getElementById('modalMesSelector');
+  cont.innerHTML = MESES_COMERCIAL.map(m =>
+    `<button class="modal-mes-btn${m===MES_MODAL?' active':''}" onclick="setMesModal('${m}',this)">${m}</button>`
+  ).join('');
+}
+
+function setMesModal(mes, btn) {
+  MES_MODAL = mes;
+  document.querySelectorAll('.modal-mes-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderModalForms();
+}
+
+function getValModal(cliente, mes, campo, esBago) {
+  const src = esBago ? DATOS_COMERCIAL.bago : DATOS_COMERCIAL.clientes;
+  return (src[cliente] && src[cliente][mes] && src[cliente][mes][campo] != null)
+    ? src[cliente][mes][campo] : '';
+}
+
+function renderModalForms() {
+  const mes = MES_MODAL;
+
+  // ── Clientes ──
+  const clientesCont = document.getElementById('modalClientesForm');
+  clientesCont.innerHTML = CLIENTES_COMERCIAL.map(cli => {
+    const d = DIRECTORES[cli] || {};
+    return `
+      <div class="modal-client-header">
+        <div class="modal-dot" style="background:${d.color||'#606060'}"></div>
+        ${cli} <span style="color:var(--text-muted);font-size:11px;font-weight:400;margin-left:4px">${d.nombre||''}</span>
+      </div>
+      <div class="modal-grid">
+        <div class="modal-field"><label>Inv. Período ($k)</label><input type="number" step="0.1" id="mc_${cli}_inv" value="${getValModal(cli,mes,'inv',false)}" placeholder="0"></div>
+        <div class="modal-field"><label>Presup. Período ($k)</label><input type="number" step="0.1" id="mc_${cli}_presup" value="${getValModal(cli,mes,'presup',false)}" placeholder="0"></div>
+        <div class="modal-field"><label>Presup. Anual ($k)</label><input type="number" step="0.1" id="mc_${cli}_presupAnual" value="${getValModal(cli,mes,'presupAnual',false)}" placeholder="0"></div>
+        <div class="modal-field"><label>Consumido Anual (%)</label><input type="number" step="0.1" id="mc_${cli}_consumidoAnual" value="${getValModal(cli,mes,'consumidoAnual',false)}" placeholder="0"></div>
+        <div class="modal-field"><label>CMB $ ($k)</label><input type="number" step="0.1" id="mc_${cli}_cmb" value="${getValModal(cli,mes,'cmb',false)}" placeholder="0"></div>
+        <div class="modal-field"><label>CMB % (%)</label><input type="number" step="0.1" id="mc_${cli}_cmbPct" value="${getValModal(cli,mes,'cmbPct',false)}" placeholder="0"></div>
+        <div class="modal-field"><label>CMB $ Presup ($k)</label><input type="number" step="0.1" id="mc_${cli}_cmbPresup" value="${getValModal(cli,mes,'cmbPresup',false)}" placeholder="0"></div>
+        <div class="modal-field"><label>FTE Anterior</label><input type="number" step="0.01" id="mc_${cli}_fteAnt" value="${getValModal(cli,mes,'fteAnt',false)}" placeholder="0"></div>
+        <div class="modal-field"><label>FTE Actual</label><input type="number" step="0.01" id="mc_${cli}_fteAct" value="${getValModal(cli,mes,'fteAct',false)}" placeholder="0"></div>
+        <div class="modal-field"><label>FTE Total</label><input type="number" step="0.01" id="mc_${cli}_fteTotal" value="${getValModal(cli,mes,'fteTotal',false)}" placeholder="0"></div>
+      </div>`;
+  }).join('<div style="border-top:1px solid var(--border);margin:10px 0"></div>');
+
+  // ── Bagó marcas ──
+  const bagoCont = document.getElementById('modalBagoForm');
+  bagoCont.innerHTML = BAGO_MARCAS.map(marca => `
+    <div class="modal-client-header">
+      <div class="modal-dot" style="background:#e8001c"></div>${marca}
+    </div>
+    <div class="modal-grid">
+      <div class="modal-field"><label>Inv. Período ($k)</label><input type="number" step="0.1" id="mb_${marca}_inv" value="${getValModal(marca,mes,'inv',true)}" placeholder="0"></div>
+      <div class="modal-field"><label>Presup. Período ($k)</label><input type="number" step="0.1" id="mb_${marca}_presup" value="${getValModal(marca,mes,'presup',true)}" placeholder="0"></div>
+      <div class="modal-field"><label>Presup. Anual ($k)</label><input type="number" step="0.1" id="mb_${marca}_presupAnual" value="${getValModal(marca,mes,'presupAnual',true)}" placeholder="0"></div>
+      <div class="modal-field"><label>Consumido Anual (%)</label><input type="number" step="0.1" id="mb_${marca}_consumidoAnual" value="${getValModal(marca,mes,'consumidoAnual',true)}" placeholder="0"></div>
+      <div class="modal-field"><label>SOI Bagó (%)</label><input type="number" step="0.1" id="mb_${marca}_soi" value="${getValModal(marca,mes,'soi',true)}" placeholder="0"></div>
+      <div class="modal-field"><label>FTE Anterior</label><input type="number" step="0.01" id="mb_${marca}_fteAnt" value="${getValModal(marca,mes,'fteAnt',true)}" placeholder="0"></div>
+      <div class="modal-field"><label>FTE Actual</label><input type="number" step="0.01" id="mb_${marca}_fteAct" value="${getValModal(marca,mes,'fteAct',true)}" placeholder="0"></div>
+      <div class="modal-field"><label>FTE Total</label><input type="number" step="0.01" id="mb_${marca}_fteTotal" value="${getValModal(marca,mes,'fteTotal',true)}" placeholder="0"></div>
+    </div>`
+  ).join('<div style="border-top:1px solid var(--border);margin:10px 0"></div>');
+}
+
+function guardarDatosComercial() {
+  const mes = MES_MODAL;
+  const n = id => { const v = parseFloat(document.getElementById(id)?.value); return isNaN(v) ? null : v; };
+
+  // Leer clientes
+  CLIENTES_COMERCIAL.forEach(cli => {
+    if (!DATOS_COMERCIAL.clientes[cli]) DATOS_COMERCIAL.clientes[cli] = {};
+    const d = {
+      inv:            n(`mc_${cli}_inv`),
+      presup:         n(`mc_${cli}_presup`),
+      presupAnual:    n(`mc_${cli}_presupAnual`),
+      consumidoAnual: n(`mc_${cli}_consumidoAnual`),
+      cmb:            n(`mc_${cli}_cmb`),
+      cmbPct:         n(`mc_${cli}_cmbPct`),
+      cmbPresup:      n(`mc_${cli}_cmbPresup`),
+      fteAnt:         n(`mc_${cli}_fteAnt`),
+      fteAct:         n(`mc_${cli}_fteAct`),
+      fteTotal:       n(`mc_${cli}_fteTotal`),
+    };
+    // calcular derivados automáticamente
+    if (d.inv != null && d.presup != null && d.presup !== 0)
+      d.vs = (((d.inv - d.presup) / d.presup) * 100).toFixed(1);
+    if (d.fteAnt != null && d.fteAct != null && d.fteAnt !== 0)
+      d.vsMes = (((d.fteAct - d.fteAnt) / d.fteAnt) * 100).toFixed(1);
+    if (d.cmb != null && d.cmbPresup != null && d.cmbPresup !== 0)
+      d.vsCmb = (((d.cmb - d.cmbPresup) / d.cmbPresup) * 100).toFixed(1);
+    DATOS_COMERCIAL.clientes[cli][mes] = d;
+  });
+
+  // Leer Bagó marcas
+  BAGO_MARCAS.forEach(marca => {
+    if (!DATOS_COMERCIAL.bago[marca]) DATOS_COMERCIAL.bago[marca] = {};
+    const d = {
+      inv:            n(`mb_${marca}_inv`),
+      presup:         n(`mb_${marca}_presup`),
+      presupAnual:    n(`mb_${marca}_presupAnual`),
+      consumidoAnual: n(`mb_${marca}_consumidoAnual`),
+      soi:            n(`mb_${marca}_soi`),
+      fteAnt:         n(`mb_${marca}_fteAnt`),
+      fteAct:         n(`mb_${marca}_fteAct`),
+      fteTotal:       n(`mb_${marca}_fteTotal`),
+    };
+    if (d.inv != null && d.presup != null && d.presup !== 0)
+      d.vs = (((d.inv - d.presup) / d.presup) * 100).toFixed(1);
+    if (d.fteAnt != null && d.fteAct != null && d.fteAnt !== 0)
+      d.vsMes = (((d.fteAct - d.fteAnt) / d.fteAnt) * 100).toFixed(1);
+    DATOS_COMERCIAL.bago[marca][mes] = d;
+  });
+
+  // Guardar en Sheet
+  postSheet('comercial', { clientes: DATOS_COMERCIAL.clientes, bago: DATOS_COMERCIAL.bago });
+
+  // Actualizar periodo badge
+  const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const idx = MESES_COMERCIAL.indexOf(mes);
+  if (idx >= 0) document.getElementById('periodoLabel').textContent = meses[idx] + ' 2026';
+
+  // Re-renderizar tablas con datos embebidos
+  renderTablasDesdeLocal(mes);
+
+  // Feedback visual
+  const badge = document.getElementById('modalSavedBadge');
+  badge.classList.add('show');
+  setTimeout(() => { badge.classList.remove('show'); cerrarModalCarga(); }, 1800);
+}
+
+function renderTablasDesdeLocal(mes) {
+  // Armar estructura compatible con renderTablas()
+  const clientes = CLIENTES_COMERCIAL.map(nombre => {
+    const d = (DATOS_COMERCIAL.clientes[nombre] && DATOS_COMERCIAL.clientes[nombre][mes]) || {};
+    return { nombre, ...d };
+  }).filter(r => r.inv != null || r.presup != null);
+
+  const bago = BAGO_MARCAS.map(nombre => {
+    const d = (DATOS_COMERCIAL.bago[nombre] && DATOS_COMERCIAL.bago[nombre][mes]) || {};
+    return { nombre, ...d };
+  }).filter(r => r.inv != null || r.presup != null);
+
+  DATA = { clientes, bago, periodo: mes + ' 2026' };
+  renderTablas(DATA);
+}
+
+// Cargar datos comercial embebidos desde Sheet al iniciar
+function cargarDatosComercialDesdeSheet(json) {
+  if (!json.comercial_clientes && !json.comercial) return;
+  const src = json.comercial || {};
+  if (src.clientes) {
+    Object.entries(src.clientes).forEach(([cli, meses]) => {
+      if (!DATOS_COMERCIAL.clientes[cli]) DATOS_COMERCIAL.clientes[cli] = {};
+      Object.entries(meses).forEach(([mes, vals]) => {
+        DATOS_COMERCIAL.clientes[cli][mes] = vals;
+      });
+    });
+  }
+  if (src.bago) {
+    Object.entries(src.bago).forEach(([marca, meses]) => {
+      if (!DATOS_COMERCIAL.bago[marca]) DATOS_COMERCIAL.bago[marca] = {};
+      Object.entries(meses).forEach(([mes, vals]) => {
+        DATOS_COMERCIAL.bago[marca][mes] = vals;
+      });
+    });
+  }
+  // Detectar mes más reciente con datos y renderizar
+  const mesesConDatos = [];
+  Object.values(DATOS_COMERCIAL.clientes).forEach(mObj => Object.keys(mObj).forEach(m => { if (!mesesConDatos.includes(m)) mesesConDatos.push(m); }));
+  if (mesesConDatos.length > 0) {
+    const ordenado = MESES_COMERCIAL.filter(m => mesesConDatos.includes(m));
+    const mesReciente = ordenado[ordenado.length - 1];
+    MES_MODAL = mesReciente;
+    renderTablasDesdeLocal(mesReciente);
+  }
+}
+
+/* INIT */
+loadData();
+</script>
+</body>
+</html>
