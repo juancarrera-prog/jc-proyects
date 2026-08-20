@@ -597,7 +597,8 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
     </div>
     <div id="kpisPerf" class="kpis"></div>
 
-    <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:10px">
+      <button id="btnIncluirBagoPerf" onclick="toggleIncluirBagoPerf()" style="background:rgba(0,200,83,0.12);border:1px solid var(--green);border-radius:20px;padding:6px 18px;color:var(--green);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:.5px">✓ Incluir Bagó</button>
       <button id="btnOHPerf" onclick="toggleOH('perf')" style="background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:6px 18px;color:var(--text-muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:.5px">Con OH</button>
     </div>
     <div class="section-header">
@@ -1762,7 +1763,7 @@ function togglePuestoFTE(puesto, tipo) {
   renderPillsPuestosFTE(tipo);
   const selId = tipo==='social' ? 'chartFTESocialSelector' : 'chartFTEPerfSelector';
   const clienteActivo = document.querySelector(`#${selId} .dir-btn.active`)?.textContent;
-  const clientes = tipo==='social' ? Object.keys(DIRECTORES_SOCIAL) : Object.keys(DIRECTORES_PERF);
+  const clientes = tipo==='social' ? Object.keys(DIRECTORES_SOCIAL) : Object.keys(DIRECTORES_PERF).filter(c => INCLUIR_BAGO_PERF || c !== 'Bagó');
   renderChartFTE(clienteActivo || clientes[0], tipo);
 }
 
@@ -1800,7 +1801,7 @@ function saveFTEVendido(cliente, puesto, valor, tipo) {
 function renderChartFTESelector(tipo) {
   const clientes = tipo==='social'
     ? Object.keys(DIRECTORES_SOCIAL)
-    : Object.keys(DIRECTORES_PERF);
+    : Object.keys(DIRECTORES_PERF).filter(c => INCLUIR_BAGO_PERF || c !== 'Bagó');
   const selId = tipo==='social' ? 'chartFTESocialSelector' : 'chartFTEPerfSelector';
   const cont = document.getElementById(selId);
   if (!cont) return;
@@ -2372,9 +2373,32 @@ function renderPillsMesesPerf() {
   }).join('');
 }
 
+let INCLUIR_BAGO_PERF = true; // toggle "Incluir Bagó" en Performance — por defecto incluido
+
+function toggleIncluirBagoPerf() {
+  INCLUIR_BAGO_PERF = !INCLUIR_BAGO_PERF;
+  const btn = document.getElementById('btnIncluirBagoPerf');
+  if (btn) {
+    if (INCLUIR_BAGO_PERF) {
+      btn.textContent = '✓ Incluir Bagó';
+      btn.style.background = 'rgba(0,200,83,0.12)';
+      btn.style.borderColor = 'var(--green)';
+      btn.style.color = 'var(--green)';
+    } else {
+      btn.textContent = '✕ Bagó excluido';
+      btn.style.background = 'var(--surface2)';
+      btn.style.borderColor = 'var(--border)';
+      btn.style.color = 'var(--text-muted)';
+    }
+  }
+  renderPerfCompleto();
+}
+
 function calcRentabilidadPerf() {
   const meses = MESES_PERF_SELECCIONADOS.length ? MESES_PERF_SELECCIONADOS : _mesesPorDefecto();
-  return Object.keys(DIRECTORES_PERF).map(nombre => {
+  return Object.keys(DIRECTORES_PERF)
+    .filter(nombre => INCLUIR_BAGO_PERF || nombre !== 'Bagó')
+    .map(nombre => {
     let totalCosto=0, totalFte=0, fee=0;
     meses.forEach(m=>{
       totalCosto+=calcCostoEquipoPerf(nombre,m);
@@ -2410,7 +2434,7 @@ function setMesActivoPerf(mes,btn) {
   const rows=calcRentabilidadPerf();
   renderKPIsPerf(rows); renderPerfConsolidado(rows); renderRankingPerf(rows);
   setTimeout(()=>renderChartPerf(rows),60);
-  setTimeout(()=>renderChartFTE(Object.keys(DIRECTORES_PERF).find(c=>document.querySelector('#chartFTEPerfSelector .dir-btn.active')?.textContent===c)||Object.keys(DIRECTORES_PERF)[0],'perf'),60);
+  setTimeout(()=>renderChartFTE(Object.keys(DIRECTORES_PERF).filter(c=>INCLUIR_BAGO_PERF||c!=='Bagó').find(c=>document.querySelector('#chartFTEPerfSelector .dir-btn.active')?.textContent===c)||Object.keys(DIRECTORES_PERF).filter(c=>INCLUIR_BAGO_PERF||c!=='Bagó')[0],'perf'),60);
   actualizarBannerVigenciaPerf();
 }
 function renderKPIsPerf(rows) {
@@ -2487,7 +2511,7 @@ function renderChartPerf(rows) {
 function renderClienteSelectorPerf() {
   const cont=document.getElementById('clienteSelectorPerf');
   if(!cont) return;
-  cont.innerHTML=Object.keys(DIRECTORES_PERF).map(nombre=>{
+  cont.innerHTML=Object.keys(DIRECTORES_PERF).filter(nombre => INCLUIR_BAGO_PERF || nombre !== 'Bagó').map(nombre=>{
     const d=DIRECTORES_PERF[nombre]||{}, isActive=nombre===clienteDetalleActivoPerf;
     return `<button class="cli-btn${isActive?' active':''}" style="${isActive?'background:'+d.color+';border-color:'+d.color+';color:white':''}" onclick="selectClientePerf('${nombre}',this,'${d.color||'#606060'}')">${nombre}</button>`;
   }).join('');
