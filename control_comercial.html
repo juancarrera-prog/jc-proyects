@@ -674,7 +674,8 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
       <div id="mesSelectorSocial" class="mes-btns"></div>
     </div>
     <div id="kpisSocial" class="kpis"></div>
-    <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:10px">
+      <button id="btnIncluirIgnisSocial" onclick="toggleIncluirIgnisSocial()" style="background:rgba(0,200,83,0.12);border:1px solid var(--green);border-radius:20px;padding:6px 18px;color:var(--green);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:.5px">✓ Incluir Ignis M&C</button>
       <button id="btnOHSocial" onclick="toggleOH('social')" style="background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:6px 18px;color:var(--text-muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:.5px">Con OH</button>
     </div>
     <div class="section-header">
@@ -1483,9 +1484,32 @@ function renderPillsMesesSocial() {
   }).join('');
 }
 
+let INCLUIR_IGNIS_SOCIAL = true; // toggle "Incluir Ignis M&C" en Social — por defecto incluido
+
+function toggleIncluirIgnisSocial() {
+  INCLUIR_IGNIS_SOCIAL = !INCLUIR_IGNIS_SOCIAL;
+  const btn = document.getElementById('btnIncluirIgnisSocial');
+  if (btn) {
+    if (INCLUIR_IGNIS_SOCIAL) {
+      btn.textContent = '✓ Incluir Ignis M&C';
+      btn.style.background = 'rgba(0,200,83,0.12)';
+      btn.style.borderColor = 'var(--green)';
+      btn.style.color = 'var(--green)';
+    } else {
+      btn.textContent = '✕ Ignis M&C excluido';
+      btn.style.background = 'var(--surface2)';
+      btn.style.borderColor = 'var(--border)';
+      btn.style.color = 'var(--text-muted)';
+    }
+  }
+  renderSocialCompleto();
+}
+
 function calcRentabilidadSocial() {
   const meses = MESES_SOCIAL_SELECCIONADOS.length ? MESES_SOCIAL_SELECCIONADOS : _mesesPorDefecto();
-  return Object.keys(DIRECTORES_SOCIAL).map(nombre => {
+  return Object.keys(DIRECTORES_SOCIAL)
+    .filter(nombre => INCLUIR_IGNIS_SOCIAL || nombre !== 'Ignis M&C')
+    .map(nombre => {
     let totalCosto=0, totalFte=0, fee=0;
     meses.forEach(m=>{
       totalCosto+=calcCostoEquipoSocial(nombre,m);
@@ -1583,13 +1607,13 @@ function setMesActivoSocial(mes,btn) {
   document.querySelectorAll(`#mesSelectorSocial .dir-btn, #mesSelectorSocialDetalle .dir-btn`).forEach(b=>{if(b.textContent===mes)b.classList.add('active');});
   const rows=calcRentabilidadSocial();
   renderKPIsSocial(rows); renderSocialConsolidado(rows); renderRankingSocial(rows);
-  setTimeout(()=>renderChartFTE(Object.keys(DIRECTORES_SOCIAL).find(c=>document.querySelector('#chartFTESocialSelector .dir-btn.active')?.textContent===c)||Object.keys(DIRECTORES_SOCIAL)[0],'social'),60);
+  setTimeout(()=>renderChartFTE(Object.keys(DIRECTORES_SOCIAL).filter(c=>INCLUIR_IGNIS_SOCIAL||c!=='Ignis M&C').find(c=>document.querySelector('#chartFTESocialSelector .dir-btn.active')?.textContent===c)||Object.keys(DIRECTORES_SOCIAL).filter(c=>INCLUIR_IGNIS_SOCIAL||c!=='Ignis M&C')[0],'social'),60);
 }
 
 function renderClienteSelectorSocial() {
   const cont=document.getElementById('clienteSelectorSocial');
   if(!cont) return;
-  cont.innerHTML=Object.keys(DIRECTORES_SOCIAL).map(c=>`<button class="dir-btn${c===clienteDetalleActivoSocial?' active':''}" onclick="selectClienteSocial('${c}',this)">${c}</button>`).join('');
+  cont.innerHTML=Object.keys(DIRECTORES_SOCIAL).filter(c=>INCLUIR_IGNIS_SOCIAL||c!=='Ignis M&C').map(c=>`<button class="dir-btn${c===clienteDetalleActivoSocial?' active':''}" onclick="selectClienteSocial('${c}',this)">${c}</button>`).join('');
 }
 
 function selectClienteSocial(cliente,btn) {
@@ -1763,7 +1787,7 @@ function togglePuestoFTE(puesto, tipo) {
   renderPillsPuestosFTE(tipo);
   const selId = tipo==='social' ? 'chartFTESocialSelector' : 'chartFTEPerfSelector';
   const clienteActivo = document.querySelector(`#${selId} .dir-btn.active`)?.textContent;
-  const clientes = tipo==='social' ? Object.keys(DIRECTORES_SOCIAL) : Object.keys(DIRECTORES_PERF).filter(c => INCLUIR_BAGO_PERF || c !== 'Bagó');
+  const clientes = tipo==='social' ? Object.keys(DIRECTORES_SOCIAL).filter(c => INCLUIR_IGNIS_SOCIAL || c !== 'Ignis M&C') : Object.keys(DIRECTORES_PERF).filter(c => INCLUIR_BAGO_PERF || c !== 'Bagó');
   renderChartFTE(clienteActivo || clientes[0], tipo);
 }
 
@@ -1800,7 +1824,7 @@ function saveFTEVendido(cliente, puesto, valor, tipo) {
 
 function renderChartFTESelector(tipo) {
   const clientes = tipo==='social'
-    ? Object.keys(DIRECTORES_SOCIAL)
+    ? Object.keys(DIRECTORES_SOCIAL).filter(c => INCLUIR_IGNIS_SOCIAL || c !== 'Ignis M&C')
     : Object.keys(DIRECTORES_PERF).filter(c => INCLUIR_BAGO_PERF || c !== 'Bagó');
   const selId = tipo==='social' ? 'chartFTESocialSelector' : 'chartFTEPerfSelector';
   const cont = document.getElementById(selId);
@@ -2286,7 +2310,7 @@ function toggleOH(tipo) {
     renderKPIsSocial(rows);
     renderSocialConsolidado(rows);
     renderRankingSocial(rows);
-    setTimeout(() => renderChartFTE(Object.keys(DIRECTORES_SOCIAL).find(c=>document.querySelector('#chartFTESocialSelector .dir-btn.active')?.textContent===c)||Object.keys(DIRECTORES_SOCIAL)[0],'social'), 60);
+    setTimeout(() => renderChartFTE(Object.keys(DIRECTORES_SOCIAL).filter(c=>INCLUIR_IGNIS_SOCIAL||c!=='Ignis M&C').find(c=>document.querySelector('#chartFTESocialSelector .dir-btn.active')?.textContent===c)||Object.keys(DIRECTORES_SOCIAL).filter(c=>INCLUIR_IGNIS_SOCIAL||c!=='Ignis M&C')[0],'social'), 60);
   }
 }
 
