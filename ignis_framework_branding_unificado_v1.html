@@ -340,6 +340,16 @@
   .notes-cell { font-size: 10px; color: #666460; line-height: 1.6; }
   .notes-cell strong { color: #333; font-weight: 600; }
 
+  /* Uso interno */
+  .internal-badge {
+    display: inline-block;
+    font-size: 8px; font-weight: 700; letter-spacing: 0.06em;
+    color: #7A5C0E; background: #FFF3D6; border: 0.5px solid #E8D090;
+    border-radius: 3px; padding: 1px 6px; margin-left: 8px; vertical-align: 1px;
+  }
+  .internal-row td { background: #FBFAF7; }
+  .internal-row:hover td { background: #F7F5F0; }
+
   /* Propuestas a futuro (Bagó) */
   .future-wrap {
     border: 1px dashed #C9A227;
@@ -410,7 +420,7 @@
   <div class="team-block active" id="team-ms" data-ad="Mercedes Silva" data-coord="Mariana Schiaffino · Tatiana Aranda">
     <div class="client-pill-bar">
       <span class="pill-bar-label">Cliente</span>
-      <button class="client-pill active" data-always-active="1" >Laboratorios Bagó <span class="client-pill-count">40</span></button>
+      <button class="client-pill active" data-always-active="1" >Laboratorios Bagó <span class="client-pill-count">44</span></button>
     </div>
 
   <div class="sow-wrap client-panel active" id="panel-ms-bago">
@@ -686,7 +696,7 @@
       <button class="family-header" data-target="ms-bago-fam-c" aria-expanded="false">
         <span class="fam-badge">C</span>
         <span class="fam-title">Reporting y Análisis</span>
-        <span class="fam-count">6 entregables</span>
+        <span class="fam-count">10 entregables</span>
         <span class="fam-chevron">&#9662;</span>
       </button>
       <div class="family-body" id="ms-bago-fam-c">
@@ -696,7 +706,7 @@
           <button class="subcat-header" data-target="ms-bago-fam-c-sc0" aria-expanded="false">
             <span class="subcat-chevron">&#9656;</span>
             <span class="subcat-title">Reporting Periódico</span>
-            <span class="subcat-count">4</span>
+            <span class="subcat-count">6</span>
           </button>
           <div class="subcat-body" id="ms-bago-fam-c-sc0">
             <div class="subcat-body-inner">
@@ -720,19 +730,31 @@
               <td><div class="del-name">Executive report quincenal</div><div class="del-sub">C6 · Reporte ejecutivo consolidado</div></td>
               <td class="timing-cell"><span class="timing-main">Quincenal</span></td>
               <td class="brands-cell"><span class="brand-tag bt-all">Todas las marcas</span></td>
-              <td class="notes-cell">Consolidación quincenal del estado de todas las marcas. Formato Word. Incluye semanas de campaña, estado de órdenes de compra, alertas, y próximos pasos por marca.</td>
+              <td class="notes-cell">Consolidación quincenal del estado de todas las marcas. Formato Word. Incluye semanas de campaña, estado de órdenes de compra, alertas, y próximos pasos por marca. Nota de validación (relevamiento de Slack, ago 2026): no se encontró evidencia de este entregable en los canales de Slack analizados — es consistente con que circule por mail u otro canal, dada su naturaleza ejecutiva y quincenal.</td>
             </tr>
             <tr class="entregable-row">
               <td><div class="del-name">Reporte mensual de marca</div><div class="del-sub">C2 · Análisis de performance mensual</div></td>
               <td class="timing-cell"><span class="timing-main">Mensual</span><br>Primeros 10 días del mes</td>
               <td class="brands-cell"><span class="brand-tag bt-a">Capilares</span><span class="brand-tag bt-a">Faciales</span><span class="brand-tag bt-a">Corporales</span><span class="brand-tag bt-a">Dioxaflex</span><span class="brand-tag bt-a">Bagó+</span><span class="brand-tag bt-b">Anaflex</span><span class="brand-tag bt-b">Solares</span></td>
-              <td class="notes-cell">Reporte mensual por marca activa. Incluye inversión ejecutada vs presupuestada, performance de campaña, share of voice, y recomendaciones para el mes siguiente. Validado con Mercedes Silva (jul 2026): incluye además un mailing mensual liviano de creatividades que no funcionaron, con foco en qué se optimizó y oportunidades de mejora (versión acotada; se descartaron los reportes extensos de creatividad que se hacían antes por baja utilidad para el cliente).</td>
+              <td class="notes-cell">Reporte mensual por marca activa. Incluye inversión ejecutada vs presupuestada, performance de campaña, share of voice, y recomendaciones para el mes siguiente. Validado con Mercedes Silva (jul 2026): incluye además un mailing mensual liviano de creatividades que no funcionaron, con foco en qué se optimizó y oportunidades de mejora (versión acotada; se descartaron los reportes extensos de creatividad que se hacían antes por baja utilidad para el cliente). También validado por relevamiento de Slack: se entrega sistemáticamente el 6 o 7 de cada mes, como cuadro de indicadores clave de desempeño (KPIs).</td>
             </tr>
             <tr class="entregable-row">
               <td><div class="del-name">Análisis de wear-out de creatividades</div><div class="del-sub">C7 · Evaluación de desgaste de piezas en rotación</div></td>
               <td class="timing-cell"><span class="timing-main">Semestral</span><br>Dic / Jun</td>
               <td class="brands-cell"><span class="brand-tag bt-a">Capilares</span><span class="brand-tag bt-a">Faciales</span><span class="brand-tag bt-a">Corporales</span><span class="brand-tag bt-a">Dioxaflex</span><span class="brand-tag bt-a">Bagó+</span></td>
-              <td class="notes-cell">Análisis de desgaste de creatividades en rotación. Incluye evaluación por vehículo y recomendación de renovación. Foco en marcas con mayor continuidad de pautas.</td>
+              <td class="notes-cell">Análisis de desgaste de creatividades en rotación. Incluye evaluación por vehículo y recomendación de renovación. Foco en marcas con mayor continuidad de pautas. Validado por relevamiento de Slack: directamente vinculado al post buy acumulado (C3), que se construye primero mes a mes para luego avanzar con este análisis.</td>
+            </tr>
+            <tr class="entregable-row">
+              <td><div class="del-name">Seguimiento de Puntos de Rating Bruto de televisión</div><div class="del-sub">C8 · Nuevo — validado por relevamiento de Slack, ago 2026</div></td>
+              <td class="timing-cell"><span class="timing-main">Continuo</span><br>Diario + acumulado mensual</td>
+              <td class="brands-cell"><span class="brand-tag bt-a">Corporales</span><span class="brand-tag bt-a">Faciales</span><span class="brand-tag bt-a">Anaflex</span><span class="brand-tag bt-a">Esoprazol</span><span class="brand-tag bt-a">Capilares</span></td>
+              <td class="notes-cell">Seguimiento diario de Puntos de Rating Bruto (TRP) de televisión por marca, con acumulado mensual. Proceso manual sostenido por el planner de cada marca. Entregable continuo, distinto del post buy (C3 / C4+C5), que es a pedido y se construye mes a mes para unificar cobertura vs. competencia.</td>
+            </tr>
+            <tr class="entregable-row">
+              <td><div class="del-name">Reporte trimestral de campaña por marca</div><div class="del-sub">C10 · Nuevo — validado por relevamiento de Slack, ago 2026</div></td>
+              <td class="timing-cell"><span class="timing-main">Trimestral</span></td>
+              <td class="brands-cell"><span class="brand-tag bt-a">Capilares</span></td>
+              <td class="notes-cell">Reporte de campaña por marca con cadencia trimestral, distinto del reporte mensual (C2) y del post buy semestral (C4+C5). Documentado para la línea Capilares (ej. reporte enero–marzo). Pendiente confirmar con Mercedes Silva si aplica de forma sistemática a todas las marcas o es específico de esta línea.</td>
             </tr>
                 </tbody>
               </table>
@@ -762,13 +784,73 @@
               <td><div class="del-name">Post buy preliminar</div><div class="del-sub">C3 · Resultados preliminares al cierre de campaña</div></td>
               <td class="timing-cell"><span class="timing-main">Por campaña</span><br>Al cierre de pauta</td>
               <td class="brands-cell"><span class="brand-tag bt-a">Capilares</span><span class="brand-tag bt-a">Faciales</span><span class="brand-tag bt-a">Corporales</span><span class="brand-tag bt-a">Dioxaflex</span><span class="brand-tag bt-a">Bagó+</span><span class="brand-tag bt-b">Anaflex</span></td>
-              <td class="notes-cell">Análisis preliminar de resultados al cierre de cada campaña. Inversión ejecutada, delivery de impresiones, cobertura/frecuencia por segmento, y desvíos vs proyección.</td>
+              <td class="notes-cell">Análisis preliminar de resultados al cierre de cada campaña. Inversión ejecutada, delivery de impresiones, cobertura/frecuencia por segmento, y desvíos vs proyección. Validado por relevamiento de Slack: se construye mes a mes y se unifica a pedido del cliente, con cobertura acumulada propia y de principales competidores.</td>
             </tr>
             <tr class="entregable-row">
               <td><div class="del-name">Post buy final de cierre de año (EOY)</div><div class="del-sub">C4 + C5 · Análisis de cierre semestral y anual</div></td>
               <td class="timing-cell"><span class="timing-main">Semestral / Anual</span><br>Jul + Dic</td>
               <td class="brands-cell"><span class="brand-tag bt-a">Capilares</span><span class="brand-tag bt-a">Faciales</span><span class="brand-tag bt-a">Corporales</span><span class="brand-tag bt-a">Dioxaflex</span><span class="brand-tag bt-a">Bagó+</span><span class="brand-tag bt-b">Anaflex</span><span class="brand-tag bt-b">Solares</span></td>
-              <td class="notes-cell">Post buy consolidado del semestre/año. Incluye conciliación entre el Last Estimate (LE, la última proyección de inversión antes del cierre) y los datos reales del sistema, análisis de eficiencia por vehículo y formato, comparativa año contra año (YoY), y recomendaciones estructurales para el año siguiente.</td>
+              <td class="notes-cell">Post buy consolidado del semestre/año. Incluye conciliación entre el Last Estimate (LE, la última proyección de inversión antes del cierre) y los datos reales del sistema, análisis de eficiencia por vehículo y formato, comparativa año contra año (YoY), y recomendaciones estructurales para el año siguiente. Validado por relevamiento de Slack: el corte semestral es el entregable más coordinado — involucra analistas, planners y coordinación con tareas asignadas por persona; el corte anual retoma el mismo formato usado en años anteriores.</td>
+            </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="subcat" style="--i:2">
+          <button class="subcat-header" data-target="ms-bago-fam-c-sc2" aria-expanded="false">
+            <span class="subcat-chevron">&#9656;</span>
+            <span class="subcat-title">Análisis Ad Hoc</span>
+            <span class="subcat-count">1</span>
+          </button>
+          <div class="subcat-body" id="ms-bago-fam-c-sc2">
+            <div class="subcat-body-inner">
+              <table>
+                <thead>
+                  <tr class="col-header">
+                    <td>Entregable</td>
+                    <td style="width:130px">Frecuencia / Timing</td>
+                    <td style="width:230px">Marcas / Líneas</td>
+                    <td>Descripción / Notas</td>
+                  </tr>
+                </thead>
+                <tbody>
+            <tr class="entregable-row">
+              <td><div class="del-name">Análisis de términos de búsqueda</div><div class="del-sub">C9 · Nuevo — validado por relevamiento de Slack, ago 2026</div></td>
+              <td class="timing-cell"><span class="timing-main">Ad hoc</span><br>A pedido del cliente</td>
+              <td class="brands-cell"><span class="brand-tag bt-a">Bagovit</span><span class="brand-tag bt-b">Resto de marcas</span></td>
+              <td class="notes-cell">Análisis de términos de búsqueda (Search, Google Trends, TikTok) vinculado a una planilla de seguimiento propia. Documentado especialmente para Bagovit, con informe presentado a Rodrigo Barrionuevo (Transformación Comercial). Prioridad en Bagovit, extensible al resto de las marcas a pedido.</td>
+            </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="subcat" style="--i:3">
+          <button class="subcat-header" data-target="ms-bago-fam-c-sc3" aria-expanded="false">
+            <span class="subcat-chevron">&#9656;</span>
+            <span class="subcat-title">Procesos Internos — no cara al cliente</span>
+            <span class="subcat-count">1</span>
+          </button>
+          <div class="subcat-body" id="ms-bago-fam-c-sc3">
+            <div class="subcat-body-inner">
+              <table>
+                <thead>
+                  <tr class="col-header">
+                    <td>Entregable</td>
+                    <td style="width:130px">Frecuencia / Timing</td>
+                    <td style="width:230px">Marcas / Líneas</td>
+                    <td>Descripción / Notas</td>
+                  </tr>
+                </thead>
+                <tbody>
+            <tr class="entregable-row internal-row">
+              <td><div class="del-name">Análisis de eficiencias<span class="internal-badge">USO INTERNO</span></div><div class="del-sub">C11 · Nuevo — validado por relevamiento de Slack, ago 2026 · Uso interno</div></td>
+              <td class="timing-cell"><span class="timing-main">Por proceso de planificación</span></td>
+              <td class="brands-cell"><span class="brand-tag bt-all">Bagó general</span><span class="brand-tag bt-a">Bagovit</span></td>
+              <td class="notes-cell">Análisis interno de eficiencias del proceso de planificación de medios. Sin evidencia de que se comparta formalmente con el cliente — es trabajo interno del equipo de cuenta, no un entregable de cara a Bagó. Se incluye en el catálogo por transparencia de la carga de trabajo real del equipo, marcado explícitamente como proceso interno.</td>
             </tr>
                 </tbody>
               </table>
@@ -2632,7 +2714,8 @@
     </div>
     <div class="footer-version">
       Ignis Media Agency · Branding<br>
-      Framework unificado · v1 · Agosto 2026
+      Framework unificado · v2 · Agosto 2026<br>
+      Bagó actualizado con relevamiento de Slack (#bagó-equipo)
     </div>
   </div>
 
