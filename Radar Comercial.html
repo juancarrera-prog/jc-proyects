@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Radar Comercial — Ignis</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+  /* ── Ignis palette — dark por defecto, con variante clara ── */
+  html, body {
+    color-scheme: dark;
+    --bg:             #0C0C0C;
+    --surface-1:      #161616;
+    --surface-2:      #1D1D1D;
+    --text-primary:   #F0EEE8;
+    --text-secondary: #9A9896;
+    --text-muted:     #6F6D6A;
+    --border:         rgba(255,255,255,0.08);
+    --gridline:       #2A2A2A;
+    --red:            #E5453D;
+    --red-dark:       #C8211D;
+    --red-deep:       #9B1A17;
+    --red-soft:       #E07070;
+    --red-bg:         rgba(200,33,29,0.16);
+    --red-border:     rgba(200,33,29,0.4);
+    --amber:          #D9A72C;
+    --amber-bg:       rgba(217,167,44,0.14);
+    --amber-border:   rgba(217,167,44,0.35);
+  }
+  html[data-theme="light"], html[data-theme="light"] body {
+    color-scheme: light;
+    --bg:             #F5F5F2;
+    --surface-1:      #FFFFFF;
+    --surface-2:      #FAFAF8;
+    --text-primary:   #1A1A1A;
+    --text-secondary: #666460;
+    --text-muted:     #9A9896;
+    --border:         #E8E6E4;
+    --gridline:       #ECEAE8;
+    --red:            #E5453D;
+    --red-dark:       #C8211D;
+    --red-deep:       #9B1A17;
+    --red-soft:       #B0322C;
+    --red-bg:         rgba(200,33,29,0.08);
+    --red-border:     rgba(200,33,29,0.25);
+    --amber:          #8A6D00;
+    --amber-bg:       #FFFBEF;
+    --amber-border:   #C9A227;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: 'Inter', system-ui, -apple-system, "Segoe UI", sans-serif;
+    padding: 24px;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+
+  /* ── HEADER (doc-header pattern) ── */
+  header.top {
+    background: #0C0C0C; color: #F0EEE8; border-radius: 8px;
+    padding: 26px 32px; display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 24px; flex-wrap: wrap; margin-bottom: 20px;
+  }
+  .doc-eyebrow { font-size: 9px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--red); margin-bottom: 6px; }
+  h1 { font-size: 21px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 4px; }
+  .subtitle { font-size: 11px; color: #888480; margin: 0; }
+  .meta { color: #6F6D6A; font-size: 10.5px; margin-top: 6px; }
+
+  button.theme-toggle {
+    background: transparent; color: #B0AEA8; border: 1px solid #383838;
+    border-radius: 20px; padding: 7px 16px; font-size: 11px; font-weight: 600; cursor: pointer;
+    font-family: inherit; transition: all 0.2s ease; flex-shrink: 0;
+  }
+  button.theme-toggle:hover { border-color: var(--red); color: #F0EEE8; }
+
+  .kpi-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 16px; }
+  @media (max-width: 900px) { .kpi-row { grid-template-columns: repeat(2, 1fr); } }
+  .kpi {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px;
+    padding: 16px; display: flex; flex-direction: column; gap: 4px;
+  }
+  .kpi .value { font-size: 25px; font-weight: 700; font-variant-numeric: proportional-nums; }
+  .kpi .label { font-size: 9.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-secondary); }
+
+  .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  @media (max-width: 900px) { .charts-row { grid-template-columns: 1fr; } }
+  figure.chart-card {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px;
+    padding: 18px; margin: 0;
+  }
+  figure.chart-card figcaption {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    margin-bottom: 14px; color: var(--red);
+  }
+  .hbar-row { display: grid; grid-template-columns: 150px 1fr 34px; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .hbar-row .cat { font-size: 11.5px; color: var(--text-secondary); text-align: right; }
+  .hbar-track { background: var(--gridline); border-radius: 3px; height: 13px; position: relative; overflow: hidden; }
+  .hbar-fill { height: 100%; border-radius: 3px; min-width: 3px; }
+  .hbar-row .n { font-size: 11.5px; color: var(--text-primary); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+  section.panel {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px;
+    padding: 18px 20px; margin-bottom: 16px;
+  }
+  section.panel h2 {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--red); margin: 0 0 12px;
+  }
+
+  table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+  thead th {
+    text-align: left; font-weight: 700; color: var(--text-secondary);
+    font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase;
+    border-bottom: 1px solid var(--gridline); padding: 8px 8px; white-space: nowrap;
+  }
+  tbody td { padding: 10px 8px; border-bottom: 1px solid var(--gridline); vertical-align: top; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: var(--surface-2); }
+  .todo { color: var(--text-muted); font-style: italic; }
+  .prospect-name { font-weight: 600; color: var(--text-primary); }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 3px;
+    font-size: 9.5px; font-weight: 700; letter-spacing: 0.03em; white-space: nowrap;
+  }
+  .badge.won  { background: var(--red-bg); color: var(--red-soft); border: 0.5px solid var(--red-border); }
+  .badge.lost { background: rgba(155,26,23,0.22); color: var(--red); border: 0.5px solid var(--red-border); }
+  .badge.paused { background: var(--amber-bg); color: var(--amber); border: 0.5px solid var(--amber-border); }
+  .badge.neutral { background: var(--surface-2); color: var(--text-secondary); border: 0.5px solid var(--border); }
+
+  .howto { color: var(--text-secondary); font-size: 11.5px; line-height: 1.7; }
+  .howto code {
+    background: var(--surface-2); border: 1px solid var(--border); border-radius: 4px;
+    padding: 1px 6px; font-size: 10.5px; color: var(--text-primary);
+  }
+  .howto ol { margin: 8px 0 0; padding-left: 20px; }
+  .howto li { margin-bottom: 4px; }
+  .conn-status { font-size: 10px; font-weight: 700; letter-spacing: 0.04em; }
+  .conn-status.live { color: var(--red); }
+  .conn-status.off { color: var(--text-muted); }
+  .err-detail { font-size: 10px; color: var(--text-muted); margin-top: 8px; font-family: ui-monospace, monospace; word-break: break-all; }
+
+  .table-scroll { overflow-x: auto; }
+
+  /* ── TABS ── */
+  .tab-nav { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .tab-btn {
+    font-family: inherit; font-size: 12px; font-weight: 600; padding: 8px 18px;
+    border-radius: 20px; border: 1px solid var(--border); background: var(--surface-1);
+    color: var(--text-secondary); cursor: pointer; transition: all 0.2s ease;
+  }
+  .tab-btn:hover { border-color: var(--red); color: var(--text-primary); }
+  .tab-btn.active { background: var(--red); border-color: var(--red); color: #fff; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── FILTERS (Radar de Mercado) ── */
+  .filters-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+  .filters-bar input, .filters-bar select {
+    font-family: inherit; font-size: 11.5px; background: var(--surface-1); color: var(--text-primary);
+    border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px;
+  }
+  .filters-bar input { flex: 1 1 200px; min-width: 160px; }
+  .filters-bar select { flex: 0 1 190px; }
+  .filters-count { font-size: 10.5px; color: var(--text-muted); margin-bottom: 10px; }
+
+  /* ── PILLS (Radar de Mercado) ── */
+  .pill {
+    display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 3px;
+    font-size: 9.5px; font-weight: 700; letter-spacing: 0.02em; white-space: nowrap;
+  }
+  .pill.industry { background: var(--surface-2); color: var(--text-secondary); border: 0.5px solid var(--border); font-weight: 600; }
+  .pill.available { background: var(--red-bg); color: var(--red-soft); border: 0.5px solid var(--red-border); }
+  .pill.unknown { background: var(--amber-bg); color: var(--amber); border: 0.5px solid var(--amber-border); }
+  .client-name { font-weight: 600; color: var(--text-primary); }
+  .mkt-note { font-size: 10.5px; color: var(--text-muted); line-height: 1.6; }
+</style>
+</head>
+<body>
+<div class="viz-root wrap">
+
+  <header class="top">
+    <div>
+      <div class="doc-eyebrow">Commercial · Radar Comercial</div>
+      <h1>Radar Comercial — Oportunidades</h1>
+      <p class="subtitle">Ignis Media Agency · Pipeline centralizado de Commercial</p>
+      <p class="meta" id="meta"></p>
+    </div>
+    <button class="theme-toggle" onclick="toggleTheme()">Modo claro / oscuro</button>
+  </header>
+
+  <div class="tab-nav">
+    <button class="tab-btn active" id="btn-pipeline" onclick="switchTab('pipeline')">Pipeline de Oportunidades</button>
+    <button class="tab-btn" id="btn-mercado" onclick="switchTab('mercado')">Radar de Mercado</button>
+  </div>
+
+  <section id="tab-pipeline" class="tab-panel active">
+
+  <div class="kpi-row" id="kpiRow"></div>
+
+  <div class="charts-row">
+    <figure class="chart-card">
+      <figcaption>Oportunidades por Estado</figcaption>
+      <div id="chartEstado"></div>
+    </figure>
+    <figure class="chart-card">
+      <figcaption>Oportunidades por Fuente</figcaption>
+      <div id="chartFuente"></div>
+    </figure>
+  </div>
+
+  <section class="panel">
+    <h2>Pipeline detallado</h2>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Prospect</th><th>Contacto</th><th>Estado</th><th>Fuente</th>
+            <th>Responsable</th><th>Valor potencial</th><th>Último contacto</th><th>Próxima acción</th>
+          </tr>
+        </thead>
+        <tbody id="pipelineBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2 id="liveHeading">Conexión con Google Sheets</h2>
+    <div class="howto">
+      <span class="conn-status off" id="connStatus">● sin conexión — mostrando snapshot</span>
+      <div style="margin-top:10px;">Este dashboard intenta leer en vivo la pestaña <b>Pipeline</b> de tu Google Sheet. Si el estado de arriba no dice "conectado":</div>
+      <ol>
+        <li>Que el archivo sea un Google Sheet nativo en Drive (ya lo es).</li>
+        <li>En el Sheet: <code>Archivo → Compartir → Compartir con otras personas → Cualquier persona con el enlace → Lector</code>.</li>
+        <li>Tocá "Reintentar conexión" abajo. Si tu organización de Google restringe el uso compartido fuera del dominio, este método no va a funcionar y hay que resolverlo distinto (avisame).</li>
+      </ol>
+      <button class="theme-toggle" onclick="tryLoadLive()" style="margin-top:10px;">Reintentar conexión</button>
+      <div class="err-detail" id="errDetail"></div>
+    </div>
+  </section>
+
+  </section><!-- /tab-pipeline -->
+
+  <section id="tab-mercado" class="tab-panel">
+
+  <div class="kpi-row" id="mktKpiRow"></div>
+
+  <div class="charts-row" style="grid-template-columns: 1fr;">
+    <figure class="chart-card">
+      <figcaption>Top 10 agencias por cantidad de cuentas</figcaption>
+      <div id="chartAgencias"></div>
+    </figure>
+  </div>
+
+  <section class="panel">
+    <h2>Anunciantes — CAAM (Cámara Argentina de Agencias de Medios)</h2>
+    <div class="mkt-note" style="margin-bottom:12px;">
+      Relevamiento consolidado a junio 2026, subido por Juan. Snapshot estático — no se actualiza solo, se refresca cuando se carga una versión nueva del archivo.
+      Industria inferida por nombre/rubro del anunciante — puede tener algún error puntual, conviene confirmar antes de usarlo en un pitch. "Disponible" = tiene una baja registrada de su última agencia y no figura alta en ninguna otra. "Sin dato" = está activo pero el registro no dice qué agencia lo tiene hoy.
+    </div>
+    <div class="filters-bar">
+      <input type="text" id="mktSearch" placeholder="Buscar anunciante...">
+      <select id="mktEstadoFilter">
+        <option value="">Todos los estados</option>
+        <option value="oportunidad">Solo oportunidades (sin agencia / sin dato)</option>
+        <option value="con_agencia">Solo con agencia</option>
+      </select>
+      <select id="mktAgenciaFilter"></select>
+      <select id="mktIndustriaFilter"></select>
+    </div>
+    <div class="filters-count" id="mktCount"></div>
+    <div class="table-scroll" style="max-height:640px; overflow-y:auto;">
+      <table>
+        <thead>
+          <tr><th>Anunciante</th><th>Industria</th><th>Agencia / Estado</th><th>Desde</th><th>Detalle</th></tr>
+        </thead>
+        <tbody id="mktBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  </section><!-- /tab-mercado -->
+
+</div>
+
+<script>
+// ---------------------------------------------------------------------
+// Snapshot de datos — migrado del tracker anterior el 18/08/2026.
+// Los campos marcados "COMPLETAR" están pendientes de confirmar con el equipo.
+// ---------------------------------------------------------------------
+const ESTADOS = ["Detectado", "En conversación", "Brief recibido", "Propuesta enviada", "Aprobado / Ganado", "Perdido", "Pausado sin novedad"];
+const FUENTES = ["Referido interno", "Contacto directo cliente", "Comvergence", "Scopen", "RECMA", "Evento", "Otro"];
+
+// Google Sheet conectado el 18/08/2026 (Juan).
+const SHEET_ID = "1WMcZIDvkJJZeWWjeEsZsk3MtV7ivm3KzlRm_KVHnrxE";
+const SHEET_NAME = "Pipeline";
+const CSV_URL_GVIZ = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:csv&sheet=" + encodeURIComponent(SHEET_NAME);
+const CSV_URL_EXPORT = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/export?format=csv&gid=0";
+
+const SNAPSHOT_DATA = [
+  {prospect:"Elementos", contacto:"Dani", fuente:"COMPLETAR", responsable:"COMPLETAR", estado:"Pausado sin novedad", valor:null, moneda:"", ultimo:"—", proxima:"Reconectar con nuevo contacto del cliente"},
+  {prospect:"Pampa y Rabieta", contacto:"Sebas", fuente:"COMPLETAR", responsable:"COMPLETAR", estado:"Perdido", valor:null, moneda:"", ultimo:"25-3", proxima:"—"},
+  {prospect:"Loma Negra", contacto:"Sebas", fuente:"COMPLETAR", responsable:"COMPLETAR", estado:"Aprobado / Ganado", valor:null, moneda:"", ultimo:"29-4", proxima:"Seguimiento post Kick Off"},
+  {prospect:"Mestizo - Hummus", contacto:"Mati", fuente:"COMPLETAR", responsable:"COMPLETAR", estado:"Pausado sin novedad", valor:null, moneda:"", ultimo:"30-3", proxima:"Reconectar en 2do semestre"},
+  {prospect:"SPL", contacto:"Jota", fuente:"COMPLETAR", responsable:"COMPLETAR", estado:"Perdido", valor:null, moneda:"", ultimo:"27-4", proxima:"—"},
+  {prospect:"Hendel", contacto:"Sebas - Nacho Elorza", fuente:"COMPLETAR", responsable:"COMPLETAR", estado:"Aprobado / Ganado", valor:null, moneda:"", ultimo:"12-6", proxima:"Iniciar servicio / Kick off"},
+  {prospect:"Florida DS", contacto:"—", fuente:"COMPLETAR", responsable:"COMPLETAR", estado:"Brief recibido", valor:null, moneda:"", ultimo:"22-6", proxima:"Preparar y enviar propuesta"},
+  {prospect:"Rutini", contacto:"Santiago Olivera", fuente:"COMPLETAR", responsable:"COMPLETAR", estado:"En conversación", valor:200000, moneda:"USD", ultimo:"Semana 15-6", proxima:"Solicitar brief formal"},
+  {prospect:"Laboratorio König - Producto CIDAR", contacto:"Contacto de Sebastián Terzi", fuente:"COMPLETAR", responsable:"COMPLETAR", estado:"Propuesta enviada", valor:80000000, moneda:"ARS (confirmar)", ultimo:"Semana 11-8", proxima:"Definir alternativa de inversión"},
+  {prospect:"Universidad Barceló", contacto:"Contacto de Matías Domínguez", fuente:"COMPLETAR", responsable:"COMPLETAR", estado:"En conversación", valor:null, moneda:"", ultimo:"Semana 11-8", proxima:"Confirmar fecha de reunión"},
+];
+
+let DATA = SNAPSHOT_DATA;
+let liveMode = false;
+
+function parseCSV(text) {
+  const rows = [];
+  let row = [], field = "", inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQuotes) {
+      if (c === '"') { if (text[i+1] === '"') { field += '"'; i++; } else inQuotes = false; }
+      else field += c;
+    } else {
+      if (c === '"') inQuotes = true;
+      else if (c === ",") { row.push(field); field = ""; }
+      else if (c === "\n") { row.push(field); rows.push(row); row = []; field = ""; }
+      else if (c === "\r") { /* skip */ }
+      else field += c;
+    }
+  }
+  if (field.length || row.length) { row.push(field); rows.push(row); }
+  return rows.filter(r => r.some(f => f !== ""));
+}
+
+function parseMonto(s) {
+  if (!s) return null;
+  const t = s.trim();
+  if (!t || t.toUpperCase() === "COMPLETAR") return null;
+  const digits = t.replace(/[.,\s]/g, "");
+  const n = parseInt(digits, 10);
+  return isNaN(n) ? null : n;
+}
+
+function rowsToData(rows) {
+  return rows.slice(1).filter(r => r[0] && r[0].trim()).map(r => ({
+    prospect: r[0] || "",
+    contacto: r[1] || "—",
+    fuente: (r[3] || "").trim() || "COMPLETAR",
+    responsable: (r[4] || "").trim() || "COMPLETAR",
+    estado: (r[5] || "").trim() || "Detectado",
+    valor: parseMonto(r[6]),
+    moneda: (r[7] || "").trim(),
+    ultimo: (r[9] || "").trim() || "—",
+    proxima: (r[10] || "").trim() || "—",
+  }));
+}
+
+async function fetchCSV(url) {
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) throw new Error("HTTP " + res.status + " en " + url);
+  return await res.text();
+}
+
+async function tryLoadLive() {
+  const heading = document.getElementById("connStatus");
+  const errEl = document.getElementById("errDetail");
+  errEl.textContent = "";
+  let lastError = null;
+  for (const url of [CSV_URL_GVIZ, CSV_URL_EXPORT]) {
+    try {
+      const text = await fetchCSV(url);
+      const rows = parseCSV(text);
+      const parsed = rowsToData(rows);
+      if (!parsed.length) throw new Error("Respuesta sin filas de datos (" + url + ")");
+      DATA = parsed;
+      liveMode = true;
+      heading.textContent = "● conectado en vivo a Google Sheets";
+      heading.className = "conn-status live";
+      renderAll();
+      return;
+    } catch (e) {
+      lastError = e;
+    }
+  }
+  DATA = SNAPSHOT_DATA;
+  liveMode = false;
+  heading.textContent = "● sin conexión — mostrando snapshot";
+  heading.className = "conn-status off";
+  errEl.textContent = "Último error: " + (lastError ? lastError.message : "desconocido");
+  console.warn("No se pudo conectar en vivo, muestro snapshot:", lastError);
+  renderAll();
+}
+
+function statusClass(estado) {
+  if (estado === "Aprobado / Ganado") return "won";
+  if (estado === "Perdido") return "lost";
+  if (estado === "Pausado sin novedad") return "paused";
+  return "neutral";
+}
+
+function fmtValor(v, moneda) {
+  if (v == null) return '<span class="todo">completar</span>';
+  return v.toLocaleString("es-AR") + " " + moneda;
+}
+
+function esc(s) {
+  return (s ?? "").toString().replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+}
+
+function renderHBars(containerId, categories, counts, color) {
+  const max = Math.max(1, ...counts);
+  const el = document.getElementById(containerId);
+  el.innerHTML = categories.map((cat, i) => {
+    const pct = Math.round((counts[i] / max) * 100);
+    return `<div class="hbar-row">
+      <div class="cat">${esc(cat)}</div>
+      <div class="hbar-track"><div class="hbar-fill" style="width:${pct}%; background:${color}"></div></div>
+      <div class="n">${counts[i]}</div>
+    </div>`;
+  }).join("");
+}
+
+function renderAll() {
+  const now = new Date();
+  const stamp = now.toLocaleDateString("es-AR") + " " + now.toLocaleTimeString("es-AR", {hour:"2-digit", minute:"2-digit"});
+  document.getElementById("meta").textContent = liveMode
+    ? "Conectado en vivo · actualizado " + stamp + " · " + DATA.length + " oportunidades"
+    : "Snapshot sin conexión (datos migrados del 18/08/2026) · " + DATA.length + " oportunidades";
+
+  const total = DATA.length;
+  const ganadas = DATA.filter(d => d.estado === "Aprobado / Ganado").length;
+  const perdidas = DATA.filter(d => d.estado === "Perdido").length;
+  const abiertas = total - ganadas - perdidas;
+  const valorAbiertoUSD = DATA.filter(d => d.moneda === "USD" && d.estado !== "Aprobado / Ganado" && d.estado !== "Perdido")
+    .reduce((s, d) => s + (d.valor || 0), 0);
+
+  const kpis = [
+    ["Total oportunidades", total],
+    ["Abiertas", abiertas],
+    ["Ganadas", ganadas],
+    ["Perdidas", perdidas],
+    ["Valor potencial abierto (USD)", "$" + valorAbiertoUSD.toLocaleString("es-AR")],
+  ];
+  document.getElementById("kpiRow").innerHTML = kpis.map(([label, value]) =>
+    `<div class="kpi"><div class="value">${value}</div><div class="label">${label}</div></div>`
+  ).join("");
+
+  const countByEstado = ESTADOS.map(e => DATA.filter(d => d.estado === e).length);
+  const countByFuente = FUENTES.map(f => DATA.filter(d => d.fuente === f).length);
+  renderHBars("chartEstado", ESTADOS, countByEstado, "var(--red)");
+  renderHBars("chartFuente", FUENTES, countByFuente, "var(--red-soft)");
+
+  document.getElementById("pipelineBody").innerHTML = DATA.map(d => `
+    <tr>
+      <td class="prospect-name">${esc(d.prospect)}</td>
+      <td>${esc(d.contacto)}</td>
+      <td><span class="badge ${statusClass(d.estado)}">${esc(d.estado)}</span></td>
+      <td>${d.fuente === "COMPLETAR" ? '<span class="todo">completar</span>' : esc(d.fuente)}</td>
+      <td>${d.responsable === "COMPLETAR" ? '<span class="todo">completar</span>' : esc(d.responsable)}</td>
+      <td>${fmtValor(d.valor, d.moneda)}</td>
+      <td>${esc(d.ultimo)}</td>
+      <td>${esc(d.proxima)}</td>
+    </tr>
+  `).join("");
+}
+
+
+// ---------------------------------------------------------------------
+// Radar de Mercado — relevamiento CAAM consolidado a junio 2026.
+// Snapshot estático (no se actualiza solo). Industria inferida por nombre.
+// ---------------------------------------------------------------------
+const RADAR_MERCADO = [{"cliente":"Acnur","industria":"ONG / Organismo Internacional","productos":"","estado":"con_agencia","agencia":"OMD","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"ACTC","industria":"Automotriz","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":"Oct 2022","fecha_ref_key":20221001,"historia":[],"flags":[]},{"cliente":"ADECCO ARGENTINA","industria":"Servicios / RRHH","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"ADIDAS","industria":"Indumentaria / Deportes","productos":"","estado":"con_agencia","agencia":"PHD","fecha_ref":"Jan 2026","fecha_ref_key":20260110,"historia":[],"flags":[]},{"cliente":"Aeropuertos Argentina","industria":"Turismo / Infraestructura","productos":"","estado":"con_agencia","agencia":"OMD","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"AGRIMAX","industria":"Agro","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":"May 2018","fecha_ref_key":20180501,"historia":[],"flags":[]},{"cliente":"Agrofy","industria":"Tecnología / Marketplace","productos":"","estado":"con_agencia","agencia":"Anunciar","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Air Europa","industria":"Turismo / Aerolíneas","productos":"","estado":"con_agencia","agencia":"Anunciar","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Air France / KLM","industria":"Turismo / Aerolíneas","productos":"Institucional / Medios Digitales","estado":"con_agencia","agencia":"Ignis","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"AL MADRE","industria":"Alimentos y Bebidas","productos":"alimentos","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Aldeas infantiles","industria":"ONG / Organismo Internacional","productos":"","estado":"con_agencia","agencia":"OSA","fecha_ref":"Nov 2025","fecha_ref_key":20251101,"historia":[],"flags":[]},{"cliente":"Alprestamo","industria":"Bancos y Finanzas","productos":"","estado":"con_agencia","agencia":"OSA","fecha_ref":"May 2025","fecha_ref_key":20250501,"historia":[],"flags":[]},{"cliente":"AMAZON","industria":"Tecnología / Marketplace","productos":"","estado":"con_agencia","agencia":"OMD","fecha_ref":"2025","fecha_ref_key":20250101,"historia":[],"flags":[]},{"cliente":"AMAZON MUSIC","industria":"Medios y Entretenimiento","productos":"","estado":"con_agencia","agencia":"OMD","fecha_ref":"2025","fecha_ref_key":20250101,"historia":[],"flags":[]},{"cliente":"AMAZON OLA","industria":"Tecnología / Marketplace","productos":"","estado":"con_agencia","agencia":"OMD","fecha_ref":"2025","fecha_ref_key":20250101,"historia":[],"flags":[]},{"cliente":"AMC Networks","industria":"Medios y Entretenimiento","productos":"Cable","estado":"disponible","agencia":null,"fecha_ref":"Dec 2023","fecha_ref_key":20231201,"historia":["PHD (hasta Dec 2023)"],"flags":[]},{"cliente":"AMERICA MOVIL (Claro)","industria":"Telecomunicaciones","productos":"Claro","estado":"con_agencia","agencia":"Havas Media","fecha_ref":"Jun 2004","fecha_ref_key":20040615,"historia":[],"flags":[]},{"cliente":"Amnistía Internacional","industria":"ONG / Organismo Internacional","productos":"","estado":"con_agencia","agencia":"Carat/dentsu","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Arimex / GA.MA.","industria":"Belleza y Cuidado Personal","productos":"Todos los productos","estado":"con_agencia","agencia":"Havas Media","fecha_ref":"Feb 2025","fecha_ref_key":20250220,"historia":[],"flags":[]},{"cliente":"Assist Card","industria":"Turismo / Asistencia al Viajero","productos":"","estado":"con_agencia","agencia":"Carat/dentsu","fecha_ref":"Feb 2026","fecha_ref_key":20260201,"historia":[],"flags":[]},{"cliente":"Automovil Club Argentino (ACA)","industria":"Automotriz / Servicios","productos":"Institucional","estado":"con_agencia","agencia":"Ignis","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Banco Comafi","industria":"Bancos y Finanzas","productos":"Todos los productos","estado":"con_agencia","agencia":"Midios","fecha_ref":"2019","fecha_ref_key":20190101,"historia":[],"flags":[]},{"cliente":"BANCO DEL SOL","industria":"Bancos y Finanzas","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":"Jan 2021","fecha_ref_key":20210101,"historia":[],"flags":[]},{"cliente":"Banco Galicia","industria":"Bancos y Finanzas","productos":"","estado":"con_agencia","agencia":"Anunciar","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Banco Macro","industria":"Bancos y Finanzas","productos":"Todos los productos","estado":"con_agencia","agencia":"Havas Media","fecha_ref":"Mar 2021","fecha_ref_key":20210315,"historia":[],"flags":[]},{"cliente":"Banco Patagonia","industria":"Bancos y Finanzas","productos":"Todos los productos","estado":"con_agencia","agencia":"Ignis","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"BAYER","industria":"Farmacéutica / Salud","productos":"","estado":"con_agencia","agencia":"Initiative","fecha_ref":"sin fecha","fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Bayer Institucional","industria":"Farmacéutica / Salud","productos":"Solo brayer institucional","estado":"con_agencia","agencia":"Anunciar","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"BBVA","industria":"Bancos y Finanzas","productos":"","estado":"con_agencia","agencia":"PHD","fecha_ref":"Jan 2026","fecha_ref_key":20260106,"historia":[],"flags":[]},{"cliente":"BDF","industria":"Belleza y Cuidado Personal","productos":"","estado":"con_agencia","agencia":"Starcom","fecha_ref":"2025","fecha_ref_key":20250101,"historia":[],"flags":[]},{"cliente":"Belgrano Day School","industria":"Educación","productos":"Todos los productos","estado":"con_agencia","agencia":"Ignis","fecha_ref":"Jun 2025","fecha_ref_key":20250601,"historia":[],"flags":[]},{"cliente":"Betano","industria":"Juegos de Azar / Apuestas","productos":"","estado":"con_agencia","agencia":"Carat/dentsu","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"BGH","industria":"Electrodomésticos / Tecnología","productos":"","estado":"con_agencia","agencia":"Zenith","fecha_ref":"Jan 2025","fecha_ref_key":20250101,"historia":[],"flags":[]},{"cliente":"BIC","industria":"Consumo Masivo","productos":"","estado":"con_agencia","agencia":"Initiative","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Binance","industria":"Tecnología / Fintech","productos":"","estado":"con_agencia","agencia":"Carat/dentsu","fecha_ref":"Aug 2025","fecha_ref_key":20250801,"historia":[],"flags":[]},{"cliente":"Blas Pascal","industria":"Educación","productos":"","estado":"con_agencia","agencia":"Anunciar","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Bodegas Norton","industria":"Alimentos y Bebidas","productos":"","estado":"con_agencia","agencia":"OMD","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Boehringer Ingelheim","industria":"Farmacéutica / Salud","productos":"","estado":"con_agencia","agencia":"OMD","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Bonafide","industria":"Alimentos y Bebidas","productos":"","estado":"con_agencia","agencia":"Carat/dentsu","fecha_ref":"Jan 2026","fecha_ref_key":20260101,"historia":[],"flags":[]},{"cliente":"Bosch","industria":"Tecnología / Industria","productos":"Herramientas","estado":"con_agencia","agencia":"Ignis","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Bouquet Pilar","industria":"Retail / Real Estate","productos":"Todos los productos","estado":"con_agencia","agencia":"Ignis","fecha_ref":"May 2025","fecha_ref_key":20250523,"historia":[],"flags":[]},{"cliente":"BRIDGESTONE","industria":"Automotriz / Neumáticos","productos":"","estado":"con_agencia","agencia":"PHD","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Brouwer","industria":"Retail","productos":"Todos los productos","estado":"con_agencia","agencia":"Midios","fecha_ref":"2019","fecha_ref_key":20190101,"historia":[],"flags":[]},{"cliente":"CAAM","industria":"Servicios / Cámara Empresaria","productos":"Todos los productos","estado":"con_agencia","agencia":"Ignis","fecha_ref":"Oct 2025","fecha_ref_key":20251001,"historia":[],"flags":[]},{"cliente":"Cabify","industria":"Movilidad / Transporte","productos":"","estado":"con_agencia","agencia":"Carat/dentsu","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Cabrales","industria":"Alimentos y Bebidas","productos":"","estado":"con_agencia","agencia":"Anunciar","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"CACE","industria":"Servicios / Cámara Empresaria","productos":"","estado":"con_agencia","agencia":"Carat/dentsu","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"CAMARA DE BINGOS Y CASINOS","industria":"Juegos de Azar","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":"Jan 2016","fecha_ref_key":20160101,"historia":[],"flags":[]},{"cliente":"Campari","industria":"Alimentos y Bebidas","productos":"","estado":"con_agencia","agencia":"Starcom","fecha_ref":"Apr 2026","fecha_ref_key":20260401,"historia":[],"flags":[]},{"cliente":"Candy","industria":"Electrodomésticos","productos":"Linea Electrodomesticos","estado":"sin_dato","agencia":null,"fecha_ref":"2025","fecha_ref_key":20250101,"historia":[],"flags":[]},{"cliente":"CCU","industria":"Alimentos y Bebidas","productos":"Todos los productos","estado":"disponible","agencia":null,"fecha_ref":"2022","fecha_ref_key":20220101,"historia":["Starcom (hasta 2022)"],"flags":[]},{"cliente":"CENCOSUD","industria":"Retail / Supermercados","productos":"Holding - Todas las banderas y marcas","estado":"con_agencia","agencia":"Arena Media","fecha_ref":"Apr 2012","fecha_ref_key":20120417,"historia":[],"flags":[]},{"cliente":"Cepage","industria":"Alimentos y Bebidas","productos":"Todos los productos","estado":"con_agencia","agencia":"Midios","fecha_ref":"2024","fecha_ref_key":20240101,"historia":[],"flags":[]},{"cliente":"Cetrogar","industria":"Retail / Electrodomésticos","productos":"","estado":"con_agencia","agencia":"Carat/dentsu","fecha_ref":"Mar 2026","fecha_ref_key":20260301,"historia":[],"flags":[]},{"cliente":"CHAN-ONE S.A","industria":"Automotriz","productos":"Grupo CarOne","estado":"con_agencia","agencia":"OMD","fecha_ref":"Jan 2025","fecha_ref_key":20250101,"historia":[],"flags":[]},{"cliente":"Chanel","industria":"Belleza / Moda / Lujo","productos":"Linea completa Chanel","estado":"con_agencia","agencia":"PHD","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Chery - Grupo Corven","industria":"Automotriz","productos":"","estado":"con_agencia","agencia":"Anunciar","fecha_ref":"Oct 2025","fecha_ref_key":20251001,"historia":[],"flags":[]},{"cliente":"Chrysler","industria":"Automotriz","productos":"","estado":"disponible","agencia":null,"fecha_ref":"sin fecha","fecha_ref_key":null,"historia":["Starcom (hasta sin fecha)"],"flags":[]},{"cliente":"CICSA Cia Cervecera - CCU","industria":"Alimentos y Bebidas","productos":"Todos los productos","estado":"con_agencia","agencia":"Havas Media","fecha_ref":"Sep 2022","fecha_ref_key":20220915,"historia":[],"flags":[]},{"cliente":"Citibank","industria":"Bancos y Finanzas","productos":"","estado":"disponible","agencia":null,"fecha_ref":"sin fecha","fecha_ref_key":null,"historia":["Starcom (hasta sin fecha)","Starcom (hasta sin fecha)"],"flags":[]},{"cliente":"Civitatis","industria":"Turismo / Viajes","productos":"","estado":"con_agencia","agencia":"Carat/dentsu","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"CNH Argentina","industria":"Automotriz / Industria","productos":"Todos los productos","estado":"con_agencia","agencia":"Midios","fecha_ref":"2018","fecha_ref_key":20180101,"historia":[],"flags":[]},{"cliente":"Colonia Express","industria":"Turismo / Viajes","productos":"Todos los productos","estado":"con_agencia","agencia":"Midios","fecha_ref":"2016","fecha_ref_key":20160101,"historia":[],"flags":[]},{"cliente":"COMBE","industria":"Belleza y Cuidado Personal","productos":"","estado":"con_agencia","agencia":"Starcom","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Compañía Financiera Argentina","industria":"Bancos y Finanzas","productos":"Efectivo Si","estado":"con_agencia","agencia":"Ignis","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Consejo de la Magistratura","industria":"Gobierno / Sector Público","productos":"","estado":"con_agencia","agencia":"Anunciar","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Consejo Publicitario Argentino","industria":"ONG / Institucional","productos":"","estado":"con_agencia","agencia":"Ignis","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"COOPERACIÓN SEGUROS - TC","industria":"Seguros","productos":"","estado":"disponible","agencia":null,"fecha_ref":"Apr 2025","fecha_ref_key":20250401,"historia":["QUIROGA (hasta Apr 2025)"],"flags":[]},{"cliente":"Corteva","industria":"Agro","productos":"","estado":"disponible","agencia":null,"fecha_ref":"sin fecha","fecha_ref_key":null,"historia":["Anunciar (hasta sin fecha)"],"flags":[]},{"cliente":"Cosméticos Avon","industria":"Belleza y Cuidado Personal","productos":"Todos los productos","estado":"disponible","agencia":null,"fecha_ref":"31-07-2026","fecha_ref_key":null,"historia":["Havas Plus (hasta 31-07-2026)"],"flags":[]},{"cliente":"Cámara Argentina de Empresas de Cobranza","industria":"Servicios / Cámara Empresaria","productos":"","estado":"con_agencia","agencia":"Anunciar","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Dabra - Dexter Shops","industria":"Retail / Moda","productos":"","estado":"con_agencia","agencia":"Anunciar","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Danica","industria":"Indumentaria","productos":"Todos los productos","estado":"con_agencia","agencia":"Ignis","fecha_ref":"Apr 2022","fecha_ref_key":20220401,"historia":[],"flags":[]},{"cliente":"DANONE","industria":"Alimentos y Bebidas","productos":"Aguas, productos lácteos y Nutrición Infantil","estado":"con_agencia","agencia":"Havas Media","fecha_ref":"Sep 2014","fecha_ref_key":20140916,"historia":[],"flags":[]},{"cliente":"DAYTONA","industria":"Automotriz","productos":"","estado":"disponible","agencia":null,"fecha_ref":"Jun 2025","fecha_ref_key":20250601,"historia":["QUIROGA (hasta Jun 2025)"],"flags":[]},{"cliente":"De Agostini","industria":"Medios y Entretenimiento","productos":"Linea completa de Coleccionables","estado":"con_agencia","agencia":"PHD","fecha_ref":"Jan 2026","fecha_ref_key":20260101,"historia":[],"flags":[]},{"cliente":"DECATHLON","industria":"Retail / Deportes","productos":"","estado":"con_agencia","agencia":"OMD","fecha_ref":"Jan 2025","fecha_ref_key":20250109,"historia":[],"flags":[]},{"cliente":"DELICIOUS FRUITS","industria":"Alimentos y Bebidas","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Despegar","industria":"Turismo / Viajes","productos":"","estado":"con_agencia","agencia":"PHD","fecha_ref":"Jan 2026","fecha_ref_key":20260106,"historia":["OSA (hasta Apr 2026)"],"flags":[]},{"cliente":"Diagnóstico Rojas","industria":"Salud / Medicina","productos":"","estado":"con_agencia","agencia":"Anunciar","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"DIDI","industria":"Movilidad / Transporte","productos":"","estado":"con_agencia","agencia":"Initiative","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"DIFFUPAR","industria":"Belleza y Cuidado Personal","productos":"Perfumería","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":["Omnicom"]},{"cliente":"DirecTv (Digital)","industria":"Medios y Entretenimiento","productos":"","estado":"con_agencia","agencia":"Carat/dentsu","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"DISAL","industria":"Hogar y Construcción","productos":"Tersuave y Colorín","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":"Aug 2025","fecha_ref_key":20250801,"historia":[],"flags":["WPP"]},{"cliente":"DREAN","industria":"Electrodomésticos","productos":"","estado":"con_agencia","agencia":"OMD","fecha_ref":"2026","fecha_ref_key":20260101,"historia":["QUIROGA"],"flags":[]},{"cliente":"EDITORIAL EMSE","industria":"Medios y Entretenimiento","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":"Apr 2017","fecha_ref_key":20170401,"historia":[],"flags":[]},{"cliente":"Editorial Perfil","industria":"Medios y Entretenimiento","productos":"Caras, Noticias, Diario Perfil, resto de productos","estado":"disponible","agencia":null,"fecha_ref":"2024","fecha_ref_key":20240101,"historia":["Ignis (hasta 2024)"],"flags":[]},{"cliente":"El Cronista","industria":"Medios y Entretenimiento","productos":"Todos los productos","estado":"con_agencia","agencia":"Ignis","fecha_ref":"May 2025","fecha_ref_key":20250501,"historia":[],"flags":[]},{"cliente":"El Lab Taller de idiomas CUI","industria":"Educación","productos":"","estado":"con_agencia","agencia":"Anunciar","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Electro Fans","industria":"Electrodomésticos","productos":"Todos los productos","estado":"con_agencia","agencia":"Midios","fecha_ref":"2019","fecha_ref_key":20190101,"historia":[],"flags":[]},{"cliente":"EMI MUSIC","industria":"Medios y Entretenimiento","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"ENEL","industria":"Energía","productos":"Todos los productos","estado":"con_agencia","agencia":"Havas Media","fecha_ref":"Jan 2022","fecha_ref_key":20220101,"historia":[],"flags":[]},{"cliente":"ERPA - SUPRABOND","industria":"Hogar y Construcción","productos":"","estado":"con_agencia","agencia":"Anunciar","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Escorial","industria":"Retail / Moda","productos":"Todos los productos","estado":"con_agencia","agencia":"Ignis","fecha_ref":"Apr 2022","fecha_ref_key":20220401,"historia":[],"flags":[]},{"cliente":"Essity","industria":"Consumo Masivo","productos":"Todos los productos /marcas en el negocio digital","estado":"con_agencia","agencia":"PHD","fecha_ref":"Jan 2026","fecha_ref_key":20260105,"historia":[],"flags":[]},{"cliente":"Essity (Algodonera Aconcagua)","industria":"Consumo Masivo","productos":"","estado":"con_agencia","agencia":"OSA","fecha_ref":"Jun 2014","fecha_ref_key":20140601,"historia":[],"flags":[]},{"cliente":"Estee Lauder","industria":"Belleza y Cuidado Personal","productos":"","estado":"disponible","agencia":null,"fecha_ref":"Jun 2026","fecha_ref_key":20260626,"historia":["OMD (hasta Jun 2026)"],"flags":[]},{"cliente":"Faber Castel","industria":"Retail / Consumo","productos":"","estado":"con_agencia","agencia":"Anunciar","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Fabric Sushi","industria":"Alimentos y Bebidas / Gastronomía","productos":"","estado":"disponible","agencia":null,"fecha_ref":"May 2025","fecha_ref_key":20250501,"historia":["OSA (hasta May 2025)"],"flags":[]},{"cliente":"Familia Bercomat / Keracasa","industria":"Hogar y Construcción","productos":"Todos los productos","estado":"con_agencia","agencia":"Midios","fecha_ref":"2023","fecha_ref_key":20230101,"historia":[],"flags":[]},{"cliente":"Farmacity","industria":"Retail / Farmacia","productos":"","estado":"con_agencia","agencia":"OSA","fecha_ref":"Apr 2022","fecha_ref_key":20220401,"historia":[],"flags":[]},{"cliente":"FarmaPlus","industria":"Farmacéutica / Salud","productos":"Todos los productos","estado":"con_agencia","agencia":"Ignis","fecha_ref":"Jun 2025","fecha_ref_key":20250624,"historia":[],"flags":[]},{"cliente":"FAST FOOD SUDAMERICANA SA","industria":"Alimentos y Bebidas / Gastronomía","productos":"Burger King, PF Chang","estado":"disponible","agencia":null,"fecha_ref":"12/31/2023","fecha_ref_key":null,"historia":["Havas Media (hasta 12/31/2023)"],"flags":[]},{"cliente":"Fiat Auto Argentina","industria":"Automotriz","productos":"Todos los productos","estado":"con_agencia","agencia":"Starcom","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Fiat Latam","industria":"Automotriz","productos":"","estado":"con_agencia","agencia":"Starcom","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Fiat Plan","industria":"Automotriz","productos":"","estado":"con_agencia","agencia":"Starcom","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Film Suez","industria":"Servicios","productos":"","estado":"con_agencia","agencia":"Starcom","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"First Data - Fiserv","industria":"Tecnología / Fintech","productos":"","estado":"con_agencia","agencia":"Anunciar","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Fondo Vitivinicola","industria":"Alimentos y Bebidas / Gobierno","productos":"","estado":"con_agencia","agencia":"Midios","fecha_ref":"2023","fecha_ref_key":20230101,"historia":[],"flags":[]},{"cliente":"FONTENLA","industria":"Hogar y Construcción","productos":"","estado":"disponible","agencia":null,"fecha_ref":"sin fecha","fecha_ref_key":null,"historia":["QUIROGA (hasta sin fecha)"],"flags":[]},{"cliente":"FRATELLI BRANCA DESTILERIAS","industria":"Alimentos y Bebidas","productos":"","estado":"con_agencia","agencia":"Initiative","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Fravega","industria":"Retail / Electrodomésticos","productos":"Todos los productos","estado":"con_agencia","agencia":"Midios","fecha_ref":"2009","fecha_ref_key":20090101,"historia":[],"flags":[]},{"cliente":"Freddo","industria":"Alimentos y Bebidas","productos":"Todos los productos","estado":"disponible","agencia":null,"fecha_ref":"2025","fecha_ref_key":20250101,"historia":["Ignis (hasta 2025)"],"flags":[]},{"cliente":"GALDERMA","industria":"Farmacéutica / Salud","productos":"Todos los productos","estado":"con_agencia","agencia":"Midios","fecha_ref":"2021","fecha_ref_key":20210101,"historia":[],"flags":[]},{"cliente":"General Motors","industria":"Automotriz","productos":"Chevrolet","estado":"con_agencia","agencia":"Carat/dentsu","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Genomma Laboratorio","industria":"Farmacéutica / Salud","productos":"Todos los productos","estado":"con_agencia","agencia":"Havas Media","fecha_ref":"Aug 2020","fecha_ref_key":20200812,"historia":[],"flags":[]},{"cliente":"Georgalos","industria":"Alimentos y Bebidas","productos":"Todos los productos","estado":"con_agencia","agencia":"Midios","fecha_ref":"2018","fecha_ref_key":20180101,"historia":[],"flags":[]},{"cliente":"Gillette","industria":"Belleza y Cuidado Personal","productos":"(Ver Procter & Gamble)","estado":"con_agencia","agencia":"Starcom","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Gobierno de la Ciudad","industria":"Gobierno / Sector Público","productos":"","estado":"disponible","agencia":null,"fecha_ref":"2023","fecha_ref_key":20230101,"historia":["Ignis (hasta 2023)"],"flags":[]},{"cliente":"GOBIERNO SALTA","industria":"Gobierno / Sector Público","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Godrej Argentina","industria":"Consumo Masivo","productos":"Todos los productos","estado":"con_agencia","agencia":"Midios","fecha_ref":"2014","fecha_ref_key":20140101,"historia":[],"flags":[]},{"cliente":"Goodyear","industria":"Automotriz / Neumáticos","productos":"Todos los productos","estado":"con_agencia","agencia":"Ignis","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Graner","industria":"Alimentos y Bebidas","productos":"Todos los productos","estado":"con_agencia","agencia":"Midios","fecha_ref":"2020","fecha_ref_key":20200101,"historia":[],"flags":[]},{"cliente":"GREAT CARS S.A","industria":"Automotriz","productos":"Grupo CarOne","estado":"con_agencia","agencia":"OMD","fecha_ref":"Jan 2025","fecha_ref_key":20250101,"historia":[],"flags":[]},{"cliente":"Green Hills","industria":"Alimentos y Bebidas","productos":"","estado":"disponible","agencia":null,"fecha_ref":"sin fecha","fecha_ref_key":null,"historia":["QUIROGA (hasta sin fecha)"],"flags":[]},{"cliente":"GRIDO","industria":"Alimentos y Bebidas","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":"Jan 2018","fecha_ref_key":20180101,"historia":[],"flags":[]},{"cliente":"Grimoldi","industria":"Indumentaria / Calzado","productos":"Institucional","estado":"disponible","agencia":null,"fecha_ref":"2023","fecha_ref_key":20230101,"historia":["Ignis (hasta 2023)"],"flags":[]},{"cliente":"Grupo Alsea","industria":"Alimentos y Bebidas / Gastronomía","productos":"Burger King, Starbucks","estado":"con_agencia","agencia":"Carat/dentsu","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"GRUPO AYUDIN","industria":"Bancos y Finanzas","productos":"","estado":"con_agencia","agencia":"PHD","fecha_ref":"Jan 2024","fecha_ref_key":20240109,"historia":[],"flags":[]},{"cliente":"Grupo Bimbo","industria":"Alimentos y Bebidas","productos":"Todos los productos","estado":"con_agencia","agencia":"PHD","fecha_ref":"Jan 2024","fecha_ref_key":20240101,"historia":["Starcom (hasta 2024)"],"flags":[]},{"cliente":"Grupo Cepas","industria":"Alimentos y Bebidas","productos":"","estado":"con_agencia","agencia":"OSA","fecha_ref":"Oct 2012","fecha_ref_key":20121001,"historia":[],"flags":[]},{"cliente":"GRUPO GCBA","industria":"Gobierno / Sector Público","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Grupo Iraola","industria":"Automotriz","productos":"CFMotos","estado":"disponible","agencia":null,"fecha_ref":"2024","fecha_ref_key":20240101,"historia":["Ignis (hasta 2024)"],"flags":[]},{"cliente":"Grupo Moura","industria":"Automotriz / Industria","productos":"Baterias","estado":"con_agencia","agencia":"OSA","fecha_ref":"Apr 2024","fecha_ref_key":20240401,"historia":[],"flags":[]},{"cliente":"GRUPO NECHO","industria":"Hogar y Limpieza","productos":"soluciones para limpieza y organización del hogar (Principales marcas: Asurín, Separata, Sky)","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"GRUPO NEW SAN","industria":"Electrodomésticos","productos":"incluyendo todas las marcas de consumo masivo de procter que adquirio grupo newsan","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"GRUPO OSDE","industria":"Salud / Medicina Prepaga","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Grupo PSA: Peugeot Citröen DS","industria":"Automotriz","productos":"Todos los productos","estado":"con_agencia","agencia":"Starcom","fecha_ref":"Jun 2021","fecha_ref_key":20210601,"historia":[],"flags":[]},{"cliente":"Grupo Saenz","industria":"Automotriz","productos":"","estado":"con_agencia","agencia":"Anunciar","fecha_ref":"Jan 2026","fecha_ref_key":20260101,"historia":[],"flags":[]},{"cliente":"Grupo SAVI","industria":"Retail","productos":"Todos los productos","estado":"con_agencia","agencia":"Ignis","fecha_ref":"Nov 2025","fecha_ref_key":20251123,"historia":[],"flags":[]},{"cliente":"Grupo Solfrut","industria":"Alimentos y Bebidas","productos":"Aceite Oliovita","estado":"con_agencia","agencia":"Ignis","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Grupo Volkswagen","industria":"Automotriz","productos":"VW, Autoahorro, Post Venta, Camiones, Audi, Ducati, Institucionales","estado":"con_agencia","agencia":"PHD","fecha_ref":"Jan 2017","fecha_ref_key":20170101,"historia":[],"flags":[]},{"cliente":"GSK","industria":"Farmacéutica / Salud","productos":"Todos los productos","estado":"con_agencia","agencia":"Midios","fecha_ref":"2022","fecha_ref_key":20220101,"historia":[],"flags":[]},{"cliente":"HCS MARKETING","industria":"Servicios","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Helena Cosmeticos","industria":"Belleza y Cuidado Personal","productos":"Todos los productos","estado":"con_agencia","agencia":"Ignis","fecha_ref":"Dec 2024","fecha_ref_key":20241201,"historia":[],"flags":[]},{"cliente":"HIPODROMO ARGENTINO DE PALERMO","industria":"Juegos de Azar / Entretenimiento","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"HISTORY CHANNEL","industria":"Medios y Entretenimiento","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"HOLCIM","industria":"Hogar y Construcción","productos":"","estado":"con_agencia","agencia":"Initiative","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Holcim / Disensa","industria":"Hogar y Construcción","productos":"Todos los productos","estado":"disponible","agencia":null,"fecha_ref":"2025","fecha_ref_key":20250101,"historia":["Midios (hasta 2025)"],"flags":[]},{"cliente":"Iberia","industria":"Turismo / Aerolíneas","productos":"Iberia","estado":"con_agencia","agencia":"Havas Media","fecha_ref":"Feb 2022","fecha_ref_key":20220201,"historia":[],"flags":[]},{"cliente":"InBev (Cervecería y Maltería Quilmes)","industria":"Alimentos y Bebidas","productos":"","estado":"con_agencia","agencia":"OSA","fecha_ref":"Jul 2024","fecha_ref_key":20240701,"historia":[],"flags":[]},{"cliente":"Indrive","industria":"Movilidad / Transporte","productos":"Por proyecto","estado":"con_agencia","agencia":"Havas Media","fecha_ref":"Jan 2023","fecha_ref_key":20230101,"historia":[],"flags":[]},{"cliente":"INNOVANT PUBLISHING","industria":"Medios y Entretenimiento","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"INSTITUTO COSTARRICENSE DE TURISMO","industria":"Turismo / Gobierno","productos":"","estado":"con_agencia","agencia":"Initiative","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"INTERBANKING","industria":"Bancos y Finanzas","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":"Mar 2021","fecha_ref_key":20210301,"historia":[],"flags":[]},{"cliente":"Inviu (Finanzas)","industria":"Bancos y Finanzas","productos":"","estado":"con_agencia","agencia":"Anunciar","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"IPCVA (INSTITUTO PARA EL CONSUMO DE LA CARNE VACUNA ARGENTINA)","industria":"Gobierno / Sector Público","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"ITBA","industria":"Educación","productos":"Todos los productos","estado":"con_agencia","agencia":"Ignis","fecha_ref":"May 2025","fecha_ref_key":20250522,"historia":[],"flags":[]},{"cliente":"Iveco (Fiat)","industria":"Automotriz","productos":"","estado":"con_agencia","agencia":"Starcom","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Iveco Argentina","industria":"Automotriz","productos":"Todos los productos","estado":"con_agencia","agencia":"Midios","fecha_ref":"2018","fecha_ref_key":20180101,"historia":[],"flags":[]},{"cliente":"IVESS","industria":"Servicios","productos":"","estado":"con_agencia","agencia":"Initiative","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"IYOSEI","industria":"Belleza y Cuidado Personal","productos":"cosmética capilar","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":"Nov 2022","fecha_ref_key":20221101,"historia":[],"flags":[]},{"cliente":"Jetour","industria":"Automotriz","productos":"Todos los productos","estado":"con_agencia","agencia":"Ignis","fecha_ref":"Sep 2025","fecha_ref_key":20250924,"historia":[],"flags":[]},{"cliente":"JOBINT","industria":"Servicios / RRHH","productos":"Bumeran + Hiring Room","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":"Jan 2025","fecha_ref_key":20250101,"historia":[],"flags":[]},{"cliente":"Juncadella Prosegur International","industria":"Seguridad / Logística","productos":"Todos los productos","estado":"con_agencia","agencia":"Havas Plus","fecha_ref":"Apr 2018","fecha_ref_key":20180411,"historia":[],"flags":[]},{"cliente":"Karinat","industria":"Hogar","productos":"Todos los productos","estado":"con_agencia","agencia":"Midios","fecha_ref":"2022","fecha_ref_key":20220101,"historia":[],"flags":[]},{"cliente":"Kenview","industria":"Belleza y Cuidado Personal","productos":"","estado":"con_agencia","agencia":"Starcom","fecha_ref":"Apr 2026","fecha_ref_key":20260401,"historia":[],"flags":[]},{"cliente":"Kia Motors","industria":"Automotriz","productos":"Todos los productos","estado":"con_agencia","agencia":"Midios","fecha_ref":"2017","fecha_ref_key":20170101,"historia":[],"flags":[]},{"cliente":"Kimberly Clark","industria":"Consumo Masivo","productos":"","estado":"con_agencia","agencia":"OMD","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"KLM","industria":"Turismo / Aerolíneas","productos":"","estado":"con_agencia","agencia":"Carat/dentsu","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"KOHINOOR","industria":"Alimentos y Bebidas","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Kopelco","industria":"Hogar","productos":"Tulipan","estado":"con_agencia","agencia":"OSA","fecha_ref":"Oct 2014","fecha_ref_key":20141001,"historia":[],"flags":[]},{"cliente":"L'Oréal","industria":"Belleza y Cuidado Personal","productos":"Todas las divisiones - Only Digital","estado":"disponible","agencia":null,"fecha_ref":"12/31/2023","fecha_ref_key":null,"historia":["Havas Media (hasta 12/31/2023)"],"flags":[]},{"cliente":"LA ANÓNIMA","industria":"Retail / Supermercados","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"La Caja - Generali","industria":"Seguros","productos":"","estado":"con_agencia","agencia":"Carat/dentsu","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"LA ESPUMERIA","industria":"Hogar y Limpieza","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":"Jul 2022","fecha_ref_key":20220701,"historia":[],"flags":[]},{"cliente":"La Nación","industria":"Medios y Entretenimiento","productos":"","estado":"con_agencia","agencia":"Carat/dentsu","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"La Paulina","industria":"Alimentos y Bebidas","productos":"Todos los productos","estado":"con_agencia","agencia":"Ignis","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Laboratorio Abbott","industria":"Farmacéutica / Salud","productos":"Todos los productos","estado":"con_agencia","agencia":"Starcom","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Laboratorio Andrómaco","industria":"Farmacéutica / Salud","productos":"Todos los productos","estado":"disponible","agencia":null,"fecha_ref":"Jan 2024","fecha_ref_key":20240106,"historia":["Arena Media (hasta Jan 2024)"],"flags":[]},{"cliente":"Laboratorio Bago","industria":"Farmacéutica / Salud","productos":"Todos los productos","estado":"con_agencia","agencia":"Ignis","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Laboratorio Eximia","industria":"Farmacéutica / Salud","productos":"Todos los productos","estado":"con_agencia","agencia":"Midios","fecha_ref":"2017","fecha_ref_key":20170101,"historia":[],"flags":[]},{"cliente":"Laboratorio LASIFARMA","industria":"Farmacéutica / Salud","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Laboratorio Novonordisk","industria":"Farmacéutica / Salud","productos":"Todos los productos","estado":"con_agencia","agencia":"Ignis","fecha_ref":"Jun 2025","fecha_ref_key":20250624,"historia":[],"flags":[]},{"cliente":"Laboratorio Raffo","industria":"Farmacéutica / Salud","productos":"Regulip - Aerotina","estado":"disponible","agencia":null,"fecha_ref":"Jan 2026","fecha_ref_key":20260101,"historia":["Carat/dentsu (hasta Jan 2026)"],"flags":[]},{"cliente":"Laboratorios Gramon Millet","industria":"Farmacéutica / Salud","productos":"Todos los productos","estado":"con_agencia","agencia":"Midios","fecha_ref":"2013","fecha_ref_key":20130101,"historia":[],"flags":[]},{"cliente":"Laboratorios Roemmers","industria":"Farmacéutica / Salud","productos":"Todos los productos","estado":"con_agencia","agencia":"Midios","fecha_ref":"2012","fecha_ref_key":20120101,"historia":[],"flags":[]},{"cliente":"LARIO","industria":"Alimentos y Bebidas","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Las Camelias","industria":"Alimentos y Bebidas","productos":"Todos los productos","estado":"con_agencia","agencia":"Midios","fecha_ref":"2022","fecha_ref_key":20220101,"historia":[],"flags":[]},{"cliente":"LATAM AIRLINES","industria":"Turismo / Aerolíneas","productos":"","estado":"con_agencia","agencia":"Initiative","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"LEDESMA","industria":"Alimentos y Bebidas","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":"Jan 2021","fecha_ref_key":20210101,"historia":[],"flags":[]},{"cliente":"LENOVO","industria":"Tecnología","productos":"","estado":"con_agencia","agencia":"OSA","fecha_ref":"Apr 2025","fecha_ref_key":20250401,"historia":["QUIROGA (hasta Jan 2025)"],"flags":[]},{"cliente":"LG","industria":"Tecnología / Electrodomésticos","productos":"Todos los productos /marcas","estado":"con_agencia","agencia":"PHD","fecha_ref":"Jan 2020","fecha_ref_key":20200101,"historia":[],"flags":[]},{"cliente":"Libra Seguros","industria":"Seguros","productos":"Todos los productos","estado":"disponible","agencia":null,"fecha_ref":"2025","fecha_ref_key":20250101,"historia":["Ignis (hasta 2025)"],"flags":[]},{"cliente":"LIBUS","industria":"Indumentaria / Protección Personal","productos":"protección personal","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":"Jan 2021","fecha_ref_key":20210101,"historia":[],"flags":[]},{"cliente":"Liderprop","industria":"Real Estate","productos":"","estado":"con_agencia","agencia":"Ignis","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Life seguros","industria":"Seguros","productos":"","estado":"con_agencia","agencia":"Starcom","fecha_ref":"2020","fecha_ref_key":20200101,"historia":[],"flags":[]},{"cliente":"Link (ex redlink)","industria":"Bancos y Finanzas","productos":"Todos los productos","estado":"con_agencia","agencia":"Midios","fecha_ref":"2017","fecha_ref_key":20170101,"historia":[],"flags":[]},{"cliente":"Logitech","industria":"Tecnología","productos":"","estado":"con_agencia","agencia":"Starcom","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Loma Negra","industria":"Hogar y Construcción","productos":"Todos los productos","estado":"con_agencia","agencia":"Ignis","fecha_ref":"May 2026","fecha_ref_key":20260501,"historia":[],"flags":[]},{"cliente":"LOTERIA DE BUENOS AIRES","industria":"Juegos de Azar","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"LUXURY OUTLET","industria":"Retail / Moda","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"LVMH LOUIS VUITTON","industria":"Moda / Lujo","productos":"FACSA y Bodegas Chandon","estado":"con_agencia","agencia":"Havas Media","fecha_ref":"Jan 2010","fecha_ref_key":20100105,"historia":[],"flags":[]},{"cliente":"MAKRO","industria":"Retail / Supermercados","productos":"","estado":"disponible","agencia":null,"fecha_ref":"Nov 2025","fecha_ref_key":20251101,"historia":["QUIROGA (hasta Nov 2025)"],"flags":[]},{"cliente":"MAPFRE","industria":"Seguros","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":"Jan 2026","fecha_ref_key":20260101,"historia":[],"flags":[]},{"cliente":"Mars","industria":"Alimentos y Bebidas / Mascotas","productos":"","estado":"con_agencia","agencia":"Zenith","fecha_ref":"Oct 2025","fecha_ref_key":20251001,"historia":[],"flags":[]},{"cliente":"Mary Kay","industria":"Belleza y Cuidado Personal","productos":"Todos los productos","estado":"disponible","agencia":null,"fecha_ref":"2023","fecha_ref_key":20230101,"historia":["Ignis (hasta 2023)"],"flags":[]},{"cliente":"Mastellone","industria":"Alimentos y Bebidas","productos":"","estado":"con_agencia","agencia":"Anunciar","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Mastercard","industria":"Bancos y Finanzas","productos":"","estado":"disponible","agencia":null,"fecha_ref":"Dec 2025","fecha_ref_key":20251201,"historia":["Carat/dentsu (hasta Dec 2025)"],"flags":[]},{"cliente":"Mc Donalds","industria":"Alimentos y Bebidas / Gastronomía","productos":"Todos los productos","estado":"con_agencia","agencia":"Starcom","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"McCain","industria":"Alimentos y Bebidas","productos":"Papas y Productos Varios","estado":"con_agencia","agencia":"Ignis","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Mega Sports","industria":"Indumentaria / Deportes","productos":"Todos los productos","estado":"con_agencia","agencia":"Midios","fecha_ref":"2021","fecha_ref_key":20210101,"historia":[],"flags":[]},{"cliente":"MEGALABS","industria":"Farmacéutica / Salud","productos":"laboratório","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"MERCADOLIBRE","industria":"Tecnología / Marketplace","productos":"","estado":"con_agencia","agencia":"ZetaBé","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Mercedes Benz","industria":"Automotriz","productos":"","estado":"con_agencia","agencia":"OMD","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"MERCEDES BENZ CAMIONES Y BUSES","industria":"Automotriz","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Merck","industria":"Farmacéutica / Salud","productos":"Bravercto","estado":"con_agencia","agencia":"PHD","fecha_ref":"2023","fecha_ref_key":20230101,"historia":[],"flags":[]},{"cliente":"METAFAR","industria":"Farmacéutica / Salud","productos":"","estado":"con_agencia","agencia":"Initiative","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"METROGAS","industria":"Energía","productos":"","estado":"disponible","agencia":null,"fecha_ref":"Dec 2024","fecha_ref_key":20241201,"historia":["QUIROGA (hasta Dec 2024)"],"flags":[]},{"cliente":"Mexx","industria":"Indumentaria","productos":"Todos los productos","estado":"con_agencia","agencia":"Midios","fecha_ref":"2021","fecha_ref_key":20210101,"historia":[],"flags":[]},{"cliente":"Michelin","industria":"Automotriz / Neumáticos","productos":"","estado":"con_agencia","agencia":"OMD","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Michelín","industria":"Automotriz / Neumáticos","productos":"Todos los productos","estado":"disponible","agencia":null,"fecha_ref":"12/31/2024","fecha_ref_key":null,"historia":["Havas Media (hasta 12/31/2024)"],"flags":[]},{"cliente":"Microsoft","industria":"Tecnología","productos":"","estado":"con_agencia","agencia":"Carat/dentsu","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"MIMO","industria":"Indumentaria","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"MITSU MOTORS S.A","industria":"Automotriz","productos":"Grupo CarOne","estado":"con_agencia","agencia":"OMD","fecha_ref":"Jan 2025","fecha_ref_key":20250101,"historia":[],"flags":[]},{"cliente":"Molinos Cañuelas","industria":"Alimentos y Bebidas","productos":"Linea Pureza","estado":"con_agencia","agencia":"Ignis","fecha_ref":"Apr 2023","fecha_ref_key":20230401,"historia":[],"flags":[]},{"cliente":"Molinos Río de la Plata","industria":"Alimentos y Bebidas","productos":"Todos los productos","estado":"con_agencia","agencia":"Arena Media","fecha_ref":"Apr 2018","fecha_ref_key":20180404,"historia":[],"flags":[]},{"cliente":"Mondelez","industria":"Alimentos y Bebidas","productos":"","estado":"con_agencia","agencia":"Spark","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Moove","industria":"Movilidad / Transporte","productos":"","estado":"con_agencia","agencia":"OMD","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"MSD","industria":"Farmacéutica / Salud","productos":"","estado":"con_agencia","agencia":"Initiative","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"MyA","industria":"Servicios","productos":"Todos los productos","estado":"con_agencia","agencia":"Ignis","fecha_ref":"May 2025","fecha_ref_key":20250523,"historia":[],"flags":[]},{"cliente":"Médicos sin fronteras","industria":"ONG / Organismo Internacional","productos":"","estado":"con_agencia","agencia":"Carat/dentsu","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Naranja X","industria":"Bancos y Finanzas","productos":"","estado":"con_agencia","agencia":"Anunciar","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Natura Cosméticos","industria":"Belleza y Cuidado Personal","productos":"Todos los productos","estado":"disponible","agencia":null,"fecha_ref":"31-07-2026","fecha_ref_key":null,"historia":["Havas Plus (hasta 31-07-2026)"],"flags":[]},{"cliente":"Nespresso","industria":"Alimentos y Bebidas","productos":"","estado":"con_agencia","agencia":"Starcom","fecha_ref":"2025","fecha_ref_key":20250101,"historia":[],"flags":[]},{"cliente":"Netflix","industria":"Medios y Entretenimiento","productos":"","estado":"con_agencia","agencia":"Carat/dentsu","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Nike","industria":"Indumentaria / Deportes","productos":"","estado":"con_agencia","agencia":"OSA","fecha_ref":"Oct 2001","fecha_ref_key":20011001,"historia":[],"flags":[]},{"cliente":"Nissan","industria":"Automotriz","productos":"","estado":"con_agencia","agencia":"OMD","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Nubia","industria":"Tecnología","productos":"Celulares","estado":"con_agencia","agencia":"OSA","fecha_ref":"Dec 2025","fecha_ref_key":20251201,"historia":[],"flags":[]},{"cliente":"Nutribaby","industria":"Alimentos y Bebidas","productos":"Todos los productos","estado":"con_agencia","agencia":"Midios","fecha_ref":"2017","fecha_ref_key":20170101,"historia":[],"flags":[]},{"cliente":"Omint","industria":"Salud / Medicina Prepaga","productos":"","estado":"con_agencia","agencia":"Carat/dentsu","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"ONCITY","industria":"Real Estate","productos":"Todos los productos","estado":"con_agencia","agencia":"Havas Plus","fecha_ref":"Dec 2012","fecha_ref_key":20121218,"historia":[],"flags":[]},{"cliente":"Opella/ Sanofi","industria":"Farmacéutica / Salud","productos":"Buscapina, Dulcolax, Allegra, Enterogermina, Bisolvon, Pharmaton","estado":"con_agencia","agencia":"PHD","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Open AI","industria":"Tecnología","productos":"","estado":"con_agencia","agencia":"PHD","fecha_ref":"Jan 2026","fecha_ref_key":20260106,"historia":[],"flags":[]},{"cliente":"PANAMERICAN ENERGY","industria":"Energía","productos":"TODOS","estado":"con_agencia","agencia":"Starcom","fecha_ref":"Aug 2021","fecha_ref_key":20210801,"historia":[],"flags":[]},{"cliente":"Panini","industria":"Medios y Entretenimiento","productos":"Todos los productos","estado":"disponible","agencia":null,"fecha_ref":"2024","fecha_ref_key":20240101,"historia":["Ignis (hasta 2024)"],"flags":[]},{"cliente":"Paramount","industria":"Medios y Entretenimiento","productos":"Productos","estado":"con_agencia","agencia":"Ignis","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Parque de la Costa","industria":"Entretenimiento","productos":"Todos los productos","estado":"disponible","agencia":null,"fecha_ref":"May 2026","fecha_ref_key":20260531,"historia":["Havas Media (hasta May 2026)"],"flags":[]},{"cliente":"PAX ASSISTANCE","industria":"Turismo / Asistencia al Viajero","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Payway","industria":"Tecnología / Fintech","productos":"","estado":"con_agencia","agencia":"OSA","fecha_ref":"Apr 2025","fecha_ref_key":20250401,"historia":[],"flags":[]},{"cliente":"PAYWAY (PRISMA)","industria":"Tecnología / Fintech","productos":"","estado":"disponible","agencia":null,"fecha_ref":"Apr 2026","fecha_ref_key":20260425,"historia":["Initiative (hasta Apr 2026)"],"flags":[]},{"cliente":"Pedidos YA","industria":"Delivery / Marketplace","productos":"Todos los productos","estado":"con_agencia","agencia":"Havas Media","fecha_ref":"Feb 2026","fecha_ref_key":20260201,"historia":["Havas Media (hasta Jan 2025)","Spark (desde 2025, superado por carga posterior)"],"flags":[]},{"cliente":"PEPSI","industria":"Alimentos y Bebidas","productos":"","estado":"con_agencia","agencia":"UM","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Pernod Ricard","industria":"Alimentos y Bebidas","productos":"Chivas- Absolut- Beefeater-Cafayate - mumm- Havana Club - Malibu","estado":"con_agencia","agencia":"Carat/dentsu","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Pernod Ricard Argentina","industria":"Alimentos y Bebidas","productos":"Todos los productos","estado":"disponible","agencia":null,"fecha_ref":"2023","fecha_ref_key":20230101,"historia":["Ignis (hasta 2023)"],"flags":[]},{"cliente":"Pfizer","industria":"Farmacéutica / Salud","productos":"Prevenar - Institucional","estado":"con_agencia","agencia":"Ignis","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Philips","industria":"Tecnología / Electrodomésticos","productos":"","estado":"con_agencia","agencia":"OMD","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Pinturerías Rex","industria":"Hogar y Construcción","productos":"","estado":"con_agencia","agencia":"Anunciar","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"PIRELLI","industria":"Automotriz / Neumáticos","productos":"","estado":"con_agencia","agencia":"Initiative","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Plataforma 10","industria":"Turismo / Viajes","productos":"","estado":"con_agencia","agencia":"Carat/dentsu","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Play Digital","industria":"Bancos y Finanzas / Fintech","productos":"Billetera digital","estado":"con_agencia","agencia":"OSA","fecha_ref":"Sep 2020","fecha_ref_key":20200901,"historia":[],"flags":[]},{"cliente":"Plus Pago","industria":"Tecnología / Fintech","productos":"Todos los productos","estado":"con_agencia","agencia":"Midios","fecha_ref":"2022","fecha_ref_key":20220101,"historia":[],"flags":[]},{"cliente":"Plus Pagos","industria":"Tecnología / Fintech","productos":"","estado":"con_agencia","agencia":"Anunciar","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"PMI","industria":"Consumo Masivo","productos":"","estado":"con_agencia","agencia":"Zenith","fecha_ref":"2025","fecha_ref_key":20250101,"historia":[],"flags":[]},{"cliente":"Presidencia de la nacion","industria":"Gobierno / Sector Público","productos":"","estado":"con_agencia","agencia":"Ignis","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"PRESTIGE AUTO","industria":"Automotriz","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":"Jun 2026","fecha_ref_key":20260601,"historia":[],"flags":[]},{"cliente":"Procter & Gamble + Gillette","industria":"Belleza y Cuidado Personal","productos":"Todos los productos","estado":"disponible","agencia":null,"fecha_ref":"2024","fecha_ref_key":20240101,"historia":["Starcom (hasta 2024)"],"flags":[]},{"cliente":"Productos de Agua","industria":"Alimentos y Bebidas","productos":"Todos los productos - Cunnington","estado":"disponible","agencia":null,"fecha_ref":"2025","fecha_ref_key":20250101,"historia":["Ignis (hasta 2025)"],"flags":[]},{"cliente":"Productos Roche SAQEI","industria":"Farmacéutica / Salud","productos":"Institucional","estado":"con_agencia","agencia":"Ignis","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Prudential","industria":"Seguros","productos":"","estado":"disponible","agencia":null,"fecha_ref":"BAJA - SE FUE DEL PAIS 31/12/2024","fecha_ref_key":null,"historia":["(agencia no registrada) (hasta BAJA - SE FUE DEL PAIS 31/12/2024)"],"flags":[]},{"cliente":"PUENTE HNOS","industria":"Bancos y Finanzas","productos":"","estado":"disponible","agencia":null,"fecha_ref":"Dec 2024","fecha_ref_key":20241201,"historia":["QUIROGA (hasta Dec 2024)"],"flags":[]},{"cliente":"PUIG","industria":"Belleza y Cuidado Personal","productos":"","estado":"con_agencia","agencia":"Starcom","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"PUMA Sports","industria":"Indumentaria / Deportes","productos":"Todos los productos","estado":"con_agencia","agencia":"Havas Media","fecha_ref":"Oct 2018","fecha_ref_key":20181001,"historia":[],"flags":[]},{"cliente":"Qualia Seguros","industria":"Seguros","productos":"Todos los productos","estado":"con_agencia","agencia":"Midios","fecha_ref":"2020","fecha_ref_key":20200101,"historia":[],"flags":[]},{"cliente":"QuickFood","industria":"Alimentos y Bebidas","productos":"Todos los productos","estado":"con_agencia","agencia":"Ignis","fecha_ref":"Jun 2025","fecha_ref_key":20250623,"historia":[],"flags":[]},{"cliente":"QUINI 6 + BRINCO (CAJA ASISTENCIA PCIA DE STA FE)","industria":"Juegos de Azar / Gobierno","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Raizen Shell","industria":"Energía","productos":"Todos los productos","estado":"con_agencia","agencia":"Havas Media","fecha_ref":"1-07-2025 a Septiembre 2025 período de Transicion // Octubre oficial","fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Rapipago","industria":"Tecnología / Fintech","productos":"","estado":"con_agencia","agencia":"Anunciar","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"RBA EDICIONES","industria":"Medios y Entretenimiento","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Re/Max","industria":"Real Estate","productos":"","estado":"con_agencia","agencia":"Anunciar","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"RECKITT (Ahora Vestacy)","industria":"Consumo Masivo","productos":"Reckitt home & health","estado":"con_agencia","agencia":"Havas Media","fecha_ref":"Mar 1998","fecha_ref_key":19980317,"historia":[],"flags":[]},{"cliente":"Red Bull","industria":"Alimentos y Bebidas","productos":"","estado":"con_agencia","agencia":"OSA","fecha_ref":"Jan 2025","fecha_ref_key":20250101,"historia":[],"flags":[]},{"cliente":"Red Hat","industria":"Tecnología","productos":"","estado":"con_agencia","agencia":"OMD","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"RENAULT","industria":"Automotriz","productos":"Renault Argentina, Plan Rombo y Centro Automotor - Renault Regional","estado":"con_agencia","agencia":"Havas Media","fecha_ref":"Jun 2002","fecha_ref_key":20020618,"historia":[],"flags":[]},{"cliente":"Revista Quijote","industria":"Medios y Entretenimiento","productos":"Producto","estado":"con_agencia","agencia":"Ignis","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Ringo","industria":"Alimentos y Bebidas","productos":"Todos los productos","estado":"con_agencia","agencia":"Midios","fecha_ref":"2024","fecha_ref_key":20240101,"historia":[],"flags":[]},{"cliente":"Royal caning","industria":"Mascotas","productos":"","estado":"con_agencia","agencia":"Zenith","fecha_ref":"Oct 2025","fecha_ref_key":20251001,"historia":[],"flags":[]},{"cliente":"Royal Prestige","industria":"Hogar","productos":"Linea completa todos los productos","estado":"con_agencia","agencia":"PHD","fecha_ref":"Jan 2024","fecha_ref_key":20240101,"historia":[],"flags":[]},{"cliente":"SALESFORCE","industria":"Tecnología","productos":"","estado":"disponible","agencia":null,"fecha_ref":"Jan 2026","fecha_ref_key":20260126,"historia":["Initiative (hasta Jan 2026)"],"flags":[]},{"cliente":"Samsung","industria":"Tecnología","productos":"Todos los productos","estado":"con_agencia","agencia":"Starcom","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Sancor Bebé","industria":"Alimentos y Bebidas","productos":"Todos los productos","estado":"con_agencia","agencia":"Midios","fecha_ref":"2022","fecha_ref_key":20220101,"historia":[],"flags":[]},{"cliente":"SANCOR SEGUROS","industria":"Seguros","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Sanofi","industria":"Farmacéutica / Salud","productos":"Laboratorio CHC, TODO, excepto división “RX” que quedó en manos de Havas a partir de Marzo-24","estado":"disponible","agencia":null,"fecha_ref":"Dec 2026","fecha_ref_key":20261224,"historia":["PHD (hasta Dec 2026)"],"flags":[]},{"cliente":"SANOFI Pasteur","industria":"Farmacéutica / Salud","productos":"División Vacunas","estado":"con_agencia","agencia":"Havas Plus","fecha_ref":"Mar 2024","fecha_ref_key":20240301,"historia":[],"flags":[]},{"cliente":"Santander","industria":"Bancos y Finanzas","productos":"","estado":"con_agencia","agencia":"Starcom","fecha_ref":"Jul 2025","fecha_ref_key":20250701,"historia":[],"flags":[]},{"cliente":"SANTILLANA","industria":"Educación","productos":"","estado":"disponible","agencia":null,"fecha_ref":"sin fecha","fecha_ref_key":null,"historia":["QUIROGA (hasta sin fecha)"],"flags":[]},{"cliente":"SAP","industria":"Tecnología","productos":"SAP","estado":"disponible","agencia":null,"fecha_ref":"Dec 2026","fecha_ref_key":20261223,"historia":["PHD (hasta Dec 2026)"],"flags":[]},{"cliente":"Savencia","industria":"Alimentos y Bebidas","productos":"","estado":"con_agencia","agencia":"Starcom","fecha_ref":"Jan 2026","fecha_ref_key":20260101,"historia":[],"flags":[]},{"cliente":"SC Johnson","industria":"Consumo Masivo","productos":"","estado":"con_agencia","agencia":"PHD","fecha_ref":"Jul 2015","fecha_ref_key":20150701,"historia":[],"flags":[]},{"cliente":"SCHÄR","industria":"Alimentos y Bebidas","productos":"","estado":"con_agencia","agencia":"Initiative","fecha_ref":"sin fecha","fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Shell","industria":"Energía","productos":"","estado":"disponible","agencia":null,"fecha_ref":"Aug 2025","fecha_ref_key":20250801,"historia":["OSA (hasta Aug 2025)"],"flags":[]},{"cliente":"SHERWIN-WILLIAMS","industria":"Hogar y Construcción","productos":"","estado":"con_agencia","agencia":"Initiative","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Skymedic","industria":"Salud / Medicina Prepaga","productos":"Todos los productos","estado":"disponible","agencia":null,"fecha_ref":"2023","fecha_ref_key":20230101,"historia":["Ignis (hasta 2023)"],"flags":[]},{"cliente":"SODIMAC","industria":"Retail / Construcción","productos":"","estado":"con_agencia","agencia":"Initiative","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"SOFTYS","industria":"Consumo Masivo","productos":"","estado":"con_agencia","agencia":"Initiative","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Sony","industria":"Tecnología","productos":"Todos los productos","estado":"disponible","agencia":null,"fecha_ref":"Mar 2026","fecha_ref_key":20260331,"historia":["Havas Media (hasta Mar 2026)"],"flags":[]},{"cliente":"SONY MUSIC","industria":"Medios y Entretenimiento","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Sony Pictures","industria":"Medios y Entretenimiento","productos":"","estado":"con_agencia","agencia":"OMD","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Space Guru","industria":"Real Estate","productos":"","estado":"con_agencia","agencia":"Anunciar","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"SUBWAY","industria":"Alimentos y Bebidas / Gastronomía","productos":"","estado":"con_agencia","agencia":"Initiative","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"SUIZO ARGENTINA","industria":"Farmacéutica / Salud","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":"Jun 2026","fecha_ref_key":20260601,"historia":[],"flags":[]},{"cliente":"Sunstar-GUM","industria":"Belleza y Cuidado Personal","productos":"","estado":"con_agencia","agencia":"Anunciar","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Supermercado Dia","industria":"Retail / Supermercados","productos":"","estado":"con_agencia","agencia":"Carat/dentsu","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"SURA - Antes Royal & Sun Alliance","industria":"Seguros","productos":"Answer Seguros","estado":"disponible","agencia":null,"fecha_ref":"2022","fecha_ref_key":20220101,"historia":["Starcom (hasta 2022)"],"flags":[]},{"cliente":"Swift","industria":"Alimentos y Bebidas","productos":"Todos los productos","estado":"con_agencia","agencia":"Midios","fecha_ref":"1991","fecha_ref_key":19910101,"historia":[],"flags":[]},{"cliente":"Tabacal","industria":"Alimentos y Bebidas","productos":"Todos los productos","estado":"con_agencia","agencia":"Midios","fecha_ref":"2017","fecha_ref_key":20170101,"historia":[],"flags":[]},{"cliente":"TELECENTRO","industria":"Telecomunicaciones","productos":"","estado":"con_agencia","agencia":"Initiative","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"TELEFÓNICA / Tuenti","industria":"Telecomunicaciones","productos":"Todos los productos","estado":"con_agencia","agencia":"Havas Plus","fecha_ref":"Oct 2014","fecha_ref_key":20141014,"historia":[],"flags":[]},{"cliente":"The Clorox Company","industria":"Consumo Masivo","productos":"","estado":"con_agencia","agencia":"OMD","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"TOPPER (ALPARGATAS)","industria":"Indumentaria / Deportes","productos":"","estado":"con_agencia","agencia":"Initiative","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"TOYOTA","industria":"Automotriz","productos":"","estado":"con_agencia","agencia":"Initiative","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Triangular","industria":"Servicios","productos":"","estado":"con_agencia","agencia":"Anunciar","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Tricot","industria":"Indumentaria","productos":"","estado":"con_agencia","agencia":"Havas Plus","fecha_ref":"Oct 2025","fecha_ref_key":20251001,"historia":[],"flags":[]},{"cliente":"Trilenium Casino","industria":"Juegos de Azar","productos":"","estado":"con_agencia","agencia":"Anunciar","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Trivago","industria":"Turismo / Viajes","productos":"","estado":"con_agencia","agencia":"Anunciar","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"TST","industria":"Servicios","productos":"","estado":"disponible","agencia":null,"fecha_ref":"Dec 2024","fecha_ref_key":20241201,"historia":["QUIROGA (hasta Dec 2024)"],"flags":[]},{"cliente":"UADE","industria":"Educación","productos":"","estado":"con_agencia","agencia":"OMD","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Ualá","industria":"Bancos y Finanzas / Fintech","productos":"","estado":"con_agencia","agencia":"Carat/dentsu","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Uber","industria":"Movilidad / Transporte","productos":"","estado":"con_agencia","agencia":"OMD","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"UCA Escuela de Negocios","industria":"Educación","productos":"","estado":"con_agencia","agencia":"Anunciar","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"UIP - United International Pictures","industria":"Medios y Entretenimiento","productos":"Paramount + Universal","estado":"con_agencia","agencia":"Carat/dentsu","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"UNICEF","industria":"ONG / Organismo Internacional","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"UNILEVER","industria":"Consumo Masivo","productos":"","estado":"con_agencia","agencia":"Initiative","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"United Airlines","industria":"Turismo / Aerolíneas","productos":"","estado":"con_agencia","agencia":"Carat/dentsu","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Universal Assistance","industria":"Turismo / Asistencia al Viajero","productos":"Todos los productos","estado":"con_agencia","agencia":"Ignis","fecha_ref":"Mar 2025","fecha_ref_key":20250301,"historia":[],"flags":[]},{"cliente":"Universidad de Flores (UFLO)","industria":"Educación","productos":"Todos los productos","estado":"con_agencia","agencia":"Ignis","fecha_ref":"Jan 2023","fecha_ref_key":20230101,"historia":[],"flags":[]},{"cliente":"Universidad de Palermo","industria":"Educación","productos":"","estado":"con_agencia","agencia":"Starcom","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Verisure","industria":"Seguridad / Hogar","productos":"","estado":"con_agencia","agencia":"Carat/dentsu","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Violetta Cosmetico","industria":"Belleza y Cuidado Personal","productos":"Todos los productos","estado":"con_agencia","agencia":"Ignis","fecha_ref":"Mar 2025","fecha_ref_key":20250322,"historia":[],"flags":[]},{"cliente":"Visa Argentina","industria":"Bancos y Finanzas","productos":"Todos los productos","estado":"con_agencia","agencia":"Starcom","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Vitalcan / HOP","industria":"Alimentos y Bebidas","productos":"Todos los productos","estado":"disponible","agencia":null,"fecha_ref":"2024","fecha_ref_key":20240101,"historia":["Ignis (hasta 2024)"],"flags":[]},{"cliente":"VOLVO CARS - JAGUAR - LAND ROVER","industria":"Automotriz","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"WARNER MUSIC","industria":"Medios y Entretenimiento","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"western Union / Pago facil","industria":"Tecnología / Fintech","productos":"","estado":"con_agencia","agencia":"Zenith","fecha_ref":"2023","fecha_ref_key":20230101,"historia":[],"flags":[]},{"cliente":"WHIRLPOOL","industria":"Electrodomésticos","productos":"","estado":"con_agencia","agencia":"QUIROGA","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"World ID (Tecnología)","industria":"Tecnología","productos":"","estado":"con_agencia","agencia":"Anunciar","fecha_ref":"Aug 2025","fecha_ref_key":20250801,"historia":[],"flags":[]},{"cliente":"YPF","industria":"Energía","productos":"Todos los productos medios off, excepto VP","estado":"con_agencia","agencia":"Midios","fecha_ref":"2025","fecha_ref_key":20250101,"historia":[],"flags":[]},{"cliente":"YPF (Digital)","industria":"Energía","productos":"","estado":"con_agencia","agencia":"Carat/dentsu","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]},{"cliente":"Zurich","industria":"Seguros","productos":"","estado":"con_agencia","agencia":"OMD","fecha_ref":null,"fecha_ref_key":null,"historia":[],"flags":[]}];
+
+const AGENCY_COLORS = ['#4E9EE8','#9B80E0','#E08050','#50C0A0','#D9A72C','#8891A5','#D97E9A','#9CB86B'];
+function agencyColor(name) {
+  if (!name) return '#777777';
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+  return AGENCY_COLORS[h % AGENCY_COLORS.length];
+}
+
+let mktFilters = { q: "", agencia: "", industria: "", estado: "" };
+
+function uniqueSorted(arr) {
+  return [...new Set(arr)].filter(Boolean).sort((a, b) => a.localeCompare(b, "es"));
+}
+
+function initMercadoFilters() {
+  const agencias = uniqueSorted(RADAR_MERCADO.map(c => c.agencia));
+  const industrias = uniqueSorted(RADAR_MERCADO.map(c => c.industria));
+  document.getElementById("mktAgenciaFilter").innerHTML = '<option value="">Todas las agencias</option>' +
+    agencias.map(a => `<option value="${esc(a)}">${esc(a)}</option>`).join("");
+  document.getElementById("mktIndustriaFilter").innerHTML = '<option value="">Todas las industrias</option>' +
+    industrias.map(i => `<option value="${esc(i)}">${esc(i)}</option>`).join("");
+}
+
+function renderMercadoKPIs() {
+  const total = RADAR_MERCADO.length;
+  const disponibles = RADAR_MERCADO.filter(c => c.estado === "disponible").length;
+  const sinDato = RADAR_MERCADO.filter(c => c.estado === "sin_dato").length;
+  const agencias = new Set(RADAR_MERCADO.map(c => c.agencia).filter(Boolean)).size;
+  const industrias = new Set(RADAR_MERCADO.map(c => c.industria)).size;
+  const kpis = [
+    ["Anunciantes relevados", total],
+    ["Oportunidades detectadas", disponibles + sinDato],
+    ["Agencias mapeadas", agencias],
+    ["Industrias cubiertas", industrias],
+  ];
+  document.getElementById("mktKpiRow").innerHTML = kpis.map(([label, value]) =>
+    `<div class="kpi"><div class="value">${value}</div><div class="label">${label}</div></div>`
+  ).join("");
+}
+
+function renderMercadoChart() {
+  const counts = {};
+  RADAR_MERCADO.forEach(c => { if (c.agencia) counts[c.agencia] = (counts[c.agencia] || 0) + 1; });
+  const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 10);
+  renderHBars("chartAgencias", sorted.map(x => x[0]), sorted.map(x => x[1]), "var(--red)");
+}
+
+function passesMktFilter(c) {
+  if (mktFilters.q && !c.cliente.toLowerCase().includes(mktFilters.q)) return false;
+  if (mktFilters.agencia && c.agencia !== mktFilters.agencia) return false;
+  if (mktFilters.industria && c.industria !== mktFilters.industria) return false;
+  if (mktFilters.estado === "oportunidad" && c.estado === "con_agencia") return false;
+  if (mktFilters.estado === "con_agencia" && c.estado !== "con_agencia") return false;
+  return true;
+}
+
+function renderMercadoTable() {
+  const filtered = RADAR_MERCADO.filter(passesMktFilter);
+  filtered.sort((a, b) => {
+    const rank = c => c.estado === "con_agencia" ? 1 : 0;
+    if (rank(a) !== rank(b)) return rank(a) - rank(b);
+    return a.cliente.localeCompare(b.cliente, "es");
+  });
+  document.getElementById("mktCount").textContent = filtered.length + " de " + RADAR_MERCADO.length + " anunciantes";
+  document.getElementById("mktBody").innerHTML = filtered.map(c => {
+    let statusHtml;
+    if (c.estado === "con_agencia") {
+      const col = agencyColor(c.agencia);
+      statusHtml = `<span class="pill" style="background:${col}26; color:${col}; border:0.5px solid ${col}88;">${esc(c.agencia)}</span>`;
+    } else if (c.estado === "disponible") {
+      statusHtml = '<span class="pill available">Disponible</span>';
+    } else {
+      statusHtml = '<span class="pill unknown">Sin dato</span>';
+    }
+    const fecha = c.fecha_ref ? esc(c.fecha_ref) : "—";
+    const detalle = [c.productos, ...(c.historia || [])].filter(Boolean).join(" · ");
+    return `<tr>
+      <td class="client-name">${esc(c.cliente)}</td>
+      <td><span class="pill industry">${esc(c.industria)}</span></td>
+      <td>${statusHtml}</td>
+      <td>${fecha}</td>
+      <td class="mkt-note">${esc(detalle)}</td>
+    </tr>`;
+  }).join("");
+}
+
+function renderMercado() {
+  renderMercadoKPIs();
+  renderMercadoChart();
+  renderMercadoTable();
+}
+
+function bindMercadoFilters() {
+  document.getElementById("mktSearch").addEventListener("input", e => {
+    mktFilters.q = e.target.value.trim().toLowerCase();
+    renderMercadoTable();
+  });
+  document.getElementById("mktAgenciaFilter").addEventListener("change", e => {
+    mktFilters.agencia = e.target.value;
+    renderMercadoTable();
+  });
+  document.getElementById("mktIndustriaFilter").addEventListener("change", e => {
+    mktFilters.industria = e.target.value;
+    renderMercadoTable();
+  });
+  document.getElementById("mktEstadoFilter").addEventListener("change", e => {
+    mktFilters.estado = e.target.value;
+    renderMercadoTable();
+  });
+}
+
+function switchTab(tab) {
+  document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+  document.getElementById("tab-" + tab).classList.add("active");
+  document.getElementById("btn-" + tab).classList.add("active");
+}
+
+function toggleTheme() {
+  const root = document.documentElement;
+  const current = root.getAttribute("data-theme");
+  root.setAttribute("data-theme", current === "light" ? "dark" : "light");
+}
+
+renderAll();
+tryLoadLive();
+initMercadoFilters();
+bindMercadoFilters();
+renderMercado();
+</script>
+</body>
+</html>
