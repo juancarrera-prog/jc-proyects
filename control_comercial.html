@@ -996,12 +996,12 @@ function getVsBadge(raw) {
   if (!raw && raw !== 0) return '<span class="badge neutral">—</span>';
   const v = parseFloat(String(raw).replace('%','').replace(',','.'));
   if (isNaN(v)) return '<span class="badge neutral">—</span>';
-  // Si es exactamente 0: guión blanco
-  if (v === 0) return '<span class="badge neutral">— 0,0%</span>';
-  // Mayor a 0: flechita arriba, verde, con +
-  if (v > 0) return `<span class="badge green">▲ ${v.toFixed(1)}%</span>`;
-  // Menor a 0: flechita abajo, rojo
-  return `<span class="badge red">▼ ${Math.abs(v).toFixed(1)}%</span>`;
+  // Mismos rangos que los velocímetros: 🔴 ≤-10% · 🟡 -10% a -1% · 🟢 ≥-1%
+  const color = getGaugeColor(v, 'pct_deviation');
+  const clase = color === '#00c853' ? 'green' : color === '#f5c400' ? 'yellow' : 'red';
+  if (v === 0) return `<span class="badge ${clase}">— 0,0%</span>`;
+  const flecha = v > 0 ? '▲' : '▼';
+  return `<span class="badge ${clase}">${flecha} ${Math.abs(v).toFixed(1)}%</span>`;
 }
 function getProgressBar(raw) {
   if (!raw && raw !== 0) return '<span style="color:var(--text-muted)">—</span>';
@@ -1197,7 +1197,7 @@ function renderTablas(data) {
         <td class="num">${fmtCC(r.presupAnual)}</td><td class="num">${fmtCC(r.cmb)}</td>
         <td class="num" style="color:#ccc">${r.cmbPct||'—'}</td>
         <td class="num" style="color:var(--text-muted)">${r.cmbPresup!=null?fmtCC(r.cmbPresup):'—'}</td>
-        <td class="num" style="color:${r.vsCmb!=null?(parseFloat(r.vsCmb)>=0?'#00c853':'#ff4455'):'var(--text-muted)'}">${r.vsCmb!=null?(parseFloat(r.vsCmb)>=0?'+':'')+parseFloat(r.vsCmb).toFixed(1)+'%':'—'}</td>
+        <td class="num" style="color:${r.vsCmb!=null?getGaugeColor(r.vsCmb,'pct_deviation'):'var(--text-muted)'}">${r.vsCmb!=null?(parseFloat(r.vsCmb)>=0?'+':'')+parseFloat(r.vsCmb).toFixed(1)+'%':'—'}</td>
         <td class="num">${fmtFte(r.fteAnt)}</td><td class="num">${fmtFte(r.fteAct)}</td>
         <td>${fmtVsMes(r.vsMes)}</td><td class="num">${fmtFte(r.fteTotal)}</td>
       </tr>`;
