@@ -255,8 +255,8 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
       <span class="filter-label">Director</span>
       <button class="dir-btn active" onclick="filtrarDirector('todos', this)">Todos</button>
       <button class="dir-btn" onclick="filtrarDirector('mechi', this)">🔴 Mechi · Bagó</button>
-      <button class="dir-btn" onclick="filtrarDirector('dani', this)">🔵 Dani · BP / LP / Pfizer</button>
-      <button class="dir-btn" onclick="filtrarDirector('jp', this)">🟢 JP · McCain / Escorial / UA</button>
+      <button class="dir-btn" onclick="filtrarDirector('dani', this)">🔵 Dani · BP / LP / Pfizer / Marfrig / Molino</button>
+      <button class="dir-btn" onclick="filtrarDirector('jp', this)">🟢 JP · McCain / Escorial / UA / Novo Nordisk / Goodyear / Loma Negra</button>
     </div>
 
     <div class="director-filter">
@@ -776,7 +776,7 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
    DATOS & CONFIGURACIÓN
 ═══════════════════════════════════════════════════════════ */
 const API_URL    = 'https://script.google.com/macros/s/AKfycbyJ7ziLiqqBqpld84Rjybve2ZCMIasb2SRUFu2hLAKPHhoazEyLuD3Sq0SRMPffuX22yQ/exec'; // Script Control Comercial
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyQ0ksmHnLh-7_U45q7aj2Q28JqX-usXT53lKlCTIN62GL7gO0AJkcK-lsgNttjwP3qxg/exec'; // Script Rentabilidad (GET+POST)
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyEfZdvqXZ-_G5mn6BtppHHr7ybT-2S0-sd3jpk68PIBpaIfbGosdamtuj1MXI_iC1Czg/exec'; // Script Rentabilidad (GET+POST)
 const WEBHOOK_URL = '';
 
 const OH_EQUIPO = 1.23;   // Overhead Rentabilidad de Equipo (123%)
@@ -907,6 +907,11 @@ const DIRECTORES = {
   'McCain':               { dir:'jp',    color:'#00c853', nombre:'JP' },
   'Escorial':             { dir:'jp',    color:'#00c853', nombre:'JP' },
   'Universal Assistance': { dir:'jp',    color:'#00c853', nombre:'JP' },
+  'Novo Nordisk':         { dir:'jp',    color:'#00c853', nombre:'JP' },
+  'Marfrig':              { dir:'dani',  color:'#4444ff', nombre:'Dani' },
+  'Goodyear':             { dir:'jp',    color:'#00c853', nombre:'JP' },
+  'Loma Negra':           { dir:'jp',    color:'#00c853', nombre:'JP' },
+  'Molino Cañuelas':      { dir:'dani',  color:'#4444ff', nombre:'Dani' },
 };
 
 // ── TABLA MAESTRA COSTO COMPAÑÍA ──
@@ -2723,7 +2728,7 @@ function _cmbInvSobreMeses(nombre, meses) {
 
 function calcRentabilidad() {
   const meses = MESES_RENT_SELECCIONADOS.length ? MESES_RENT_SELECCIONADOS : _mesesPorDefecto();
-  return Object.keys(DIRECTORES).map(nombre => {
+  return CLIENTES_COMERCIAL.map(nombre => {
     let totalCosto = 0, totalFte = 0;
     meses.forEach(m => {
       totalCosto += calcCostoEquipoCliente(nombre, m);
@@ -2847,7 +2852,7 @@ function renderChart(rows) {
 function renderClienteSelector() {
   const cont = document.getElementById('clienteSelector');
   if (!cont) return;
-  cont.innerHTML = Object.keys(DIRECTORES).map(nombre => {
+  cont.innerHTML = CLIENTES_COMERCIAL.map(nombre => {
     const d=DIRECTORES[nombre]||{}, isActive=nombre===clienteDetalleActivo;
     return `<button class="cli-btn${isActive?' active':''}" style="${isActive?'background:'+d.color+';border-color:'+d.color+';color:white':''}" onclick="selectCliente('${nombre}',this,'${d.color||'#606060'}')">${nombre}</button>`;
   }).join('');
