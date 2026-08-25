@@ -1146,21 +1146,25 @@ function renderKPIsComercial(clientes) {
     }
   }
 
-  // Render Big7 donuts — usar variables disponibles en este scope
-  const b7vsPct = tPresup > 0 ? ((tInv - tPresup) / tPresup) * 100 : null;
-  const b7vsCmb = tCmbPresup > 0 ? ((tCmb - tCmbPresup) / tCmbPresup) * 100 : null;
-  const b7cmbPct = tInv > 0 ? (tCmb / tInv) * 100 : null;
-  const b7cons = clientes.length > 0
-    ? clientes.reduce((a,r) => a + (parseFloat(r.consumidoAnual)||0), 0) / clientes.length
+  // Render Big7 donuts — SOLO los 7 clientes originales (Bagó...Universal Assistance),
+  // no toda la tabla Clientes (que ahora incluye Novo Nordisk/Marfrig/Goodyear/Loma Negra/Molino)
+  const clientesBig7 = clientes.filter(r => CLIENTES_COMERCIAL.includes(r.nombre));
+  let b7Inv=0, b7Presup=0, b7Cmb=0, b7CmbPresup=0;
+  clientesBig7.forEach(r => { b7Inv += parseFloat(r.inv)||0; b7Presup += parseFloat(r.presup)||0; b7Cmb += parseFloat(r.cmb)||0; b7CmbPresup += parseFloat(r.cmbPresup||0); });
+  const b7vsPct = b7Presup > 0 ? ((b7Inv - b7Presup) / b7Presup) * 100 : null;
+  const b7vsCmb = b7CmbPresup > 0 ? ((b7Cmb - b7CmbPresup) / b7CmbPresup) * 100 : null;
+  const b7cmbPct = b7Inv > 0 ? (b7Cmb / b7Inv) * 100 : null;
+  const b7cons = clientesBig7.length > 0
+    ? clientesBig7.reduce((a,r) => a + (parseFloat(r.consumidoAnual)||0), 0) / clientesBig7.length
     : null;
-  const b7presupAnual = clientes.reduce((a,r) => a + (parseFloat(r.presupAnual)||0), 0);
+  const b7presupAnual = clientesBig7.reduce((a,r) => a + (parseFloat(r.presupAnual)||0), 0);
   renderKPIsGauge({
-    inv: tInv, presup: tPresup,
+    inv: b7Inv, presup: b7Presup,
     vs: b7vsPct!=null ? b7vsPct.toFixed(1) : null,
     consumidoAnual: b7cons!=null ? b7cons.toFixed(1) : null,
-    presupAnual: b7presupAnual, cmb: tCmb,
+    presupAnual: b7presupAnual, cmb: b7Cmb,
     cmbPct: b7cmbPct!=null ? b7cmbPct.toFixed(1)+'%' : null,
-    cmbPresup: tCmbPresup,
+    cmbPresup: b7CmbPresup,
     vsCmb: b7vsCmb!=null ? b7vsCmb.toFixed(1)+'%' : null
   }, 'b7');
 
