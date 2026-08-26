@@ -491,10 +491,8 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
           <th class="num">Inv. Período</th><th class="num">Presup. Período</th>
           <th>Vs Presup.</th><th>Consumido Anual</th>
           <th class="num">Presup. Anual</th><th class="num">SOI Bagó</th>
-          <th class="num">FTE Ant.</th><th class="num">FTE Act.</th>
-          <th>Vs Mes</th><th class="num">FTE Total</th>
         </tr></thead>
-        <tbody id="tbodyBago"><tr class="loading-row"><td colspan="11">Cargando datos...</td></tr></tbody>
+        <tbody id="tbodyBago"><tr class="loading-row"><td colspan="7">Cargando datos...</td></tr></tbody>
       </table>
     </div>
 
@@ -1215,9 +1213,7 @@ function renderTablas(data) {
     <td>${getVsBadge(r.vs)}</td><td>${getProgressBar(r.consumidoAnual)}</td>
     <td class="num">${fmtCC(r.presupAnual)}</td>
     <td class="num" style="color:#ccc">${r.soi||'—'}</td>
-    <td class="num">${fmtFte(r.fteAnt)}</td><td class="num">${fmtFte(r.fteAct)}</td>
-    <td>${fmtVsMes(r.vsMes)}</td><td class="num">${fmtFte(r.fteTotal)}</td>
-  </tr>`).join('') : '<tr class="loading-row"><td colspan="11" style="color:var(--text-muted)">Sin datos</td></tr>';
+  </tr>`).join('') : '<tr class="loading-row"><td colspan="7" style="color:var(--text-muted)">Sin datos</td></tr>';
 }
 
 async function enviarAlertas() {
@@ -2112,7 +2108,7 @@ async function loadData() {
   } catch(e) {
     console.error('loadData error:', e);
     document.getElementById('tbodyClientes').innerHTML = '<tr class="loading-row"><td colspan="11" style="color:#ff4455">No se pudo conectar: '+e.message+'</td></tr>';
-    document.getElementById('tbodyBago').innerHTML     = '<tr class="loading-row"><td colspan="11" style="color:#ff4455">Error de conexion: '+e.message+'</td></tr>';
+    document.getElementById('tbodyBago').innerHTML     = '<tr class="loading-row"><td colspan="7" style="color:#ff4455">Error de conexion: '+e.message+'</td></tr>';
     document.getElementById('periodoLabel').textContent = 'Sin conexion';
   }
 
