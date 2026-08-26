@@ -466,10 +466,8 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
           <th class="num">Presup. Anual</th><th class="num">CMB $</th><th class="num">CMB %</th>
             <th class="num">CMB $ Presup</th>
             <th class="num">Vs CMB Presup</th>
-            <th class="num">FTE Ant.</th><th class="num">FTE Act.</th>
-          <th>Vs Mes</th><th class="num">FTE Total</th>
         </tr></thead>
-        <tbody id="tbodyClientes"><tr class="loading-row"><td colspan="15">Cargando datos...</td></tr></tbody>
+        <tbody id="tbodyClientes"><tr class="loading-row"><td colspan="11">Cargando datos...</td></tr></tbody>
       </table>
     </div>
 
@@ -1189,7 +1187,7 @@ function renderTablas(data) {
 
   const tbody = document.getElementById('tbodyClientes');
   if (!filt.length) {
-    tbody.innerHTML = '<tr class="loading-row"><td colspan="15" style="color:var(--text-muted)">Sin datos para este director</td></tr>';
+    tbody.innerHTML = '<tr class="loading-row"><td colspan="11" style="color:var(--text-muted)">Sin datos para este director</td></tr>';
   } else {
     let html = filt.map(r => {
       const d = DIRECTORES[r.nombre] || {};
@@ -1202,13 +1200,11 @@ function renderTablas(data) {
         <td class="num" style="color:#ccc">${r.cmbPct||'—'}</td>
         <td class="num" style="color:var(--text-muted)">${r.cmbPresup!=null?fmtCC(r.cmbPresup):'—'}</td>
         <td class="num" style="color:${r.vsCmb!=null?getGaugeColor(r.vsCmb,'pct_deviation'):'var(--text-muted)'}">${r.vsCmb!=null?(parseFloat(r.vsCmb)>=0?'+':'')+parseFloat(r.vsCmb).toFixed(1)+'%':'—'}</td>
-        <td class="num">${fmtFte(r.fteAnt)}</td><td class="num">${fmtFte(r.fteAct)}</td>
-        <td>${fmtVsMes(r.vsMes)}</td><td class="num">${fmtFte(r.fteTotal)}</td>
       </tr>`;
     }).join('');
-    let tI=0,tP=0,tF=0,tCmbTot=0,tCmbPresupTot=0;
-    filt.forEach(r => { tI+=parseFloat(r.inv||0); tP+=parseFloat(r.presup||0); tF+=parseFloat(r.fteAct||0); tCmbTot+=parseFloat(r.cmb||0); tCmbPresupTot+=parseFloat(r.cmbPresup||0); });
-    html += `<tr class="total-row"><td colspan="2">TOTAL</td><td class="num">${fmtCC(tI)}</td><td class="num">${fmtCC(tP)}</td><td colspan="2"></td><td></td><td class="num">${fmtCC(tCmbTot)}</td><td></td><td class="num">${fmtCC(tCmbPresupTot)}</td><td></td><td></td><td class="num"><span style="color:#ccc">${tF.toFixed(2)}</span></td><td colspan="2"></td></tr>`;
+    let tI=0,tP=0,tCmbTot=0,tCmbPresupTot=0;
+    filt.forEach(r => { tI+=parseFloat(r.inv||0); tP+=parseFloat(r.presup||0); tCmbTot+=parseFloat(r.cmb||0); tCmbPresupTot+=parseFloat(r.cmbPresup||0); });
+    html += `<tr class="total-row"><td colspan="2">TOTAL</td><td class="num">${fmtCC(tI)}</td><td class="num">${fmtCC(tP)}</td><td colspan="2"></td><td></td><td class="num">${fmtCC(tCmbTot)}</td><td></td><td class="num">${fmtCC(tCmbPresupTot)}</td><td></td></tr>`;
     tbody.innerHTML = html;
   }
 
@@ -2115,7 +2111,7 @@ async function loadData() {
     if (raw.agencia) renderKPIsAgencia(raw.agencia);
   } catch(e) {
     console.error('loadData error:', e);
-    document.getElementById('tbodyClientes').innerHTML = '<tr class="loading-row"><td colspan="15" style="color:#ff4455">No se pudo conectar: '+e.message+'</td></tr>';
+    document.getElementById('tbodyClientes').innerHTML = '<tr class="loading-row"><td colspan="11" style="color:#ff4455">No se pudo conectar: '+e.message+'</td></tr>';
     document.getElementById('tbodyBago').innerHTML     = '<tr class="loading-row"><td colspan="11" style="color:#ff4455">Error de conexion: '+e.message+'</td></tr>';
     document.getElementById('periodoLabel').textContent = 'Sin conexion';
   }
