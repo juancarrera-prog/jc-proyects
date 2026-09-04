@@ -1336,100 +1336,157 @@ function enviarResumenEjecutivo() {
     return;
   }
 
-  const periodo = DATA.periodo || 'Período actual';
-  const ag      = DATA.agencia || {};
+  const ag       = DATA.agencia || {};
   const clientes = DATA.clientes || [];
 
   // ── HELPERS ──
   const fmt    = v => v != null ? '$' + parseFloat(v).toLocaleString('es-AR',{minimumFractionDigits:1,maximumFractionDigits:1}) + ' M' : '—';
-  const fmtN   = v => v != null ? parseFloat(v).toLocaleString('es-AR',{minimumFractionDigits:1,maximumFractionDigits:1}) : '—';
   const arrow  = v => parseFloat(v) >= 0 ? '▲' : '▼';
   const bar    = (v, max=100) => { const n=Math.round(Math.min(Math.abs(parseFloat(v)||0),max)/max*8); return '█'.repeat(n)+'░'.repeat(8-n); };
   const sfB7   = v => parseFloat(v)>35?'🟢':parseFloat(v)>=30?'🟡':'🔴';
   const sfPerf = v => parseFloat(v)>=25?'🟢':parseFloat(v)>0?'🟡':'🔴';
+  const pad    = (s,n) => String(s).padEnd(n);
+
+  // Título de período legible: "Enero a Julio 2026" en vez de "Ene+Feb+...+Jul 2026"
+  const mesesSel = MESES_CC_SELECCIONADOS.length ? MESES_CC_SELECCIONADOS : _mesesPorDefecto();
+  const periodoTitulo = mesesSel.length > 1
+    ? `${mesesSel[0]} a ${mesesSel[mesesSel.length-1]} 2026`
+    : `${mesesSel[0]} 2026`;
 
   // ── TOTAL AGENCIA ──
   const agVs     = parseFloat(ag.vs||0);
   const agVsCmb  = parseFloat(String(ag.vsCmb||'0').replace('%',''));
-  const agCmbPct = parseFloat(String(ag.cmbPct||'0').replace('%',''));
   const agCons   = parseFloat(ag.consumidoAnual||0);
 
-  // ── BIG 7 ──
-  const rowsB7 = calcRentabilidad();
+  // ── BIG 7 (siempre los 7 originales — CLIENTES_COMERCIAL, nunca los 12 de la tabla) ──
+  const rowsB7 = calcRentabilidad(); // ya viene restringido a CLIENTES_COMERCIAL
+  const b7ClienteData = CLIENTES_COMERCIAL.map(n => clientes.find(c=>c.nombre===n)).filter(Boolean);
+  const tB7Inv = b7ClienteData.reduce((a,c)=>a+(parseFloat(c.inv)||0),0);
+  const tB7Presup = b7ClienteData.reduce((a,c)=>a+(parseFloat(c.presup)||0),0);
+  const tB7Cmb = rowsB7.reduce((a,r)=>a+(r.cmb||0),0);
+  const tB7CmbPresup = b7ClienteData.reduce((a,c)=>a+(parseFloat(c.cmbPresup)||0),0);
+  const tB7VsPct = tB7Presup>0 ? ((tB7Inv-tB7Presup)/tB7Presup)*100 : 0;
+  const tB7CmoPromedio = rowsB7.length ? rowsB7.reduce((a,r)=>a+(r.inv>0?(r.cm/r.inv)*100:0),0)/rowsB7.length : 0;
 
-  // Facturación
-  const facLines = clientes.map(c => {
+  const facLines = b7ClienteData.map(c => {
     const vsP = parseFloat(c.vs||0);
-    return `${c.nombre.padEnd(22)}: ${fmt(c.inv)}  |  ${arrow(vsP)} ${Math.abs(vsP).toFixed(1)}%`;
+    return `${pad(c.nombre,22)}: ${fmt(c.inv)}  |  ${arrow(vsP)} ${Math.abs(vsP).toFixed(1)}%`;
   }).join('\n');
 
-  // CMB y CMO sin OH
   const cmbLines = rowsB7.map(r => {
     const cd     = clientes.find(c=>c.nombre===r.nombre)||{};
     const cmbPct = parseFloat(String(cd.cmbPct||'0').replace('%',''));
     const vsCmb  = parseFloat(String(cd.vsCmb||'0').replace('%',''));
-    const cmoPct = r.inv>0 ? (r.cm/r.inv)*100 : 0; // Sin OH: cm ya es cmb-costoEq sin OH
-    return `${r.nombre.padEnd(22)}: CMB ${cmbPct.toFixed(1)}%  ${arrow(vsCmb)} ${Math.abs(vsCmb).toFixed(1)}%  |  CMO ${cmoPct.toFixed(1)}% ${sfB7(cmoPct)}`;
+    const cmoPct = r.inv>0 ? (r.cm/r.inv)*100 : 0;
+    return `${pad(r.nombre,22)}: CMB ${cmbPct.toFixed(1)}%  ${arrow(vsCmb)} ${Math.abs(vsCmb).toFixed(1)}%  |  CMO ${cmoPct.toFixed(1)}% ${sfB7(cmoPct)}`;
   }).join('\n');
 
-  // FTE último mes y total
-  const fteLines = clientes.map(c => {
-    const fteAnt = parseFloat(c.fteAnt||0);
-    const fteAct = parseFloat(c.fteAct||0);
-    const fteTot = parseFloat(c.fteTotal||0);
-    const ftePct = fteAnt>0 ? ((fteAct-fteAnt)/fteAnt)*100 : 0;
-    return `${c.nombre.padEnd(22)}: ${fteAct.toFixed(2)}  ${arrow(ftePct)} ${Math.abs(ftePct).toFixed(1)}%  |  Total: ${fteTot.toFixed(2)}`;
-  }).join('\n');
+  // ── PERFORMANCE — Con OH y Sin OH, sin Bagó (todavía no tiene Fee cargado en Performance) ──
+  const mesesPerf = MESES_PERF_SELECCIONADOS.length ? MESES_PERF_SELECCIONADOS : _mesesPorDefecto();
+  const perfBase = Object.keys(DIRECTORES_PERF).filter(n => n !== 'Bagó').map(nombre => {
+    let totalCosto=0, fee=0;
+    mesesPerf.forEach(m=>{
+      totalCosto += calcCostoEquipoPerf(nombre,m);
+      fee += (INGRESOS_PERF[nombre]&&INGRESOS_PERF[nombre][m])||0;
+    });
+    return {nombre, fee, costoEq: totalCosto};
+  }).filter(r=>r.fee>0);
 
-  // ── PERFORMANCE con OH ──
-  const rowsPerf = calcRentabilidadPerf();
-  const perfData = rowsPerf.filter(r=>r.ingresos>0).map(r => {
+  const rowsPerf = perfBase.map(r => {
     const costoOH = r.costoEq*(1+OH_PERF);
-    const cmoOH   = r.ingresos - costoOH;
-    const pctOH   = r.ingresos>0 ? (cmoOH/r.ingresos)*100 : 0;
-    return {nombre:r.nombre, cmoOH, pctOH};
+    const cmoOH   = r.fee - costoOH;
+    const pctOH   = r.fee>0 ? (cmoOH/r.fee)*100 : 0;
+    return {nombre:r.nombre, fee:r.fee, cmoOH, pctOH};
   }).sort((a,b)=>b.pctOH-a.pctOH);
 
-  const perfLines = perfData.length > 0
-    ? perfData.map(r => `${r.nombre.padEnd(22)}: ${fmt(r.cmoOH)}  |  ${r.pctOH.toFixed(1)}% ${sfPerf(r.pctOH)}`).join('\n')
+  const tPerfFee        = perfBase.reduce((a,r)=>a+r.fee,0);
+  const tPerfCostoOH    = perfBase.reduce((a,r)=>a+r.costoEq*(1+OH_PERF),0);
+  const tPerfCostoSinOH = perfBase.reduce((a,r)=>a+r.costoEq,0);
+  const tPerfCmoOH      = tPerfFee - tPerfCostoOH;
+  const tPerfCmoSinOH   = tPerfFee - tPerfCostoSinOH;
+  const tPerfPctOH      = tPerfFee>0 ? (tPerfCmoOH/tPerfFee)*100 : 0;
+  const tPerfPctSinOH   = tPerfFee>0 ? (tPerfCmoSinOH/tPerfFee)*100 : 0;
+
+  const perfLines = rowsPerf.length > 0
+    ? rowsPerf.map(r => `${pad(r.nombre,22)}: ${fmt(r.cmoOH)}  |  ${r.pctOH.toFixed(1)}% ${sfPerf(r.pctOH)}`).join('\n')
     : '  Sin datos de Fee cargados en esta sesión.';
 
-  // ── CONSTRUIR MENSAJE ──
+  // ── SOCIAL — Sin OH, con un segundo total que incluye el costo de Ignis M&C (sin Fee propio) ──
+  const mesesSocial = MESES_SOCIAL_SELECCIONADOS.length ? MESES_SOCIAL_SELECCIONADOS : _mesesPorDefecto();
+  const socialBase = Object.keys(DIRECTORES_SOCIAL).map(nombre => {
+    let totalCosto=0, fee=0;
+    mesesSocial.forEach(m=>{
+      totalCosto += calcCostoEquipoSocial(nombre,m);
+      fee += (INGRESOS_SOCIAL[nombre]&&INGRESOS_SOCIAL[nombre][m])||0;
+    });
+    return {nombre, fee, costoEq: totalCosto};
+  });
+  const socialConFee = socialBase.filter(r=>r.nombre!=='Ignis M&C' && r.fee>0);
+
+  const rowsSocial = socialConFee.map(r => {
+    const cmo = r.fee - r.costoEq; // Sin OH
+    const pct = r.fee>0 ? (cmo/r.fee)*100 : 0;
+    return {nombre:r.nombre, fee:r.fee, cmo, pct};
+  }).sort((a,b)=>b.pct-a.pct);
+
+  const tSocialFee    = socialConFee.reduce((a,r)=>a+r.fee,0);
+  const tSocialCosto  = socialConFee.reduce((a,r)=>a+r.costoEq,0);
+  const tSocialCmo    = tSocialFee - tSocialCosto;
+  const tSocialPct    = tSocialFee>0 ? (tSocialCmo/tSocialFee)*100 : 0;
+
+  const ignisRow          = socialBase.find(r=>r.nombre==='Ignis M&C');
+  const tSocialCostoIgnis = tSocialCosto + (ignisRow ? ignisRow.costoEq : 0);
+  const tSocialCmoIgnis   = tSocialFee - tSocialCostoIgnis; // Ignis M&C no tiene Fee propio, solo suma costo
+  const tSocialPctIgnis   = tSocialFee>0 ? (tSocialCmoIgnis/tSocialFee)*100 : 0;
+
+  const socialLines = rowsSocial.length > 0
+    ? rowsSocial.map(r => `${pad(r.nombre,22)}: ${fmt(r.cmo)}  |  ${r.pct.toFixed(1)}% ${sfPerf(r.pct)}`).join('\n')
+    : '  Sin datos de Fee cargados en esta sesión.';
+
+  // ── CONSTRUIR MENSAJE — de lo general a lo específico, totales arriba + detalle abajo en cada sección ──
   const msg = [
-    `*RESUMEN EJECUTIVO — Enero a ${periodo}*`,
+    `*RESUMEN EJECUTIVO — ${periodoTitulo}*`,
     `Ignis Media Agency · Control Comercial`,
     ``,
-    `*TOTAL AGENCIA*`,
+    `*1. TOTAL AGENCIA*`,
     `────────────────────────────`,
     `Inversión:       ${fmt(ag.inv)}  ${arrow(agVs)} ${Math.abs(agVs).toFixed(1)}% vs Presup`,
     `CMB:             ${fmt(ag.cmb)}  ${arrow(agVsCmb)} ${Math.abs(agVsCmb).toFixed(1)}% vs Presup`,
     `Consumido anual: ${agCons.toFixed(1)}%  ${bar(agCons)}`,
     ``,
-    `*CLIENTES BIG 7*`,
-    ``,
-    `FACTURACIÓN (Vs Presupuesto)`,
+    `*2. CLIENTES BIG 7*`,
     `────────────────────────────`,
+    `Inversión: ${fmt(tB7Inv)}  ${arrow(tB7VsPct)} ${Math.abs(tB7VsPct).toFixed(1)}% vs Presup  |  CMB: ${fmt(tB7Cmb)}  |  CMO promedio: ${tB7CmoPromedio.toFixed(1)}% ${sfB7(tB7CmoPromedio)}`,
+    ``,
+    `Facturación (Vs Presupuesto)`,
     `\`\`\``,
     facLines,
     `\`\`\``,
     ``,
     `CMB y CMO (Vs Presupuesto, Sin OH)`,
-    `────────────────────────────`,
     `\`\`\``,
     cmbLines,
     `\`\`\``,
     ``,
-    `FTE último mes y Total`,
+    `*3. PERFORMANCE (sin Bagó)*`,
     `────────────────────────────`,
-    `\`\`\``,
-    fteLines,
-    `\`\`\``,
+    `Con OH:  Fee: ${fmt(tPerfFee)}  |  Costo: ${fmt(tPerfCostoOH)}  |  CMO: ${fmt(tPerfCmoOH)}  |  CMO%: ${tPerfPctOH.toFixed(1)}% ${sfPerf(tPerfPctOH)}`,
+    `Sin OH:  Fee: ${fmt(tPerfFee)}  |  Costo: ${fmt(tPerfCostoSinOH)}  |  CMO: ${fmt(tPerfCmoSinOH)}  |  CMO%: ${tPerfPctSinOH.toFixed(1)}% ${sfPerf(tPerfPctSinOH)}`,
     ``,
-    `*PERFORMANCE — CMO $ y CMO % (Con OH)*`,
-    `────────────────────────────`,
     `\`\`\``,
     perfLines,
     `\`\`\``,
+    ``,
+    `*4. SOCIAL (Sin OH)*`,
+    `────────────────────────────`,
+    `Fee: ${fmt(tSocialFee)}  |  Costo: ${fmt(tSocialCosto)}  |  CMO: ${fmt(tSocialCmo)}  |  CMO%: ${tSocialPct.toFixed(1)}% ${sfPerf(tSocialPct)}`,
+    ``,
+    `\`\`\``,
+    socialLines,
+    `\`\`\``,
+    ``,
+    `Incluyendo Ignis M&C (sin Fee propio, solo suma costo):`,
+    `Fee: ${fmt(tSocialFee)}  |  Costo: ${fmt(tSocialCostoIgnis)}  |  CMO: ${fmt(tSocialCmoIgnis)}  |  CMO%: ${tSocialPctIgnis.toFixed(1)}% ${sfPerf(tSocialPctIgnis)}`,
     ``,
     `────────────────────────────`,
     `_Generado automáticamente · Control Comercial Ignis_`
