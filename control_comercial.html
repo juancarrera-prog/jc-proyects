@@ -1525,22 +1525,9 @@ function enviarResumenEjecutivo() {
   }
   document.getElementById('resumenEjecutivoTexto').value = msg;
   panel.style.display = 'flex';
-
-  const htmlBody = slackMsgToHtmlEmail(msg);
-  fetch(SCRIPT_URL, {
-    method: 'POST',
-    headers: {'Content-Type': 'text/plain'},
-    body: JSON.stringify({
-      tipo: 'enviar_resumen_email',
-      data: { subject: `Resumen Ejecutivo — ${periodoTitulo}`, htmlBody, plainBody: msg }
-    })
-  })
-  .then(r => r.json())
-  .then(r => {
-    if (r.ok) alert('✅ Resumen enviado por mail a Juanchi.');
-    else alert('❌ Error al enviar: ' + (r.error || 'desconocido'));
-  })
-  .catch(() => alert('❌ Error de conexión al enviar el mail.'));
+  // El botón solo arma y muestra el texto acá (id="resumenEjecutivoTexto").
+  // El envío del mail lo hace Cowork con su propia conexión de Gmail — no depende
+  // de ningún permiso de Apps Script, evita todo el lío de autorización.
 }
 
 // Convierte el texto estilo Slack (*negrita*, ```bloques```) a un HTML de mail
