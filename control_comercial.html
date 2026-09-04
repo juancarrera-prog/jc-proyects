@@ -772,7 +772,7 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
    DATOS & CONFIGURACIÓN
 ═══════════════════════════════════════════════════════════ */
 const API_URL    = 'https://script.google.com/macros/s/AKfycbyJ7ziLiqqBqpld84Rjybve2ZCMIasb2SRUFu2hLAKPHhoazEyLuD3Sq0SRMPffuX22yQ/exec'; // Script Control Comercial
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyEfZdvqXZ-_G5mn6BtppHHr7ybT-2S0-sd3jpk68PIBpaIfbGosdamtuj1MXI_iC1Czg/exec'; // Script Rentabilidad (GET+POST)
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSG0PNjB1ziFAQGu50fhz-AOjY_FrHW387JU3YMLxHShw2yWOfAOpnfBMQo0f9hIRa3A/exec'; // Script Rentabilidad (GET+POST)
 const WEBHOOK_URL = '';
 
 const OH_EQUIPO = 1.23;   // Overhead Rentabilidad de Equipo (123%)
@@ -1494,17 +1494,72 @@ function enviarResumenEjecutivo() {
     `_Generado automáticamente · Control Comercial Ignis_`
   ].join('\n');
 
-  const SLACK_PROXY = 'https://script.google.com/macros/s/AKfycbwdEWqrT2eb9S_UN5v0y716-GUvfxvaaK5ERCqhGQ-EqSe0KQ4pMRiiqQguWTUjfx9QTg/exec';
-  fetch(SLACK_PROXY, {
+  // Muestra el texto en pantalla (además de mandarlo por mail) — así queda visible
+  // para copiar a mano, o para que un agente de navegador (ej. Claude en Chrome / Cowork)
+  // pueda leerlo del DOM y reenviarlo por otro medio (mail, etc.) sin tener que re-derivar
+  // ningún cálculo.
+  let panel = document.getElementById('resumenEjecutivoPanel');
+  if (!panel) {
+    panel = document.createElement('div');
+    panel.id = 'resumenEjecutivoPanel';
+    panel.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+    panel.innerHTML = `
+      <div style="background:var(--surface,#161616);border:1px solid var(--border,#2a2a2a);border-radius:14px;max-width:720px;width:100%;max-height:85vh;display:flex;flex-direction:column">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border,#2a2a2a)">
+          <b style="color:#fff">Resumen Ejecutivo — texto completo</b>
+          <div style="display:flex;gap:8px">
+            <button id="btnCopiarResumen" style="background:#aa44ff;border:none;border-radius:8px;padding:6px 14px;color:#fff;cursor:pointer;font-size:12px">📋 Copiar</button>
+            <button id="btnCerrarResumen" style="background:var(--surface2,#1f1f1f);border:1px solid var(--border,#2a2a2a);border-radius:8px;padding:6px 14px;color:#fff;cursor:pointer;font-size:12px">✕ Cerrar</button>
+          </div>
+        </div>
+        <textarea id="resumenEjecutivoTexto" readonly style="flex:1;background:#0e0e0e;color:#e0e0e0;border:none;padding:20px;font-family:monospace;font-size:12.5px;white-space:pre-wrap;resize:none;min-height:400px"></textarea>
+      </div>`;
+    document.body.appendChild(panel);
+    document.getElementById('btnCerrarResumen').onclick = () => panel.style.display = 'none';
+    document.getElementById('btnCopiarResumen').onclick = () => {
+      document.getElementById('resumenEjecutivoTexto').select();
+      document.execCommand('copy');
+      document.getElementById('btnCopiarResumen').textContent = '✅ Copiado';
+      setTimeout(() => { document.getElementById('btnCopiarResumen').textContent = '📋 Copiar'; }, 1500);
+    };
+  }
+  document.getElementById('resumenEjecutivoTexto').value = msg;
+  panel.style.display = 'flex';
+
+  const htmlBody = slackMsgToHtmlEmail(msg);
+  fetch(SCRIPT_URL, {
     method: 'POST',
     headers: {'Content-Type': 'text/plain'},
-    body: JSON.stringify({ type: 'slack_resumen', mensaje: msg })
+    body: JSON.stringify({
+      tipo: 'enviar_resumen_email',
+      data: { subject: `Resumen Ejecutivo — ${periodoTitulo}`, htmlBody, plainBody: msg }
+    })
   })
+  .then(r => r.json())
   .then(r => {
-    if (r.ok) alert('✅ Resumen enviado a Slack.');
-    else alert('❌ Error al enviar.');
+    if (r.ok) alert('✅ Resumen enviado por mail a Juanchi.');
+    else alert('❌ Error al enviar: ' + (r.error || 'desconocido'));
   })
-  .catch(() => alert('❌ Error de conexión con Slack.'));
+  .catch(() => alert('❌ Error de conexión al enviar el mail.'));
+}
+
+// Convierte el texto estilo Slack (*negrita*, ```bloques```) a un HTML de mail
+// legible en fondo claro — mismo texto que se ve en el panel, una sola fuente de verdad.
+function slackMsgToHtmlEmail(text) {
+  const codeBlocks = [];
+  let working = text.replace(/```([\s\S]*?)```/g, (m, code) => {
+    codeBlocks.push(code.trim());
+    return `\u0000CODE${codeBlocks.length - 1}\u0000`;
+  });
+  working = working.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  working = working.replace(/\*(.+?)\*/g, '<b>$1</b>');
+  working = working.replace(/─+/g, '<hr style="border:none;border-top:1px solid #e0e0e0;margin:12px 0">');
+  working = working.replace(/\n/g, '<br>');
+  working = working.replace(/\u0000CODE(\d+)\u0000/g, (m, i) => {
+    const escapedCode = codeBlocks[i].replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return `<pre style="background:#f5f5f5;border:1px solid #e0e0e0;border-radius:8px;padding:12px 14px;font-family:monospace;font-size:12.5px;white-space:pre-wrap;color:#1a1a1a;margin:10px 0">${escapedCode}</pre>`;
+  });
+  return `<div style="font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;max-width:640px;margin:0 auto;background:#ffffff;color:#1a1a1a;padding:24px;line-height:1.7;font-size:14px">${working}</div>`;
 }
 
 
