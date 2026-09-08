@@ -1172,7 +1172,8 @@ function renderKPIsComercial(clientes) {
     badge.style.display = 'inline-flex';
     document.getElementById('alertItems').innerHTML = alertas.map(r => {
       const v = parseFloat(String(r.vs).replace('%','').replace(',','.'));
-      return `<div class="alert-item"><strong>${r.nombre}</strong>: Vs Presup. ${v.toFixed(1)}% · Inv $${(parseFloat(r.inv||0)/1000).toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2})} vs Presup $${(parseFloat(r.presup||0)/1000).toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>`;
+      const dif = (parseFloat(r.inv||0) - parseFloat(r.presup||0)) / 1000;
+      return `<div class="alert-item"><strong>${r.nombre}</strong>: Dif ${dif.toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2,signDisplay:'always'})}</div>`;
     }).join('');
   } else { panel.classList.remove('visible'); badge.style.display='none'; }
 }
