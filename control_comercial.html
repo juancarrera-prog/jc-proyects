@@ -1495,6 +1495,63 @@ function enviarResumenEjecutivo() {
     `_Generado automáticamente · Control Comercial Ignis_`
   ].join('\n');
 
+  // ── HTML lindo para el mail (fondo blanco, tablas reales, tarjetas de resumen) ──
+  // Mismo criterio de color que el resto del dashboard: verde/amarillo/rojo.
+  const colorSf = v => v === '🟢' ? '#1a8a4a' : v === '🟡' ? '#b8860b' : '#c0392b';
+  const rowsHtml = (arr) => arr.map((r,i) => `<tr style="${i%2? 'background:#fafafa;':''}"><td style="padding:6px 10px;width:44%;word-break:break-word">${r[0]}</td><td style="text-align:right;padding:6px 10px;width:28%;word-break:break-word">${r[1]}</td><td style="text-align:right;padding:6px 10px;width:28%;word-break:break-word;color:${r[3]?colorSf(r[3]):'#333'};font-weight:${r[3]?'600':'400'}">${r[2]}${r[3]||''}</td></tr>`).join('');
+  const tableHead = (c1,c2,c3) => `<tr style="background:#f5f5f5"><th style="text-align:left;padding:6px 10px;color:#666;font-weight:500;font-size:12px;width:44%">${c1}</th><th style="text-align:right;padding:6px 10px;color:#666;font-weight:500;font-size:12px;width:28%">${c2}</th><th style="text-align:right;padding:6px 10px;color:#666;font-weight:500;font-size:12px;width:28%">${c3}</th></tr>`;
+  const table = (head, rows) => `<table width="100%" cellpadding="0" cellspacing="0" style="width:100%;max-width:100%;min-width:0;table-layout:fixed;font-size:13px;border-collapse:collapse;margin-bottom:18px;border:1px solid #e5e5e5;border-radius:8px"><colgroup><col style="width:44%"><col style="width:28%"><col style="width:28%"></colgroup>${head}${rows}</table>`;
+  const h3 = t => `<h3 style="border-bottom:2px solid #1a1a1a;padding-bottom:6px;margin-top:26px;color:#1a1a1a;font-size:16px">${t}</h3>`;
+  const subtotal = (t) => `<p style="font-size:13.5px;color:#333;margin:4px 0 14px">${t}</p>`;
+
+  const facRows = rowsHtml(b7ClienteData.map(c => {
+    const vsP = parseFloat(c.vs||0);
+    return [c.nombre, fmt(c.inv), `${arrow(vsP)} ${Math.abs(vsP).toFixed(1)}%`, null];
+  }));
+  const cmbRows = rowsHtml(rowsB7.map(r => {
+    const cd = clientes.find(c=>c.nombre===r.nombre)||{};
+    const cmbPct = parseFloat(String(cd.cmbPct||'0').replace('%',''));
+    const cmoPct = r.inv>0 ? (r.cm/r.inv)*100 : 0;
+    return [r.nombre, `CMB ${cmbPct.toFixed(1)}%`, `${cmoPct.toFixed(1)}% CMO`, sfB7(cmoPct)];
+  }));
+  const perfRows = rowsHtml(rowsPerf.map(r => [r.nombre, fmt(r.cmoOH), `${r.pctOH.toFixed(1)}%`, sfPerf(r.pctOH)]));
+  const socialRows = rowsHtml(rowsSocial.map(r => [r.nombre, fmt(r.cmo), `${r.pct.toFixed(1)}%`, sfPerf(r.pct)]));
+
+  const htmlBonito = `<div style="font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;max-width:640px;margin:0 auto;background:#ffffff;color:#1a1a1a;padding:24px">
+    <h2 style="margin-bottom:2px;color:#1a1a1a">RESUMEN EJECUTIVO — ${periodoTitulo}</h2>
+    <p style="color:#666;margin-top:0">Ignis Media Agency · Control Comercial</p>
+
+    ${h3('1. Total Agencia')}
+    <table width="100%" cellpadding="0" cellspacing="0" style="width:100%;max-width:100%;min-width:0;table-layout:fixed;font-size:14px;border-collapse:collapse;margin-bottom:8px"><colgroup><col style="width:34%"><col style="width:33%"><col style="width:33%"></colgroup>
+      <tr><td style="padding:4px 0;color:#333">Inversión</td><td style="text-align:right;font-weight:600">${fmt(ag.inv)}</td><td style="text-align:right;word-break:break-word;color:${agVs>=0?'#1a8a4a':'#c0392b'}">${arrow(agVs)} ${Math.abs(agVs).toFixed(1)}% vs Presup</td></tr>
+      <tr><td style="padding:4px 0;color:#333">CMB</td><td style="text-align:right;font-weight:600">${fmt(ag.cmb)}</td><td style="text-align:right;word-break:break-word;color:${agVsCmb>=0?'#1a8a4a':'#c0392b'}">${arrow(agVsCmb)} ${Math.abs(agVsCmb).toFixed(1)}% vs Presup</td></tr>
+      <tr><td style="padding:4px 0;color:#333">Consumido anual</td><td colspan="2" style="text-align:right">${agCons.toFixed(1)}%</td></tr>
+    </table>
+
+    ${h3('2. Clientes Big 7')}
+    ${subtotal(`Inversión: <b>${fmt(tB7Inv)}</b> (${arrow(tB7VsPct)}${Math.abs(tB7VsPct).toFixed(1)}% vs Presup) · CMB: <b>${fmt(tB7Cmb)}</b> · CMO promedio: <b style="color:${colorSf(sfB7(tB7CmoPromedio))}">${tB7CmoPromedio.toFixed(1)}%</b>`)}
+    <p style="font-size:12px;text-transform:uppercase;color:#666;letter-spacing:1px;margin-bottom:4px">Facturación (Vs Presupuesto)</p>
+    ${table(tableHead('Cliente','Inversión','Vs Presup.'), facRows)}
+    <p style="font-size:12px;text-transform:uppercase;color:#666;letter-spacing:1px;margin-bottom:4px">CMB y CMO (Sin OH)</p>
+    ${table(tableHead('Cliente','CMB %','CMO %'), cmbRows)}
+
+    ${h3('3. Performance (sin Bagó)')}
+    ${subtotal(`Con OH: Fee ${fmt(tPerfFee)} · Costo ${fmt(tPerfCostoOH)} · CMO <b style="color:${tPerfPctOH>=0?'#1a8a4a':'#c0392b'}">${fmt(tPerfCmoOH)} (${tPerfPctOH.toFixed(1)}%)</b>`)}
+    ${subtotal(`Sin OH: Fee ${fmt(tPerfFee)} · Costo ${fmt(tPerfCostoSinOH)} · CMO <b style="color:${tPerfPctSinOH>=0?'#1a8a4a':'#c0392b'}">${fmt(tPerfCmoSinOH)} (${tPerfPctSinOH.toFixed(1)}%)</b>`)}
+    <p style="font-size:12px;text-transform:uppercase;color:#666;letter-spacing:1px;margin-bottom:4px">Detalle por cliente — Con OH</p>
+    ${table(tableHead('Cliente','CMO $','CMO %'), perfRows || '<tr><td colspan="3" style="padding:10px;color:#999">Sin datos de Fee cargados en esta sesión.</td></tr>')}
+
+    ${h3('4. Social (Sin OH)')}
+    ${subtotal(`Fee ${fmt(tSocialFee)} · Costo ${fmt(tSocialCosto)} · CMO <b style="color:${tSocialPct>=0?'#1a8a4a':'#c0392b'}">${fmt(tSocialCmo)} (${tSocialPct.toFixed(1)}%)</b>`)}
+    <p style="font-size:12px;text-transform:uppercase;color:#666;letter-spacing:1px;margin-bottom:4px">Detalle por cliente — Sin OH</p>
+    ${table(tableHead('Cliente','CMO $','CMO %'), socialRows || '<tr><td colspan="3" style="padding:10px;color:#999">Sin datos de Fee cargados en esta sesión.</td></tr>')}
+    <p style="font-size:12px;color:#666;margin:10px 0 2px">Incluyendo Ignis M&C (sin Fee propio, solo suma costo):</p>
+    <p style="font-size:13.5px;color:#333">Fee ${fmt(tSocialFee)} · Costo ${fmt(tSocialCostoIgnis)} · CMO <b style="color:${tSocialPctIgnis>=0?'#1a8a4a':'#c0392b'}">${fmt(tSocialCmoIgnis)} (${tSocialPctIgnis.toFixed(1)}%)</b></p>
+
+    <hr style="border:none;border-top:1px solid #e0e0e0;margin:24px 0 10px">
+    <p style="font-size:11px;color:#999;text-align:center">Generado automáticamente · Control Comercial Ignis</p>
+  </div>`;
+
   // Muestra el texto en pantalla (además de mandarlo por mail) — así queda visible
   // para copiar a mano, o para que un agente de navegador (ej. Claude en Chrome / Cowork)
   // pueda leerlo del DOM y reenviarlo por otro medio (mail, etc.) sin tener que re-derivar
@@ -1505,15 +1562,27 @@ function enviarResumenEjecutivo() {
     panel.id = 'resumenEjecutivoPanel';
     panel.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
     panel.innerHTML = `
-      <div style="background:var(--surface,#161616);border:1px solid var(--border,#2a2a2a);border-radius:14px;max-width:720px;width:100%;max-height:85vh;display:flex;flex-direction:column">
+      <div style="background:var(--surface,#161616);border:1px solid var(--border,#2a2a2a);border-radius:14px;max-width:760px;width:100%;max-height:85vh;display:flex;flex-direction:column">
         <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border,#2a2a2a)">
-          <b style="color:#fff">Resumen Ejecutivo — texto completo</b>
-          <div style="display:flex;gap:8px">
-            <button id="btnCopiarResumen" style="background:#aa44ff;border:none;border-radius:8px;padding:6px 14px;color:#fff;cursor:pointer;font-size:12px">📋 Copiar</button>
-            <button id="btnCerrarResumen" style="background:var(--surface2,#1f1f1f);border:1px solid var(--border,#2a2a2a);border-radius:8px;padding:6px 14px;color:#fff;cursor:pointer;font-size:12px">✕ Cerrar</button>
-          </div>
+          <b style="color:#fff">Resumen Ejecutivo</b>
+          <button id="btnCerrarResumen" style="background:var(--surface2,#1f1f1f);border:1px solid var(--border,#2a2a2a);border-radius:8px;padding:6px 14px;color:#fff;cursor:pointer;font-size:12px">✕ Cerrar</button>
         </div>
-        <textarea id="resumenEjecutivoTexto" readonly style="flex:1;background:#0e0e0e;color:#e0e0e0;border:none;padding:20px;font-family:monospace;font-size:12.5px;white-space:pre-wrap;resize:none;min-height:400px"></textarea>
+        <div style="display:flex;gap:6px;padding:12px 20px 0">
+          <button id="tabTextoPlano" style="background:#aa44ff;border:none;border-radius:8px 8px 0 0;padding:8px 16px;color:#fff;cursor:pointer;font-size:12px;font-weight:600">Texto plano (Slack)</button>
+          <button id="tabHtmlLindo" style="background:var(--surface2,#1f1f1f);border:none;border-radius:8px 8px 0 0;padding:8px 16px;color:#ccc;cursor:pointer;font-size:12px;font-weight:600">HTML para mail (copiar y pegar)</button>
+        </div>
+        <div id="vistaTextoPlano" style="flex:1;display:flex;flex-direction:column">
+          <div style="padding:8px 20px"><button id="btnCopiarResumen" style="background:#aa44ff;border:none;border-radius:8px;padding:6px 14px;color:#fff;cursor:pointer;font-size:12px">📋 Copiar texto plano</button></div>
+          <textarea id="resumenEjecutivoTexto" readonly style="flex:1;background:#0e0e0e;color:#e0e0e0;border:none;padding:0 20px 20px;font-family:monospace;font-size:12.5px;white-space:pre-wrap;resize:none;min-height:380px"></textarea>
+        </div>
+        <div id="vistaHtmlLindo" style="flex:1;display:none;flex-direction:column">
+          <div style="padding:8px 20px;display:flex;gap:8px;align-items:center">
+            <button id="btnCopiarHtml" style="background:#aa44ff;border:none;border-radius:8px;padding:6px 14px;color:#fff;cursor:pointer;font-size:12px">📋 Copiar vista previa (pegar directo en el mail)</button>
+            <span style="font-size:11px;color:#888">Copia el diseño con formato, no el código HTML — pegalo directo en el cuerpo del mail</span>
+          </div>
+          <div id="resumenEjecutivoHtmlPreview" style="flex:1;overflow:auto;background:#fff;min-height:380px"></div>
+          <textarea id="resumenEjecutivoHtmlCodigo" style="display:none"></textarea>
+        </div>
       </div>`;
     document.body.appendChild(panel);
     document.getElementById('btnCerrarResumen').onclick = () => panel.style.display = 'none';
@@ -1521,12 +1590,44 @@ function enviarResumenEjecutivo() {
       document.getElementById('resumenEjecutivoTexto').select();
       document.execCommand('copy');
       document.getElementById('btnCopiarResumen').textContent = '✅ Copiado';
-      setTimeout(() => { document.getElementById('btnCopiarResumen').textContent = '📋 Copiar'; }, 1500);
+      setTimeout(() => { document.getElementById('btnCopiarResumen').textContent = '📋 Copiar texto plano'; }, 1500);
+    };
+    document.getElementById('btnCopiarHtml').onclick = () => {
+      const preview = document.getElementById('resumenEjecutivoHtmlPreview');
+      const range = document.createRange();
+      range.selectNodeContents(preview);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      document.execCommand('copy');
+      sel.removeAllRanges();
+      document.getElementById('btnCopiarHtml').textContent = '✅ Copiado — pegalo en el mail';
+      setTimeout(() => { document.getElementById('btnCopiarHtml').textContent = '📋 Copiar vista previa (pegar directo en el mail)'; }, 2000);
+    };
+    document.getElementById('tabTextoPlano').onclick = () => {
+      document.getElementById('vistaTextoPlano').style.display = 'flex';
+      document.getElementById('vistaHtmlLindo').style.display = 'none';
+      document.getElementById('tabTextoPlano').style.background = '#aa44ff';
+      document.getElementById('tabTextoPlano').style.color = '#fff';
+      document.getElementById('tabHtmlLindo').style.background = 'var(--surface2,#1f1f1f)';
+      document.getElementById('tabHtmlLindo').style.color = '#ccc';
+    };
+    document.getElementById('tabHtmlLindo').onclick = () => {
+      document.getElementById('vistaHtmlLindo').style.display = 'flex';
+      document.getElementById('vistaTextoPlano').style.display = 'none';
+      document.getElementById('tabHtmlLindo').style.background = '#aa44ff';
+      document.getElementById('tabHtmlLindo').style.color = '#fff';
+      document.getElementById('tabTextoPlano').style.background = 'var(--surface2,#1f1f1f)';
+      document.getElementById('tabTextoPlano').style.color = '#ccc';
     };
   }
   document.getElementById('resumenEjecutivoTexto').value = msg;
+  document.getElementById('resumenEjecutivoHtmlPreview').innerHTML = htmlBonito;
+  document.getElementById('resumenEjecutivoHtmlCodigo').value = htmlBonito;
   panel.style.display = 'flex';
-  // El botón solo arma y muestra el texto acá (id="resumenEjecutivoTexto").
+  // El botón arma y muestra el texto (id="resumenEjecutivoTexto", estilo Slack) Y el HTML
+  // lindo listo para mail (id="resumenEjecutivoHtmlCodigo" = código fuente completo,
+  // id="resumenEjecutivoHtmlPreview" = la vista renderizada, para copiar con formato).
   // El envío del mail lo hace Cowork con su propia conexión de Gmail — no depende
   // de ningún permiso de Apps Script, evita todo el lío de autorización.
 }
