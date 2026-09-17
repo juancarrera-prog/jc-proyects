@@ -586,6 +586,13 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
 
 <div id="page-performance" class="page">
 
+  <div class="director-filter" id="perfSegmentoFilter">
+    <span class="filter-label">Alcance</span>
+    <button class="dir-btn active" onclick="switchPerfSegmento('total', this)">🌎 Total</button>
+    <button class="dir-btn" onclick="switchPerfSegmento('nacional', this)">🇦🇷 Nacional</button>
+    <button class="dir-btn" onclick="switchPerfSegmento('internacional', this)">✈️ Internacional</button>
+  </div>
+
   <div id="perf-consolidado" class="rent-section" style="display:block">
     <div class="mes-selector-row">
       <span class="mes-label">MES DE ANÁLISIS</span>
@@ -1991,7 +1998,7 @@ function togglePuestoFTE(puesto, tipo) {
   renderPillsPuestosFTE(tipo);
   const selId = tipo==='social' ? 'chartFTESocialSelector' : 'chartFTEPerfSelector';
   const clienteActivo = document.querySelector(`#${selId} .dir-btn.active`)?.textContent;
-  const clientes = tipo==='social' ? Object.keys(DIRECTORES_SOCIAL).filter(c => INCLUIR_IGNIS_SOCIAL || c !== 'Ignis M&C') : Object.keys(DIRECTORES_PERF).filter(c => INCLUIR_BAGO_PERF || c !== 'Bagó');
+  const clientes = tipo==='social' ? Object.keys(DIRECTORES_SOCIAL).filter(c => INCLUIR_IGNIS_SOCIAL || c !== 'Ignis M&C') : clientesPerfVisibles();
   renderChartFTE(clienteActivo || clientes[0], tipo);
 }
 
@@ -2029,7 +2036,7 @@ function saveFTEVendido(cliente, puesto, valor, tipo) {
 function renderChartFTESelector(tipo) {
   const clientes = tipo==='social'
     ? Object.keys(DIRECTORES_SOCIAL).filter(c => INCLUIR_IGNIS_SOCIAL || c !== 'Ignis M&C')
-    : Object.keys(DIRECTORES_PERF).filter(c => INCLUIR_BAGO_PERF || c !== 'Bagó');
+    : clientesPerfVisibles();
   const selId = tipo==='social' ? 'chartFTESocialSelector' : 'chartFTEPerfSelector';
   const cont = document.getElementById(selId);
   if (!cont) return;
@@ -2622,10 +2629,32 @@ function toggleIncluirBagoPerf() {
   renderPerfCompleto();
 }
 
+// Sub-solapas Performance: Total / Nacional / Internacional (pedido de Vicky)
+// El toggle "Incluir Bagó" sigue funcionando independiente de esto, en cualquier sub-solapa.
+const CLIENTES_PERF_NACIONAL      = ['ITBA', 'Bagó', 'Banco Patagonia', 'Violetta', 'Belgrano Day School', 'Hendel'];
+const CLIENTES_PERF_INTERNACIONAL = ['Parts Vu', 'Yamaha O.P.', 'TH Marine'];
+let PERF_SEGMENTO = 'total'; // 'total' | 'nacional' | 'internacional'
+
+// Lista única de clientes de Performance visibles — aplica el toggle Incluir Bagó
+// Y el segmento (Total/Nacional/Internacional) juntos. Usar SIEMPRE esta función
+// en vez de Object.keys(DIRECTORES_PERF) directo, para que ambos filtros no se pisen.
+function clientesPerfVisibles() {
+  let clientes = Object.keys(DIRECTORES_PERF).filter(c => INCLUIR_BAGO_PERF || c !== 'Bagó');
+  if (PERF_SEGMENTO === 'nacional')           clientes = clientes.filter(c => CLIENTES_PERF_NACIONAL.includes(c));
+  else if (PERF_SEGMENTO === 'internacional') clientes = clientes.filter(c => CLIENTES_PERF_INTERNACIONAL.includes(c));
+  return clientes;
+}
+
+function switchPerfSegmento(segmento, btn) {
+  PERF_SEGMENTO = segmento;
+  document.querySelectorAll('#perfSegmentoFilter .dir-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderPerfCompleto();
+}
+
 function calcRentabilidadPerf() {
   const meses = MESES_PERF_SELECCIONADOS.length ? MESES_PERF_SELECCIONADOS : _mesesPorDefecto();
-  return Object.keys(DIRECTORES_PERF)
-    .filter(nombre => INCLUIR_BAGO_PERF || nombre !== 'Bagó')
+  return clientesPerfVisibles()
     .map(nombre => {
     let totalCosto=0, totalFte=0, fee=0;
     meses.forEach(m=>{
@@ -2662,7 +2691,7 @@ function setMesActivoPerf(mes,btn) {
   const rows=calcRentabilidadPerf();
   renderKPIsPerf(rows); renderPerfConsolidado(rows); renderRankingPerf(rows);
   setTimeout(()=>renderChartPerf(rows),60);
-  setTimeout(()=>renderChartFTE(Object.keys(DIRECTORES_PERF).filter(c=>INCLUIR_BAGO_PERF||c!=='Bagó').find(c=>document.querySelector('#chartFTEPerfSelector .dir-btn.active')?.textContent===c)||Object.keys(DIRECTORES_PERF).filter(c=>INCLUIR_BAGO_PERF||c!=='Bagó')[0],'perf'),60);
+  setTimeout(()=>renderChartFTE(clientesPerfVisibles().find(c=>document.querySelector('#chartFTEPerfSelector .dir-btn.active')?.textContent===c)||clientesPerfVisibles()[0],'perf'),60);
   actualizarBannerVigenciaPerf();
 }
 function renderKPIsPerf(rows) {
@@ -2739,7 +2768,7 @@ function renderChartPerf(rows) {
 function renderClienteSelectorPerf() {
   const cont=document.getElementById('clienteSelectorPerf');
   if(!cont) return;
-  cont.innerHTML=Object.keys(DIRECTORES_PERF).filter(nombre => INCLUIR_BAGO_PERF || nombre !== 'Bagó').map(nombre=>{
+  cont.innerHTML=clientesPerfVisibles().map(nombre=>{
     const d=DIRECTORES_PERF[nombre]||{}, isActive=nombre===clienteDetalleActivoPerf;
     return `<button class="cli-btn${isActive?' active':''}" style="${isActive?'background:'+d.color+';border-color:'+d.color+';color:white':''}" onclick="selectClientePerf('${nombre}',this,'${d.color||'#606060'}')">${nombre}</button>`;
   }).join('');
