@@ -213,6 +213,62 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
 .ck-val{font-size:13px;font-weight:500;color:var(--text)}
 
 
+/* ===== TEMA "PROPUESTA TOYOTA" — solo estética, no toca contenido ni gauges ===== */
+:root{
+  --bg:#0a0a0a; --surface:#121212; --surface2:#171716; --border:#2b2a28;
+  --red:#e02020; --red-soft:rgba(224,32,32,.12);
+  --purple:#f4f3f1; --purple-soft:rgba(244,243,241,.08);
+  --text:#ffffff; --text-muted:#9a9793; --radius:2px; --radius-sm:2px;
+}
+body{font-family:'Poppins',Arial,sans-serif}
+body::before{display:none!important}               /* sin grilla roja de fondo */
+
+/* Header */
+.logo-mark{border-radius:0}
+.header{border-bottom:1px solid var(--border)}
+.header-title h1{font-family:'Poppins',sans-serif;font-weight:800;font-size:26px;letter-spacing:.14em;text-transform:uppercase}
+.header-title p{letter-spacing:.2em;text-transform:uppercase;font-size:10px;color:#6b6864}
+.period-badge{border-radius:0;background:transparent;border:1px solid var(--border);letter-spacing:.1em;text-transform:uppercase;font-size:10px}
+
+/* Solapas numeradas 01 · 02 · 03 · 04 */
+.page-tabs{counter-reset:tabn;gap:40px}
+.page-tab{counter-increment:tabn;padding:12px 0;font-size:12px;letter-spacing:.18em;text-transform:uppercase;font-weight:500;color:#6b6864}
+.page-tab::before{content:"0" counter(tabn);margin-right:10px;color:#6b6864;font-weight:400}
+.page-tab.active{color:#fff;font-weight:600}
+.page-tab.active::before{color:var(--red)}
+.page-tab .tab-badge{border-radius:0}
+
+/* Filtros: píldoras sobrias, activo en blanco (el rojo queda como acento) */
+.filter-label{letter-spacing:.24em;font-size:10px;color:#6b6864}
+.dir-btn,.rent-tab{border-radius:100px;letter-spacing:.12em;text-transform:uppercase;font-size:10.5px;font-weight:500;border-color:var(--border);color:#9a9793}
+.dir-btn.active,.rent-tab.active{background:#f4f3f1;border-color:#f4f3f1;color:#0a0a0a;font-weight:700}
+.slack-btn{border-radius:0;letter-spacing:.12em;text-transform:uppercase;font-size:10.5px}
+
+/* Títulos de sección */
+.section-title{font-family:'Poppins',sans-serif;font-weight:800;font-size:20px;letter-spacing:.04em;text-transform:uppercase;position:relative}
+.section-sub{letter-spacing:.06em;color:#9a9793}
+
+/* Tablas: líneas finas, encabezados en capitulares espaciadas */
+.table-card{border-radius:0;background:transparent;border-left:0;border-right:0}
+thead tr{background:transparent;border-bottom:1px solid #6b6864}
+th{font-weight:500;letter-spacing:.2em;color:#6b6864}
+td{border-bottom:1px solid #222120}
+tbody tr:hover{background:rgba(255,255,255,.025)}
+tfoot td,tr.total-row td{border-top:1px solid #6b6864}
+
+/* Tarjetas, paneles y KPIs */
+.kpi{border-radius:0;background:transparent}
+.kpi:hover{border-color:var(--red)}
+.kpi-value{font-family:'Poppins',sans-serif;font-weight:800;letter-spacing:-.01em}
+.kpi-label{letter-spacing:.24em;font-weight:500}
+.cards-kpi{border-radius:0;background:var(--border)}
+.alert-panel{border-radius:0;background:rgba(224,32,32,.05);border-color:rgba(224,32,32,.35)}
+.alert-item{border-radius:0}
+.alert-panel-title{letter-spacing:.2em;font-weight:600}
+.badge{border-radius:0;letter-spacing:.06em}
+[class*="card"],[class*="panel"]{border-radius:0}
+
+.dir-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:9px;vertical-align:middle}
 </style>
 </style>
 </head>
@@ -233,17 +289,17 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
         <div class="live-dot"></div>
         Período: <span id="periodoLabel">Cargando...</span>
       </div>
-      <button class="slack-btn" onclick="enviarAlertas()">📣 Enviar alertas Slack</button>
-      <button class="slack-btn" onclick="enviarResumenEjecutivo()" style="background:linear-gradient(135deg,#e8001c,#c20018);color:#fff;border-color:#e8001c">📊 Resumen Ejecutivo</button>
+      <button class="slack-btn" onclick="enviarAlertas()">Enviar alertas Slack</button>
+      <button class="slack-btn" onclick="enviarResumenEjecutivo()" style="background:linear-gradient(135deg,#e8001c,#c20018);color:#fff;border-color:#e8001c">Resumen Ejecutivo</button>
     </div>
   </div>
 
   <!-- PAGE TABS -->
   <div class="page-tabs">
-    <button class="page-tab active" onclick="switchPage('comercial', this)">📊 Control Comercial</button>
-    <button class="page-tab" onclick="switchPage('rentabilidad', this)">👥 Clientes Big 7 <span class="tab-badge" id="alertBadge" style="display:none">!</span></button>
-    <button class="page-tab" onclick="switchPage('performance', this)">🚀 Performance</button>
-    <button class="page-tab" onclick="switchPage('social', this)">📱 Social</button>
+    <button class="page-tab active" onclick="switchPage('comercial', this)">Control Comercial</button>
+    <button class="page-tab" onclick="switchPage('rentabilidad', this)">Clientes Big 7 <span class="tab-badge" id="alertBadge" style="display:none">!</span></button>
+    <button class="page-tab" onclick="switchPage('performance', this)">Performance</button>
+    <button class="page-tab" onclick="switchPage('social', this)">Social</button>
   </div>
 
   <!-- ══════════════════════════════════════════ -->
@@ -254,9 +310,9 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
     <div class="director-filter">
       <span class="filter-label">Director</span>
       <button class="dir-btn active" onclick="filtrarDirector('todos', this)">Todos</button>
-      <button class="dir-btn" onclick="filtrarDirector('mechi', this)">🔴 Mechi · Bagó</button>
-      <button class="dir-btn" onclick="filtrarDirector('dani', this)">🔵 Dani · BP / LP / Pfizer / Marfrig / Molino</button>
-      <button class="dir-btn" onclick="filtrarDirector('jp', this)">🟢 JP · McCain / Escorial / UA / Novo Nordisk / Goodyear / Loma Negra</button>
+      <button class="dir-btn" onclick="filtrarDirector('mechi', this)"><span class="dir-dot" style="background:#e02020"></span>Mechi · Bagó</button>
+      <button class="dir-btn" onclick="filtrarDirector('dani', this)"><span class="dir-dot" style="background:#4488ff"></span>Dani · BP / LP / Pfizer / Marfrig / Molino</button>
+      <button class="dir-btn" onclick="filtrarDirector('jp', this)"><span class="dir-dot" style="background:#00c853"></span>JP · McCain / Escorial / UA / Novo Nordisk / Goodyear / Loma Negra</button>
     </div>
 
     <div class="director-filter">
@@ -472,7 +528,7 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
     </div>
 
     <div class="alert-panel" id="alertPanel">
-      <div class="alert-panel-title">⚠️ Clientes con desvío mayor al -10%</div>
+      <div class="alert-panel-title">Clientes con desvío mayor al -10%</div>
       <div class="alert-items" id="alertItems"></div>
     </div>
 
@@ -499,9 +555,9 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
     <div class="bottom-grid">
       <div class="mini-card">
         <div class="mini-card-title">Directores · Big Seven</div>
-        <div class="dir-row"><div><div class="dir-row-name">🔴 Mercedes Silva (Mechi)</div><div class="dir-row-clients">Bagó (cuenta total + marcas)</div></div></div>
-        <div class="dir-row"><div><div class="dir-row-name">🔵 Daniela Kravanja (Dani)</div><div class="dir-row-clients">Banco Patagonia · La Paulina · Pfizer</div></div></div>
-        <div class="dir-row"><div><div class="dir-row-name">🟢 Juan Pablo Echeverría (JP)</div><div class="dir-row-clients">McCain · Escorial · Universal Assistance</div></div></div>
+        <div class="dir-row"><div><div class="dir-row-name"><span class="dir-dot" style="background:#e02020"></span>Mercedes Silva (Mechi)</div><div class="dir-row-clients">Bagó (cuenta total + marcas)</div></div></div>
+        <div class="dir-row"><div><div class="dir-row-name"><span class="dir-dot" style="background:#4488ff"></span>Daniela Kravanja (Dani)</div><div class="dir-row-clients">Banco Patagonia · La Paulina · Pfizer</div></div></div>
+        <div class="dir-row"><div><div class="dir-row-name"><span class="dir-dot" style="background:#00c853"></span>Juan Pablo Echeverría (JP)</div><div class="dir-row-clients">McCain · Escorial · Universal Assistance</div></div></div>
       </div>
       <div class="mini-card">
         <div class="mini-card-title">Umbrales de Alerta</div>
@@ -588,9 +644,9 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
 
   <div class="director-filter" id="perfSegmentoFilter">
     <span class="filter-label">Alcance</span>
-    <button class="dir-btn active" onclick="switchPerfSegmento('total', this)">🌎 Total</button>
-    <button class="dir-btn" onclick="switchPerfSegmento('nacional', this)">🇦🇷 Nacional</button>
-    <button class="dir-btn" onclick="switchPerfSegmento('internacional', this)">✈️ Internacional</button>
+    <button class="dir-btn active" onclick="switchPerfSegmento('total', this)">Total</button>
+    <button class="dir-btn" onclick="switchPerfSegmento('nacional', this)">Nacional</button>
+    <button class="dir-btn" onclick="switchPerfSegmento('internacional', this)">Internacional</button>
   </div>
 
   <div id="perf-consolidado" class="rent-section" style="display:block">
@@ -742,7 +798,7 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
 <div class="modal-overlay" id="modalCarga" onclick="cerrarModalSiOverlay(event)">
   <div class="modal-box">
     <button class="modal-close" onclick="cerrarModalCarga()">✕</button>
-    <div class="modal-title">📥 Cargar datos del mes</div>
+    <div class="modal-title">Cargar datos del mes</div>
     <div class="modal-sub">Completá los campos y guardá — el dashboard se actualiza automáticamente</div>
 
     <!-- Selector de mes -->
@@ -764,7 +820,7 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
     </div>
 
     <div class="modal-actions">
-      <div class="modal-saved-badge" id="modalSavedBadge">✅ Guardado correctamente</div>
+      <div class="modal-saved-badge" id="modalSavedBadge">Guardado correctamente</div>
       <button class="btn-action" onclick="cerrarModalCarga()">Cancelar</button>
       <button class="btn-action primary" onclick="guardarDatosComercial()">✓ Guardar y actualizar</button>
     </div>
@@ -1227,14 +1283,14 @@ function renderTablas(data) {
 async function enviarAlertas() {
   if (!DATA) return;
   const alertas = (DATA.clientes||[]).filter(r => { const v=parseFloat(String(r.vs||'').replace('%','').replace(',','.')); return !isNaN(v)&&v<-10; });
-  if (!alertas.length) { alert('✅ No hay clientes con desvío mayor al -10%'); return; }
+  if (!alertas.length) { alert('No hay clientes con desvío mayor al -10%'); return; }
   const msg = '🚨 *Alerta Comercial — Control de Presupuesto*\n\n' +
     alertas.map(r => { const v=parseFloat(String(r.vs).replace('%','').replace(',','.')); const d=DIRECTORES[r.nombre]; return `*${r.nombre}* (${d?.nombre||'—'}): Vs Presupuesto en *${v.toFixed(1)}%* · Inv $${parseFloat(r.inv||0).toFixed(1)} | Presup $${parseFloat(r.presup||0).toFixed(1)}`; }).join('\n')
     + '\n\n_Revisá el Control Comercial para más detalle._';
   try {
     await fetch(WEBHOOK_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:msg,channel:'#mail-counter'})});
-    alert('✅ Alertas enviadas a Slack');
-  } catch(e) { alert('❌ Error al enviar: '+e.message); }
+    alert('Alertas enviadas a Slack');
+  } catch(e) { alert('Error al enviar: '+e.message); }
 }
 
 
@@ -1579,12 +1635,12 @@ function enviarResumenEjecutivo() {
           <button id="tabHtmlLindo" style="background:var(--surface2,#1f1f1f);border:none;border-radius:8px 8px 0 0;padding:8px 16px;color:#ccc;cursor:pointer;font-size:12px;font-weight:600">HTML para mail (copiar y pegar)</button>
         </div>
         <div id="vistaTextoPlano" style="flex:1;display:flex;flex-direction:column">
-          <div style="padding:8px 20px"><button id="btnCopiarResumen" style="background:#aa44ff;border:none;border-radius:8px;padding:6px 14px;color:#fff;cursor:pointer;font-size:12px">📋 Copiar texto plano</button></div>
+          <div style="padding:8px 20px"><button id="btnCopiarResumen" style="background:#aa44ff;border:none;border-radius:8px;padding:6px 14px;color:#fff;cursor:pointer;font-size:12px">Copiar texto plano</button></div>
           <textarea id="resumenEjecutivoTexto" readonly style="flex:1;background:#0e0e0e;color:#e0e0e0;border:none;padding:0 20px 20px;font-family:monospace;font-size:12.5px;white-space:pre-wrap;resize:none;min-height:380px"></textarea>
         </div>
         <div id="vistaHtmlLindo" style="flex:1;display:none;flex-direction:column">
           <div style="padding:8px 20px;display:flex;gap:8px;align-items:center">
-            <button id="btnCopiarHtml" style="background:#aa44ff;border:none;border-radius:8px;padding:6px 14px;color:#fff;cursor:pointer;font-size:12px">📋 Copiar vista previa (pegar directo en el mail)</button>
+            <button id="btnCopiarHtml" style="background:#aa44ff;border:none;border-radius:8px;padding:6px 14px;color:#fff;cursor:pointer;font-size:12px">Copiar vista previa (pegar directo en el mail)</button>
             <span style="font-size:11px;color:#888">Copia el diseño con formato, no el código HTML — pegalo directo en el cuerpo del mail</span>
           </div>
           <div id="resumenEjecutivoHtmlPreview" style="flex:1;overflow:auto;background:#fff;min-height:380px"></div>
@@ -1596,8 +1652,8 @@ function enviarResumenEjecutivo() {
     document.getElementById('btnCopiarResumen').onclick = () => {
       document.getElementById('resumenEjecutivoTexto').select();
       document.execCommand('copy');
-      document.getElementById('btnCopiarResumen').textContent = '✅ Copiado';
-      setTimeout(() => { document.getElementById('btnCopiarResumen').textContent = '📋 Copiar texto plano'; }, 1500);
+      document.getElementById('btnCopiarResumen').textContent = 'Copiado';
+      setTimeout(() => { document.getElementById('btnCopiarResumen').textContent = 'Copiar texto plano'; }, 1500);
     };
     document.getElementById('btnCopiarHtml').onclick = () => {
       const preview = document.getElementById('resumenEjecutivoHtmlPreview');
@@ -1608,8 +1664,8 @@ function enviarResumenEjecutivo() {
       sel.addRange(range);
       document.execCommand('copy');
       sel.removeAllRanges();
-      document.getElementById('btnCopiarHtml').textContent = '✅ Copiado — pegalo en el mail';
-      setTimeout(() => { document.getElementById('btnCopiarHtml').textContent = '📋 Copiar vista previa (pegar directo en el mail)'; }, 2000);
+      document.getElementById('btnCopiarHtml').textContent = 'Copiado — pegalo en el mail';
+      setTimeout(() => { document.getElementById('btnCopiarHtml').textContent = 'Copiar vista previa (pegar directo en el mail)'; }, 2000);
     };
     document.getElementById('tabTextoPlano').onclick = () => {
       document.getElementById('vistaTextoPlano').style.display = 'flex';
@@ -1769,7 +1825,7 @@ function renderSocialConsolidado(rows) {
 }
 
 function renderRankingSocial(rows) {
-  const medals=['🥇','🥈','🥉'];
+  const medals=['1','2','3'];
   const rowsD=rows.map(r=>{const costoD=ohActivoSocial?r.costoEq*(1+OH_SOCIAL):r.costoEq;const cmD=r.ingresos-costoD;const pctD=r.ingresos>0?(cmD/r.ingresos)*100:0;return{...r,cmD,pctD};});
   const byCM=[...rowsD].sort((a,b)=>b.cmD-a.cmD);
   const byPct=[...rowsD].sort((a,b)=>b.pctD-a.pctD);
@@ -1905,7 +1961,7 @@ function renderCostosCiaSocial() {
   const head=document.getElementById('headCostoCiaSocial');
   const body=document.getElementById('bodyCostoCiaSocial');
   if(!head||!body) return;
-  head.innerHTML=`<tr><th style="min-width:210px">Puesto</th>${cols.map(m=>`<th class="mes-header num${m===MES_VIGENTE_SOCIAL?' vigente-col':''}">${m}${m==='Diciembre'?' (base Ene)':''}${m===MES_VIGENTE_SOCIAL?' ⚡':''}</th>`).join('')}</tr>`;
+  head.innerHTML=`<tr><th style="min-width:210px">Puesto</th>${cols.map(m=>`<th class="mes-header num${m===MES_VIGENTE_SOCIAL?' vigente-col':''}">${m}${m==='Diciembre'?' (base Ene)':''}${m===MES_VIGENTE_SOCIAL?' · vigente':''}</th>`).join('')}</tr>`;
   body.innerHTML=Object.entries(TABLA_COSTOS_SOCIAL).map(([puesto,costos])=>
     `<tr><td class="puesto-col">${puesto}</td>${cols.map(m=>{const v=costos[m],isVig=m===MES_VIGENTE_SOCIAL;return`<td class="costo-cell${isVig?' vigente':''} editable" ondblclick="editCellSocial(this,'${puesto}','${m}')" title="Doble click para editar">${v?fmtCosto(v):'—'}</td>`;}).join('')}</tr>`
   ).join('');
@@ -2735,7 +2791,7 @@ function renderPerfConsolidado(rows) {
   document.getElementById('tbodyPerfConsolidado').innerHTML=html;
 }
 function renderRankingPerf(rows) {
-  const medals=['🥇','🥈','🥉'];
+  const medals=['1','2','3'];
   // Aplicar OH al momento del render igual que la tabla
   const rowsDisplay = rows.map(r => {
     const costoD = ohActivoPerf ? r.costoEq*(1+OH_PERF) : r.costoEq;
@@ -2862,7 +2918,7 @@ function getColsRRHHPerf() {
 function renderTablaCostoCiaPerf() {
   const cols=getColsRRHHPerf();
   document.getElementById('colVigenteLabelPerf').textContent=MES_VIGENTE_PERF;
-  document.getElementById('headCostoCiaPerf').innerHTML=`<tr><th style="min-width:210px">Puesto</th>${cols.map(m=>`<th class="mes-header num${m===MES_VIGENTE_PERF?' vigente-col':''}">${m}${m==='Diciembre'?' (base Ene)':''}${m===MES_VIGENTE_PERF?' ⚡':''}</th>`).join('')}</tr>`;
+  document.getElementById('headCostoCiaPerf').innerHTML=`<tr><th style="min-width:210px">Puesto</th>${cols.map(m=>`<th class="mes-header num${m===MES_VIGENTE_PERF?' vigente-col':''}">${m}${m==='Diciembre'?' (base Ene)':''}${m===MES_VIGENTE_PERF?' · vigente':''}</th>`).join('')}</tr>`;
   document.getElementById('bodyCostoCiaPerf').innerHTML=Object.entries(TABLA_COSTOS_PERF).map(([puesto,costos])=>`<tr><td class="puesto-col">${puesto}</td>${cols.map(m=>{const v=costos[m],isVig=m===MES_VIGENTE_PERF;return`<td class="costo-cell${isVig?' vigente':''} editable" ondblclick="editCellPerf(this,'${puesto}','${m}')" title="Doble click para editar">${v?fmtCosto(v):'—'}</td>`;}).join('')}</tr>`).join('');
 }
 function editCellPerf(td,puesto,mes) {
@@ -3046,7 +3102,7 @@ function renderConsolidado(rows) {
   document.getElementById('tbodyConsolidado').innerHTML = html;
 }
 function renderRanking(rows) {
-  const medals=['🥇','🥈','🥉'];
+  const medals=['1','2','3'];
   // Aplicar OH al momento del render
   const rowsD = rows.map(r => {
     const costoD = ohActivoEquipo ? r.costoEq*(1+OH_EQUIPO) : r.costoEq;
@@ -3168,7 +3224,7 @@ function getColsRRHH() {
 function renderTablaCostoCia() {
   const cols=getColsRRHH();
   document.getElementById('colVigenteLabel').textContent=MES_VIGENTE;
-  document.getElementById('headCostoCia').innerHTML=`<tr><th style="min-width:210px">Puesto</th>${cols.map(m=>`<th class="mes-header num${m===MES_VIGENTE?' vigente-col':''}"><div style="display:flex;align-items:center;justify-content:flex-end;gap:6px"><span>${m}${m==='Diciembre'?' (base Ene)':''}${m===MES_VIGENTE?' ⚡':''}</span>${cols.length>2&&m!=='Diciembre'&&m!=='Febrero'?`<button onclick="eliminarColRRHH('${m}')" style="background:transparent;border:none;color:#404040;cursor:pointer;font-size:12px;padding:0" onmouseover="this.style.color='#ff4455'" onmouseout="this.style.color='#404040'">x</button>`:''}</div></th>`).join('')}</tr>`;
+  document.getElementById('headCostoCia').innerHTML=`<tr><th style="min-width:210px">Puesto</th>${cols.map(m=>`<th class="mes-header num${m===MES_VIGENTE?' vigente-col':''}"><div style="display:flex;align-items:center;justify-content:flex-end;gap:6px"><span>${m}${m==='Diciembre'?' (base Ene)':''}${m===MES_VIGENTE?' · vigente':''}</span>${cols.length>2&&m!=='Diciembre'&&m!=='Febrero'?`<button onclick="eliminarColRRHH('${m}')" style="background:transparent;border:none;color:#404040;cursor:pointer;font-size:12px;padding:0" onmouseover="this.style.color='#ff4455'" onmouseout="this.style.color='#404040'">x</button>`:''}</div></th>`).join('')}</tr>`;
   document.getElementById('bodyCostoCia').innerHTML=Object.entries(TABLA_COSTOS).map(([puesto,costos])=>`<tr><td class="puesto-col">${puesto}</td>${cols.map(m=>{const v=costos[m],isVig=m===MES_VIGENTE;return`<td class="costo-cell${isVig?' vigente':''} editable" ondblclick="editCell(this,'${puesto}','${m}')" title="Doble click para editar">${v?fmtCosto(v):'—'}</td>`;}).join('')}</tr>`).join('');
 }
 function editCell(td, puesto, mes) {
