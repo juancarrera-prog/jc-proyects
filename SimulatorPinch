@@ -1,0 +1,742 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Simulador de precios BodyCare</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F1F3EF; --surface:#FFFFFF; --surface-2:#E7EBE4;
+  --ink:#15211D; --ink-muted:#5C6B63; --ink-faint:#8B968F;
+  --line:#D7DED6;
+  --accent:#0F6E8C; --accent-soft:#D7E9EE; --accent-ink:#0A4A5F;
+  --good:#1E8F6B; --good-soft:#DCEFE6;
+  --warn:#C1392B; --warn-soft:#F7E1DC;
+  --mid:#A9790A; --mid-soft:#F3E7CE;
+  --display:'Archivo',system-ui,sans-serif;
+  --mono:'Archivo',system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#101613; --surface:#1B2420; --surface-2:#212B25;
+    --ink:#E7EEEA; --ink-muted:#9FB0A8; --ink-faint:#6C7A73;
+    --line:#2B362F;
+    --accent:#5AB6D6; --accent-soft:#1E3A42; --accent-ink:#BEE7F2;
+    --good:#34A379; --good-soft:#17352A;
+    --warn:#CE5339; --warn-soft:#3A2420;
+    --mid:#D9A94B; --mid-soft:#3A2F17;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#101613; --surface:#1B2420; --surface-2:#212B25;
+  --ink:#E7EEEA; --ink-muted:#9FB0A8; --ink-faint:#6C7A73;
+  --line:#2B362F;
+  --accent:#5AB6D6; --accent-soft:#1E3A42; --accent-ink:#BEE7F2;
+  --good:#34A379; --good-soft:#17352A;
+  --warn:#CE5339; --warn-soft:#3A2420;
+  --mid:#D9A94B; --mid-soft:#3A2F17;
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--display); font-variant-numeric:tabular-nums; padding-inline:16px; padding-block:28px 64px;}
+.wrap{max-width:720px; margin-inline:auto}
+h1,h2{font-family:var(--display); text-wrap:balance; margin:0}
+p{margin:0; line-height:1.55}
+.mono{font-family:var(--mono)}
+.tnum{font-variant-numeric:tabular-nums}
+button{font-family:var(--display)}
+
+/* ---- header ---- */
+.hero{padding-block:4px 24px; border-bottom:1px solid var(--line); margin-bottom:22px}
+.eyebrow{display:flex; align-items:center; flex-wrap:wrap; gap:8px 10px; font-family:var(--mono); font-size:14px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-muted); margin-bottom:14px;}
+.eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--accent); flex:none}
+h1{font-size:clamp(28px,6vw,36px); font-weight:800; letter-spacing:-0.02em; line-height:1.08; color:var(--ink)}
+.dek{font-size:16.5px; color:var(--ink-muted); margin-top:12px; max-width:58ch; line-height:1.6}
+
+/* ---- config bar ---- */
+.config-bar{display:flex; flex-wrap:wrap; gap:14px 22px; align-items:flex-end; background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:14px 16px; margin-bottom:16px;}
+.cfg-field{display:flex; flex-direction:column; gap:4px; min-width:0;}
+.cfg-field label{font-family:var(--mono); font-size:12.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-faint);}
+.cfg-field input{font-family:var(--mono); font-size:16px; border:1px solid var(--line); border-radius:7px; background:var(--bg); color:var(--ink); padding:6px 8px; width:108px;}
+.cfg-note{font-size:14px; color:var(--ink-faint); flex:1; min-width:180px;}
+
+/* ---- filter chips ---- */
+.chips{display:flex; flex-wrap:wrap; gap:7px; margin-bottom:18px;}
+.chip{font-family:var(--mono); font-size:14px; border:1px solid var(--line); background:var(--surface); color:var(--ink-muted); border-radius:999px; padding:6px 12px; cursor:pointer; white-space:nowrap;}
+.chip.active{background:var(--ink); color:var(--bg); border-color:var(--ink);}
+.chip .c{color:var(--ink-faint); margin-left:3px;}
+.chip.active .c{color:var(--bg); opacity:.7;}
+
+/* ---- cards ---- */
+.cards{display:flex; flex-direction:column; gap:14px;}
+.card{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:16px 16px 18px; min-width:0;}
+.card[hidden]{display:none;}
+.card-head{display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap;}
+.card-title{font-family:var(--mono); font-weight:700; font-size:16.5px; color:var(--ink);}
+.card-n{font-weight:400; color:var(--ink-faint); font-size:14px;}
+.card-desc{font-size:15px; color:var(--ink-muted); margin-top:2px;}
+.badge{font-family:var(--mono); font-size:12px; text-transform:uppercase; letter-spacing:.03em; padding:4px 9px; border-radius:999px; white-space:nowrap; flex:none;}
+.badge.subir{background:var(--good-soft); color:var(--good);}
+.badge.revisar{background:var(--warn-soft); color:var(--warn);}
+.badge.nicho{background:var(--accent-soft); color:var(--accent-ink);}
+.badge.bien{background:var(--surface-2); color:var(--ink-muted);}
+
+.card-rank{font-family:var(--mono); font-size:12.5px; color:var(--ink-faint); margin-right:6px;}
+.badges{display:flex; gap:6px; flex-wrap:wrap; align-items:center; justify-content:flex-end;}
+.perf{margin-top:12px; border:1px solid var(--line); border-radius:10px; background:var(--surface-2); padding:10px 12px;}
+.perf-head{display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:8px;}
+.perf-title{font-family:var(--mono); font-size:12.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-faint);}
+.perf-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:8px 14px;}
+.perf-grid .k{font-family:var(--mono); font-size:12px; text-transform:uppercase; letter-spacing:.03em; color:var(--ink-faint);}
+.perf-grid .v{font-size:18px; font-weight:700; color:var(--ink); line-height:1.25;}
+.perf-grid .s{font-size:13px; color:var(--ink-muted); line-height:1.4;}
+.perf-note{font-size:13.5px; color:var(--ink-muted); margin-top:8px; line-height:1.5;}
+.perf-none{margin-top:12px; border:1px dashed var(--line); border-radius:10px; padding:10px 12px; font-size:14px; color:var(--ink-muted);}
+.rot{font-family:var(--mono); font-size:12px; text-transform:uppercase; letter-spacing:.03em; padding:3px 9px; border-radius:999px; white-space:nowrap;}
+.rot.alta{background:var(--good-soft); color:var(--good);}
+.rot.media{background:var(--mid-soft); color:var(--mid);}
+.rot.baja{background:var(--surface); color:var(--ink-muted); border:1px solid var(--line);}
+.rot.nula{background:var(--warn-soft); color:var(--warn);}
+@media (max-width:520px){ .perf-grid{grid-template-columns:repeat(2,1fr);} }
+.ref-line{font-size:13.5px; color:var(--ink-faint); margin-top:10px; line-height:1.5;}
+
+.controls-row{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:12px;}
+.seg{display:inline-flex; border:1px solid var(--line); border-radius:8px; overflow:hidden;}
+.seg button{border:none; background:var(--surface); color:var(--ink-muted); font-family:var(--mono); font-size:13.5px; padding:6px 11px; cursor:pointer;}
+.seg button.active{background:var(--accent-soft); color:var(--accent-ink); font-weight:600;}
+.pill-toggle{border:1px solid var(--line); border-radius:8px; background:var(--surface); color:var(--ink-muted); font-family:var(--mono); font-size:13.5px; padding:6px 11px; cursor:pointer;}
+.pill-toggle.active{background:var(--accent-soft); color:var(--accent-ink); font-weight:600; border-color:var(--accent-soft);}
+
+.slider-wrap{position:relative; height:68px; margin:18px 0 4px;}
+.track-base{position:absolute; left:0; right:0; top:30px; height:12px; background:var(--surface-2); border-radius:6px;}
+.track-under{position:absolute; top:30px; height:12px; background:var(--mid); opacity:.7; border-radius:6px 0 0 6px;}
+.track-comp{position:absolute; top:30px; height:12px; background:var(--good); opacity:.7; border-radius:0;}
+.track-over{position:absolute; top:30px; height:12px; background:var(--warn); opacity:.75; border-radius:0 6px 6px 0;}
+.dots{position:absolute; left:0; right:0; top:0; height:100%; z-index:1; pointer-events:none;}
+.stack{position:absolute; top:52px; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:1px; pointer-events:auto; cursor:default;}
+.stack i{width:12px; height:9px; background:var(--ink); clip-path:polygon(50% 0,0 100%,100% 100%); display:block;}
+.stack span{font-size:12px; font-weight:600; color:var(--ink); line-height:14px; margin-top:1px;}
+.stack.sim i{width:9px; height:9px; background:var(--ink-muted); clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);}
+.stack.sim span{color:var(--ink-muted);}
+.legend i.dia3{width:10px; height:10px; background:var(--ink-muted); clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%); border-radius:0;}
+.legend i.tri{width:12px; height:9px; background:var(--ink); clip-path:polygon(50% 0,0 100%,100% 100%); border-radius:0;}
+.legend i.dia2{width:9px; height:9px; border:2px solid var(--ink); background:var(--surface); transform:rotate(45deg); border-radius:0;}
+.legend{display:flex; flex-wrap:wrap; gap:6px 16px; font-size:13px; color:var(--ink-muted); margin:2px 0 4px;}
+.legend span{display:inline-flex; align-items:center; gap:6px;}
+.legend i{width:14px; height:10px; border-radius:3px; display:inline-block; flex:none;}
+.legend i.u{background:var(--mid); opacity:.7;} .legend i.c{background:var(--good); opacity:.7;} .legend i.o{background:var(--warn); opacity:.75;}
+.tick{position:absolute; top:26px; width:3px; height:20px; background:var(--ink-faint); border-radius:1px;}
+.tick.floor{background:var(--warn);}
+.tick.bump{background:var(--accent);}
+.tick-label{position:absolute; top:0; font-family:var(--mono); font-size:11.5px; color:var(--ink-faint); white-space:nowrap; transform:translateX(-50%);}
+.tick-label.floor{color:var(--warn);}
+.tick-label.bump{color:var(--accent-ink);}
+.tick-label.today{transform:translateX(-100%); padding-right:5px;}
+.tick-label.bump{transform:none; padding-left:5px;}
+input[type=range]{-webkit-appearance:none; appearance:none; position:absolute; left:0; top:24px; width:100%; height:24px; background:transparent; margin:0; z-index:3; cursor:pointer;}
+input[type=range]::-webkit-slider-runnable-track{background:transparent; height:24px;}
+input[type=range]::-moz-range-track{background:transparent; height:24px;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:24px; height:24px; border-radius:50%; background:var(--ink); border:3px solid var(--surface); box-shadow:0 0 0 1px var(--line); margin-top:0; cursor:grab;}
+input[type=range]::-moz-range-thumb{width:24px; height:24px; border-radius:50%; background:var(--ink); border:3px solid var(--surface); box-shadow:0 0 0 1px var(--line); cursor:grab;}
+
+.stats-row{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:8px; margin-top:12px;}
+.stat{background:var(--surface-2); border-radius:10px; padding:9px 11px; min-width:0;}
+.stat .k{font-family:var(--mono); font-size:12px; text-transform:uppercase; color:var(--ink-faint); letter-spacing:.03em;}
+.stat .v{font-family:var(--mono); font-weight:700; font-size:17.5px; margin-top:3px; color:var(--ink);}
+.stat.price input{width:100%; border:1px solid var(--line); border-radius:7px; background:var(--surface); color:var(--ink); font-family:var(--mono); font-weight:700; font-size:17.5px; padding:5px 7px; margin-top:3px;}
+.stat.margin.good{background:var(--good-soft);} .stat.margin.good .v{color:var(--good);}
+.stat.margin.mid{background:var(--mid-soft);} .stat.margin.mid .v{color:var(--mid);}
+.stat.margin.warn{background:var(--warn-soft);} .stat.margin.warn .v{color:var(--warn);}
+.stat.status.good{background:var(--good-soft);} .stat.status.good .v{color:var(--good); font-size:15px;}
+.stat.status.warn{background:var(--warn-soft);} .stat.status.warn .v{color:var(--warn); font-size:15px;}
+.stat.status.mid{background:var(--mid-soft);} .stat.status.mid .v{color:var(--mid); font-size:15px;}
+.stat.status.accent{background:var(--accent-soft);} .stat.status.accent .v{color:var(--accent-ink); font-size:15px;}
+.stat.status.neutral .v{font-size:15px; color:var(--ink-faint);}
+
+.actions-row{display:flex; flex-wrap:wrap; gap:14px; align-items:center; margin-top:10px;}
+.linkbtn{border:none; background:none; color:var(--accent-ink); font-size:14px; font-family:var(--display); cursor:pointer; padding:0; text-decoration:underline;}
+.save-indicator{font-size:13px; color:var(--ink-faint); font-family:var(--mono);}
+
+.comp-edit{display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end; margin-top:10px; padding-top:10px; border-top:1px dashed var(--line);}
+.comp-edit label{display:flex; flex-direction:column; gap:3px; font-family:var(--mono); font-size:12.5px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.03em;}
+.comp-edit input{font-family:var(--mono); font-size:15px; border:1px solid var(--line); border-radius:7px; background:var(--bg); color:var(--ink); padding:5px 7px; width:100px;}
+.comp-edit button{border:1px solid var(--accent); background:var(--accent-soft); color:var(--accent-ink); border-radius:7px; font-size:14px; padding:5px 11px; cursor:pointer;}
+
+footer{margin-top:30px; padding-top:18px; border-top:1px solid var(--line); font-size:13.5px; color:var(--ink-faint); line-height:1.6;}
+#db-status{font-size:14px; color:var(--warn); margin-bottom:14px;}
+#db-status[hidden]{display:none;}
+</style>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow"><span class="dot"></span><span>Pinch Ortopedia · BodyCare · Mercado Libre</span></div>
+    <h1>Simulador de precios BodyCare</h1>
+    <p class="dek">Los 23 SKU publicados hoy en ML, ordenados de mayor a menor facturación de los últimos 30 días. Por cada uno: cómo rindió en los últimos 30 días (ventas, conversión, margen en $ y rotación), precio hoy, el +7,5% del proveedor, el rango de competencia relevado y una barra para probar un precio nuevo y ver al toque qué margen te deja — según esté en Full o Flex, y con o sin cuotas.</p>
+  </header>
+
+  <div id="db-status" hidden></div>
+
+  <div class="config-bar">
+    <div class="cfg-field">
+      <label>Costo envío Full ($/u)</label>
+      <input type="number" id="cfg-full" class="tnum">
+    </div>
+    <div class="cfg-field">
+      <label>Costo envío Flex ($/u)</label>
+      <input type="number" id="cfg-flex" class="tnum">
+    </div>
+    <div class="cfg-note">Si no tenés el dato todavía, dejalo en 0 — el margen va a verse un poco mejor de lo real hasta que lo completes. Se guarda para los 23 productos a la vez.</div>
+  </div>
+
+  <nav class="chips" id="chips"></nav>
+
+  <div class="cards" id="cards"></div>
+
+  <footer>
+    Piso 70% = precio necesario para que, después de comisión ML, cargo fijo, envío y costo de financiación en cuotas (si aplica), te queden $0,30 de ganancia por cada $1 que efectivamente recibís. Rango de competencia = productos similares + otros vendedores y distribuidores del mismo BodyCare, relevado en Mercado Libre el 14/10/2026 (se excluyen tus propias publicaciones, la tienda oficial Body Care y el dropshipping internacional). Cada triángulo es una publicación del mismo BodyCare (apilados cuando coinciden en precio, con el total debajo); cada rombo gris es una publicación de producto similar (se muestran las que caen dentro del rango relevado el 14/10/2026). Etiquetas: «Para revisar» = tu precio hoy supera el máximo de los revendedores del mismo producto o del mercado, o está en el 25% superior del rango; «Margen para subir» = está por debajo del mínimo o en el 25% inferior; «Nicho propio» = sin productos similares; el resto, «Bien ubicado». Los cambios que hagas acá — precio elegido, Full/Flex, cuotas, y los rangos de competencia si los actualizás — se guardan solos en este artifact. Rendimiento = reporte de publicaciones de Mercado Libre del 19/09 al 19/10/2026, sumando todas las publicaciones y variantes de cada SKU (activas e inactivas). Margen en $ = (precio promedio cobrado menos comisión, cargo fijo y costo Pinch) × unidades, antes de envíos e impuestos. Rotación = unidades vendidas en 30 días: alta desde 10, media de 4 a 9, baja de 1 a 3. Si un SKU del simulador no aparece en ML, se muestra como «Aún no subido».
+  </footer>
+</div>
+
+<script>
+const PERF = {"BC1087":{"pubs":1,"act":0,"vis":66,"ventas":3,"uds":3,"br":227997,"conv":4.5,"pu":75999,"mg":52.9,"mgars":102529,"u7":1},"BC1102E":{"pubs":3,"act":1,"vis":94,"ventas":2,"uds":3,"br":57597,"conv":2.1,"pu":19199,"mg":51.7,"mgars":21055,"u7":0},"BC1103E":{"pubs":5,"act":1,"vis":91,"ventas":1,"uds":2,"br":49114,"conv":1.1,"pu":24557,"mg":53.3,"mgars":18909,"u7":0},"BC1104E":{"pubs":5,"act":2,"vis":97,"ventas":4,"uds":4,"br":187280,"conv":4.1,"pu":46820,"mg":60.3,"mgars":95914,"u7":0},"BC1105E":{"pubs":5,"act":2,"vis":279,"ventas":6,"uds":6,"br":287418,"conv":2.2,"pu":47903,"mg":59.9,"mgars":146282,"u7":0},"BC1106E":{"pubs":5,"act":4,"vis":73,"ventas":1,"uds":1,"br":26149,"conv":1.4,"pu":26149,"mg":51.9,"mgars":9802,"u7":0},"BC1109":{"pubs":1,"act":1,"vis":251,"ventas":7,"uds":8,"br":83596,"conv":2.8,"pu":10450,"mg":16.5,"mgars":8096,"u7":0},"BC1304A":{"pubs":4,"act":4,"vis":417,"ventas":0,"uds":0,"br":0,"conv":0.0,"pu":null,"mg":null,"mgars":null,"u7":0},"BC1402E":{"pubs":5,"act":2,"vis":101,"ventas":7,"uds":8,"br":129638,"conv":6.9,"pu":16205,"mg":48.8,"mgars":43073,"u7":3},"BC1468":{"pubs":1,"act":1,"vis":53,"ventas":0,"uds":0,"br":0,"conv":0.0,"pu":null,"mg":null,"mgars":null,"u7":0},"BC1500A":{"pubs":5,"act":3,"vis":112,"ventas":6,"uds":7,"br":105203,"conv":5.4,"pu":15029,"mg":50.8,"mgars":35705,"u7":0},"BC1555":{"pubs":2,"act":1,"vis":64,"ventas":3,"uds":3,"br":99949,"conv":4.7,"pu":33316,"mg":61.0,"mgars":51844,"u7":0},"BC1651A":{"pubs":5,"act":2,"vis":228,"ventas":11,"uds":11,"br":337710,"conv":4.8,"pu":30701,"mg":47.8,"mgars":126123,"u7":2},"BC1655":{"pubs":6,"act":4,"vis":80,"ventas":2,"uds":2,"br":110592,"conv":2.5,"pu":55296,"mg":58.8,"mgars":55228,"u7":0},"BC2007":{"pubs":1,"act":0,"vis":121,"ventas":18,"uds":56,"br":369600,"conv":14.9,"pu":6600,"mg":10.8,"mgars":25608,"u7":0},"BC2400":{"pubs":2,"act":2,"vis":72,"ventas":4,"uds":4,"br":132000,"conv":5.6,"pu":33000,"mg":59.6,"mgars":66911,"u7":2},"BC2401":{"pubs":4,"act":2,"vis":619,"ventas":42,"uds":45,"br":1911648,"conv":6.8,"pu":42481,"mg":56.5,"mgars":918800,"u7":17},"BC2404":{"pubs":1,"act":1,"vis":94,"ventas":9,"uds":10,"br":234310,"conv":9.6,"pu":23431,"mg":40.9,"mgars":70245,"u7":6},"BC2405":{"pubs":2,"act":1,"vis":37,"ventas":5,"uds":5,"br":176470,"conv":13.5,"pu":35294,"mg":62.5,"mgars":93750,"u7":0},"BC2406":{"pubs":2,"act":1,"vis":47,"ventas":7,"uds":8,"br":156537,"conv":14.9,"pu":19567,"mg":39.8,"mgars":43280,"u7":0},"BC2407":{"pubs":3,"act":3,"vis":49,"ventas":6,"uds":6,"br":50099,"conv":12.2,"pu":8350,"mg":46.7,"mgars":16161,"u7":2},"BC2409":{"pubs":2,"act":1,"vis":110,"ventas":20,"uds":20,"br":343680,"conv":18.2,"pu":17184,"mg":46.0,"mgars":109228,"u7":10},"BC2480":{"pubs":1,"act":1,"vis":551,"ventas":5,"uds":5,"br":180686,"conv":0.9,"pu":36137,"mg":52.9,"mgars":81307,"u7":4}};
+const PERF_PERIODO = '19/09 al 19/10/2026';
+const SEED = [{"codigo": "BC1087", "desc": "Hombrera L.R.A.", "bucket": "bien", "nVariantes": 2, "precioHoy": 83450, "precioMinVar": 75999, "precioMaxVar": 90901, "comision": 0.15, "cargoFijo": 0, "costoFinCuotas": 0, "costoPinch": 30422.85, "compMin": 50877, "compMax": 124899, "posicion": "Media", "revMin": 87670, "revMax": 87670, "revN": 1, "rev": [87670], "sim": [56385, 56385, 56385, 56999, 57899, 60880, 67070, 75070, 76899, 79999, 100918]}, {"codigo": "BC1102E", "desc": "Rodillera rotuliana", "bucket": "bien", "nVariantes": 3, "precioHoy": 19199, "precioMinVar": 19199, "precioMaxVar": 19199, "comision": 0.15, "cargoFijo": 2753, "costoFinCuotas": 0, "costoPinch": 6547.79, "compMin": 18999, "compMax": 28100, "posicion": "Baja", "revMin": 18162, "revMax": 21995, "revN": 12, "rev": [18162, 20116, 20116, 20116, 20314, 20350, 20353, 20353, 20353, 20353, 21995, 21995], "sim": [19999, 19999, 20999, 20999, 22999, 22999, 22999, 24427, 26300, 26300, 26659]}, {"codigo": "BC1103E", "desc": "Rodillera rótula velcro", "bucket": "bien", "nVariantes": 8, "precioHoy": 22928, "precioMinVar": 19868, "precioMaxVar": 24557, "comision": 0.15, "cargoFijo": 3122, "costoFinCuotas": 0, "costoPinch": 8296.82, "compMin": 19499, "compMax": 34940, "posicion": "Baja-media", "revMin": 24750, "revMax": 26117, "revN": 3, "rev": [24750, 24750, 26117], "sim": [19499, 20160, 20509, 20550, 20999, 21754, 22999, 22999, 25779, 25779, 26300, 26300, 26659, 27800, 31999]}, {"codigo": "BC1104E", "desc": "Rodillera ballenada", "bucket": "subir", "nVariantes": 5, "precioHoy": 46820, "precioMinVar": 46820, "precioMaxVar": 46820, "comision": 0.15, "cargoFijo": 0, "costoFinCuotas": 0, "costoPinch": 15818.41, "compMin": 46990, "compMax": 86319, "posicion": "Baja", "revMin": 44118, "revMax": 67100, "revN": 7, "rev": [44118, 48028, 51810, 52752, 56160, 60000, 67100], "sim": [46990, 46990, 50606, 59990, 64769, 66500, 66613, 67889, 72102, 86319, 86319]}, {"codigo": "BC1105E", "desc": "Rodillera articulada", "bucket": "subir", "nVariantes": 5, "precioHoy": 47903, "precioMinVar": 47903, "precioMaxVar": 47903, "comision": 0.15, "cargoFijo": 0, "costoFinCuotas": 0, "costoPinch": 16337.29, "compMin": 46881, "compMax": 111958, "posicion": "Baja", "revMin": 46269, "revMax": 70000, "revN": 7, "rev": [46269, 46269, 46269, 49280, 49280, 52425, 70000], "sim": [50606, 59990, 59990, 66500, 66500, 68500, 77773, 86319, 86319, 89999, 91548]}, {"codigo": "BC1106E", "desc": "Rodillera abierta", "bucket": "bien", "nVariantes": 4, "precioHoy": 26149, "precioMinVar": 26149, "precioMaxVar": 26149, "comision": 0.15, "cargoFijo": 3340, "costoFinCuotas": 0, "costoPinch": 9084.38, "compMin": 19499, "compMax": 27800, "posicion": "Media-alta", "revMin": 27321, "revMax": 46341, "revN": 3, "rev": [27321, 27720, 46341], "sim": [19499, 20160, 20509, 20550]}, {"codigo": "BC1109", "desc": "Cincha rotuliana", "bucket": "revisar", "nVariantes": 1, "precioHoy": 18999, "precioMinVar": 18999, "precioMaxVar": 18999, "comision": 0.15, "cargoFijo": 2740, "costoFinCuotas": 0, "costoPinch": 5130.47, "compMin": 13500, "compMax": 25717, "posicion": "Alta - ojo", "revMin": 13100, "revMax": 14410, "revN": 3, "rev": [13100, 13100, 14410], "sim": [15999, 15999, 18350, 18525, 18749, 18999, 19371, 19900, 19990, 19999, 19999, 20391, 20391, 21999, 22430, 23899, 24299]}, {"codigo": "BC1304A", "desc": "Faja post-quirúrgica", "bucket": "revisar", "nVariantes": 4, "precioHoy": 30786, "precioMinVar": 30786, "precioMaxVar": 30786, "comision": 0.16, "cargoFijo": 3345, "costoFinCuotas": 0, "costoPinch": 10401.85, "compMin": 17395, "compMax": 35599, "posicion": "Alta - ojo", "revMin": 29124, "revMax": 32999, "revN": 4, "rev": [29124, 31130, 31154, 32999], "sim": [18651, 18700, 24315, 24900, 24900, 27099, 27353, 27399, 30699, 32165, 32295, 32295, 34639, 34639]}, {"codigo": "BC1402E", "desc": "Tobillera ajuste en 8", "bucket": "bien", "nVariantes": 5, "precioHoy": 16216, "precioMinVar": 16166, "precioMaxVar": 16228, "comision": 0.15, "cargoFijo": 2752, "costoFinCuotas": 0, "costoPinch": 5638.07, "compMin": 12499, "compMax": 27272, "posicion": "Baja-media", "revMin": 15314, "revMax": 25900, "revN": 8, "rev": [15314, 15314, 15510, 15510, 16394, 20680, 25900, 25900], "sim": [12903, 13200, 13200, 13999, 15190, 17097, 18525, 18880, 19440, 19561, 20122, 20599, 20900, 20975, 22700, 24213, 24754, 24900]}, {"codigo": "BC1468", "desc": "Tobillera runner", "bucket": "nicho", "nVariantes": 4, "precioHoy": 40999, "precioMinVar": 40999, "precioMaxVar": 40999, "comision": 0.15, "cargoFijo": 0, "costoFinCuotas": 0, "costoPinch": 18463.21, "compMin": 0, "compMax": 0, "posicion": "Nicho propio", "revMin": 53790, "revMax": 53790, "revN": 1, "rev": [53790], "sim": []}, {"codigo": "BC1500A", "desc": "Codera Elasticflex", "bucket": "bien", "nVariantes": 5, "precioHoy": 15029, "precioMinVar": 15029, "precioMaxVar": 15029, "comision": 0.15, "cargoFijo": 2740, "costoFinCuotas": 0, "costoPinch": 4933.94, "compMin": 7899, "compMax": 29999, "posicion": "Media", "revMin": 12672, "revMax": 15738, "revN": 7, "rev": [12672, 12672, 12672, 13915, 14740, 14740, 15738], "sim": [7899, 7999, 7999, 8330, 8967, 8967, 9863, 9959, 9990, 10093, 11303, 11303, 11303, 12997, 13179, 13432, 15865, 15899, 15899, 16910, 16970, 16990, 16990, 17815, 17840, 17850, 19995, 20470, 21900, 21990, 23479, 25990, 25990, 27000, 28327, 28500]}, {"codigo": "BC1555", "desc": "Epi-top codera", "bucket": "bien", "nVariantes": 2, "precioHoy": 33474, "precioMinVar": 33000, "precioMaxVar": 33949, "comision": 0.15, "cargoFijo": 0, "costoFinCuotas": 0, "costoPinch": 11037.35, "compMin": 24173, "compMax": 41892, "posicion": "Media", "revMin": 32000, "revMax": 42300, "revN": 5, "rev": [32000, 33990, 38665, 40185, 42300], "sim": [25079, 25175, 26373, 28610, 29999, 32990, 35999, 39172, 39900, 41308]}, {"codigo": "BC1651A", "desc": "Inmovilizador muñeca largo", "bucket": "bien", "nVariantes": 8, "precioHoy": 30809, "precioMinVar": 27250, "precioMaxVar": 36740, "comision": 0.15, "cargoFijo": 2100, "costoFinCuotas": 0, "costoPinch": 12530.1, "compMin": 16633, "compMax": 47855, "posicion": "Media", "revMin": 34755, "revMax": 45999, "revN": 4, "rev": [34755, 34755, 42900, 45999], "sim": [16633, 17575, 17810, 19008, 19900, 20493, 21374, 21999, 22218, 24027, 24649, 24865, 25990, 25990, 28900, 29999, 32770, 32770, 32770, 32770, 37456, 37456, 37456, 39688, 39688, 39688, 39688, 40308, 41988, 44445, 44445, 46654, 46899, 47055]}, {"codigo": "BC1655", "desc": "Inmov. dedo pulgar", "bucket": "bien", "nVariantes": 6, "precioHoy": 55296, "precioMinVar": 55296, "precioMaxVar": 55296, "comision": 0.15, "cargoFijo": 0, "costoFinCuotas": 0, "costoPinch": 19387.35, "compMin": 46654, "compMax": 72045, "posicion": "Media", "revMin": 52002, "revMax": 57530, "revN": 4, "rev": [52002, 52002, 52309, 57530], "sim": [46654, 46654, 46654, 55984, 66344, 67725]}, {"codigo": "BC2007", "desc": "Gel frío-calor", "bucket": "subir", "nVariantes": 1, "precioHoy": 6600, "precioMinVar": 6600, "precioMaxVar": 6600, "comision": 0.15, "cargoFijo": 1370, "costoFinCuotas": 0, "costoPinch": 3782.71, "compMin": 4700, "compMax": 11800, "posicion": "Baja-media", "revMin": 10600, "revMax": 13999, "revN": 8, "rev": [10600, 10600, 11532, 11532, 11532, 12040, 12776, 13999], "sim": [6050, 6290, 6290, 7300, 7999, 9200, 11103]}, {"codigo": "BC2400", "desc": "Casco frío-calor", "bucket": "subir", "nVariantes": 1, "precioHoy": 33000, "precioMinVar": 33000, "precioMaxVar": 33000, "comision": 0.15, "cargoFijo": 0, "costoFinCuotas": 0.05, "costoPinch": 11322.19, "compMin": 23000, "compMax": 66000, "posicion": "Barata", "revMin": 30318, "revMax": 34980, "revN": 4, "rev": [30318, 31000, 32065, 34980], "sim": [24570, 29900, 31349, 38990, 39999, 39999, 40000, 43899, 45848, 45869, 48490, 63710]}, {"codigo": "BC2401", "desc": "Rodillera gemelera", "bucket": "bien", "nVariantes": 4, "precioHoy": 45614, "precioMinVar": 41999, "precioMaxVar": 49230, "comision": 0.15, "cargoFijo": 0, "costoFinCuotas": 0, "costoPinch": 15691.07, "compMin": 29900, "compMax": 55000, "posicion": "Media", "revMin": 44950, "revMax": 53120, "revN": 5, "rev": [44950, 45045, 45900, 46500, 53120], "sim": [29900, 33250, 34200, 36100, 36999, 38000, 38479, 38999, 39335, 39999, 41790, 43939, 46347, 47967, 48999, 49500, 49500, 49500, 49579, 49900, 51999, 53570]}, {"codigo": "BC2404", "desc": "Tobillera frío-calor", "bucket": "bien", "nVariantes": 1, "precioHoy": 23431, "precioMinVar": 23431, "precioMaxVar": 23431, "comision": 0.15, "cargoFijo": 2760, "costoFinCuotas": 0, "costoPinch": 10131.86, "compMin": 18981, "compMax": 40431, "posicion": "Media", "revMin": 27835, "revMax": 32990, "revN": 5, "rev": [27835, 28999, 28999, 30481, 32990], "sim": [18981, 19527, 19566, 20000, 20900, 20975, 20990, 20999, 23999, 24900, 32900, 32900, 32900, 32990, 33900, 34742, 34898, 34898, 36125, 38208, 38208, 38208, 39699, 39990, 39990]}, {"codigo": "BC2405", "desc": "Codera frío-calor", "bucket": "subir", "nVariantes": 1, "precioHoy": 35294, "precioMinVar": 35294, "precioMaxVar": 35294, "comision": 0.15, "cargoFijo": 0, "costoFinCuotas": 0, "costoPinch": 11249.89, "compMin": 33000, "compMax": 66231, "posicion": "Baja", "revMin": 32000, "revMax": 43130, "revN": 6, "rev": [32000, 32900, 32999, 33000, 35090, 43130], "sim": [32900, 33364, 36900, 38990, 40552, 40990, 40990, 41308, 41514, 41800, 43840, 43840, 43840, 45540, 48224, 48495, 49500, 49500, 49500, 49500, 49900, 55296, 59900, 61245, 62018, 65549]}, {"codigo": "BC2406", "desc": "Muñequera palmar", "bucket": "revisar", "nVariantes": 2, "precioHoy": 22196, "precioMinVar": 18691, "precioMaxVar": 25700, "comision": 0.15, "cargoFijo": 3030, "costoFinCuotas": 0, "costoPinch": 8191.9, "compMin": 13156, "compMax": 28999, "posicion": "Alta - ojo", "revMin": 22000, "revMax": 26915, "revN": 8, "rev": [22000, 22700, 23056, 23056, 23332, 24900, 26070, 26915], "sim": [13156, 13493, 13777, 14900, 15977, 17169, 18999, 19499, 19999, 20618, 20900, 21129, 21129, 21129, 23142, 24900, 26100, 26100, 28900, 28999]}, {"codigo": "BC2407", "desc": "Dedo frío-calor", "bucket": "bien", "nVariantes": 1, "precioHoy": 8350, "precioMinVar": 8349.87, "precioMaxVar": 8349.87, "comision": 0.15, "cargoFijo": 1330, "costoFinCuotas": 0, "costoPinch": 3073.96, "compMin": 9999, "compMax": 14999, "posicion": "Barata", "revMin": 7477, "revMax": 10990, "revN": 12, "rev": [7477, 7477, 7478, 8854, 8854, 8854, 8854, 8854, 8854, 10275, 10340, 10990], "sim": [9999, 9999, 9999, 11199, 11530, 12999, 14499, 14980, 14999, 14999]}, {"codigo": "BC2409", "desc": "Antifaz frío-calor", "bucket": "bien", "nVariantes": 1, "precioHoy": 17184, "precioMinVar": 17184, "precioMaxVar": 17184, "comision": 0.15, "cargoFijo": 2740, "costoFinCuotas": 0, "costoPinch": 6405, "compMin": 8500, "compMax": 21000, "posicion": "Media", "revMin": 18500, "revMax": 22220, "revN": 3, "rev": [18500, 21758, 22220], "sim": [8599, 9152, 9200, 9980, 9999, 11183, 11898, 11959, 12215, 12990, 13689, 15999, 16199, 17000, 17241, 17425, 17501, 17995, 18108, 18108, 18419, 18999, 18999, 19888, 19999]}, {"codigo": "BC2480", "desc": "Cervical frío-calor", "bucket": "nicho", "nVariantes": 1, "precioHoy": 36137, "precioMinVar": 36137.2, "precioMaxVar": 36137.2, "comision": 0.15, "cargoFijo": 0, "costoFinCuotas": 0, "costoPinch": 14455, "compMin": 0, "compMax": 0, "posicion": "Nicho propio", "revMin": 44900, "revMax": 44900, "revN": 1, "rev": [44900], "sim": []}];
+const BUCKET_LABEL = {subir:'Margen para subir', nicho:'Nicho propio', revisar:'Para revisar', bien:'Bien ubicado'};
+const BUCKET_ORDER = {revisar:0, subir:1, nicho:2, bien:3};
+
+function computeBucket(s){
+  if(!(s.compMin>0 || s.compMax>0)) return 'nicho';
+  const r=combRange(s), lo=r[0], hi=r[1], h=s.precioHoy;
+  if(s.revN>0 && h>s.revMax) return 'revisar';
+  if(h>hi) return 'revisar';
+  if(h<lo) return 'subir';
+  if(hi>lo){ const t=(h-lo)/(hi-lo); if(t>=0.75) return 'revisar'; if(t<=0.25) return 'subir'; }
+  return 'bien';
+}
+SEED.forEach(s=>{ s.bucket = computeBucket(s); });
+const SKU_BY_CODE = {};
+SEED.forEach(s => SKU_BY_CODE[s.codigo] = s);
+
+const ORDER = SEED.slice().sort((a,b)=>{
+  const fa = PERF[a.codigo] ? PERF[a.codigo].br : -1;
+  const fb = PERF[b.codigo] ? PERF[b.codigo].br : -1;
+  if(fa !== fb) return fb - fa;
+  const d = BUCKET_ORDER[a.bucket]-BUCKET_ORDER[b.bucket];
+  return d !== 0 ? d : a.codigo.localeCompare(b.codigo);
+});
+const RANK = {};
+ORDER.forEach((s,i)=>{ RANK[s.codigo] = i+1; });
+
+let config = {costoEnvioFull:0, costoEnvioFlex:0, topeRonda:20};
+let state = {};
+let scaleCache = {};
+let db = null;
+let currentFilter = 'all';
+
+function combRange(s){
+  const lo=[s.compMin,s.revMin].filter(v=>v>0), hi=[s.compMax,s.revMax].filter(v=>v>0);
+  return [lo.length?Math.min(...lo):0, hi.length?Math.max(...hi):0];
+}
+SEED.forEach(s=>{
+  state[s.codigo] = {
+    fulfillment:'flex',
+    cuotas:false,
+    precioElegido:s.precioHoy,
+    compMin:combRange(s)[0],
+    compMax:combRange(s)[1],
+  };
+});
+
+function recibis(sku, precio, fulfillment, cuotas){
+  const costoEnvio = fulfillment === 'full' ? config.costoEnvioFull : config.costoEnvioFlex;
+  const finCost = cuotas ? sku.costoFinCuotas : 0;
+  return precio * (1 - sku.comision - finCost) - sku.cargoFijo - costoEnvio;
+}
+function marginOf(sku, precio, fulfillment, cuotas){
+  const r = recibis(sku, precio, fulfillment, cuotas);
+  if(r <= 0) return -Infinity;
+  return (r - sku.costoPinch) / r;
+}
+function floorPrice(sku, fulfillment, cuotas){
+  const costoEnvio = fulfillment === 'full' ? config.costoEnvioFull : config.costoEnvioFlex;
+  const finCost = cuotas ? sku.costoFinCuotas : 0;
+  const recibisFloor = sku.costoPinch / 0.30;
+  return (recibisFloor + sku.cargoFijo + costoEnvio) / (1 - sku.comision - finCost);
+}
+function fmtMoney(n){
+  if(!isFinite(n)) return '—';
+  return '$' + Math.round(n).toLocaleString('es-AR');
+}
+function fmtPct(n){
+  if(!isFinite(n)) return '—';
+  return (n*100).toFixed(1).replace('.', ',') + '%';
+}
+
+function computeScale(sku){
+  const floors = [
+    floorPrice(sku,'flex',false), floorPrice(sku,'flex',true),
+    floorPrice(sku,'full',false), floorPrice(sku,'full',true)
+  ].filter(isFinite);
+  const maxFloor = floors.length ? Math.max(...floors) : sku.precioHoy;
+  const compMin = sku.compMin > 0 ? sku.compMin : sku.precioHoy;
+  const compMax = sku.compMax > 0 ? sku.compMax : sku.precioHoy;
+  let lo = Math.min(compMin, sku.precioHoy, sku.precioMinVar) * 0.85;
+  let hi = Math.max(compMax, sku.precioHoy*1.15, sku.precioMaxVar, maxFloor*1.05);
+  lo = Math.max(0, Math.floor(lo/50)*50);
+  hi = Math.ceil(hi/50)*50;
+  const span = Math.max(hi-lo, 100);
+  let step = Math.round(span/250/10)*10;
+  if(step < 10) step = 10;
+  return {min:lo, max:hi, step};
+}
+function computeAllScales(){
+  SEED.forEach(s => scaleCache[s.codigo] = computeScale(s));
+}
+function ensureScale(codigo, val){
+  const sc = scaleCache[codigo];
+  if(!isFinite(val)) return;
+  if(val < sc.min) sc.min = Math.max(0, Math.floor(val*0.95/50)*50);
+  if(val > sc.max) sc.max = Math.ceil(val*1.05/50)*50;
+}
+
+function cardHTML(sku){
+  const id = sku.codigo;
+  const variantNote = sku.nVariantes > 1 ? `<span class="card-n"> · ${sku.nVariantes} variantes</span>` : '';
+  return `
+  <article class="card" id="card-${id}" data-bucket="${sku.bucket}">
+    <div class="card-head">
+      <div>
+        <div class="card-title"><span class="card-rank">#${RANK[id]}</span>${id}${variantNote}</div>
+        <div class="card-desc">${sku.desc}${PERF[id] ? ' · ' + fmtMoney(PERF[id].br) + ' en 30 días' : ''}</div>
+      </div>
+      <div class="badges">${PERF[id] ? `<span class="rot ${rotInfo(PERF[id].uds).k}">${rotInfo(PERF[id].uds).t}</span>` : ''}<span class="badge ${sku.bucket}">${BUCKET_LABEL[sku.bucket]}</span></div>
+    </div>
+
+    <div class="ref-line mono tnum" id="refline-${id}"></div>
+
+    ${perfHTML(sku)}
+
+    <div class="controls-row">
+      <div class="seg" data-codigo="${id}">
+        <button type="button" data-val="flex">Flex</button>
+        <button type="button" data-val="full">Full</button>
+      </div>
+      <button type="button" class="pill-toggle" id="cuotas-${id}" data-codigo="${id}">Cuotas: No</button>
+    </div>
+
+    <div class="slider-wrap" id="wrap-${id}">
+      <div class="track-base"></div>
+      <div class="track-under" id="trackunder-${id}"></div>
+      <div class="track-comp" id="trackcomp-${id}"></div>
+      <div class="track-over" id="trackover-${id}"></div>
+      <div class="tick today" id="tick-today-${id}"></div>
+      <div class="tick-label today" id="ticklabel-today-${id}">Hoy</div>
+      <div class="tick bump" id="tick-bump-${id}"></div>
+      <div class="tick-label bump" id="ticklabel-bump-${id}">+7,5%</div>
+      <div class="tick floor" id="tick-floor-${id}"></div>
+      <div class="tick-label floor" id="ticklabel-floor-${id}">Piso 70%</div>
+      <div class="dots" id="dots-${id}"></div>
+      <input type="range" id="range-${id}" data-codigo="${id}">
+    </div>
+
+    <div class="legend" id="legend-${id}"><span><i class="u"></i>Más barato que todos</span><span><i class="c"></i>Dentro del mercado</span><span><i class="o"></i>Más caro que todos</span><span><i class="tri"></i>Publicación del mismo BodyCare</span><span><i class="dia3"></i>Publicación de producto similar</span></div>
+
+    <div class="stats-row">
+      <div class="stat price">
+        <div class="k">Precio simulado</div>
+        <input type="number" class="tnum" id="priceinput-${id}" data-codigo="${id}">
+      </div>
+      <div class="stat margin" id="stat-margin-${id}">
+        <div class="k">Margen resultante</div>
+        <div class="v tnum" id="marginval-${id}"></div>
+      </div>
+      <div class="stat recibe">
+        <div class="k">Recibirías</div>
+        <div class="v tnum" id="recibeval-${id}"></div>
+      </div>
+      <div class="stat status" id="stat-status-${id}">
+        <div class="k">Vs. competencia</div>
+        <div class="v" id="statusval-${id}"></div>
+      </div>
+    </div>
+
+    <div class="actions-row">
+      <button type="button" class="linkbtn" data-action="reset" data-codigo="${id}">Volver a precio hoy</button>
+      <button type="button" class="linkbtn" data-action="bump" data-codigo="${id}">Aplicar +7,5%</button>
+      <button type="button" class="linkbtn" data-action="edit-comp" data-codigo="${id}">Editar competencia</button>
+      <span class="save-indicator" id="save-${id}"></span>
+    </div>
+
+    <div class="comp-edit" id="compedit-${id}" hidden>
+      <label>Mín. competencia<input type="number" class="tnum" id="compmin-${id}"></label>
+      <label>Máx. competencia<input type="number" class="tnum" id="compmax-${id}"></label>
+      <button type="button" data-action="save-comp" data-codigo="${id}">Guardar</button>
+      <button type="button" data-action="reset-comp" data-codigo="${id}">Restaurar relevamiento</button>
+    </div>
+  </article>`;
+}
+
+function rotInfo(u){
+  if(u>=10) return {k:'alta', t:'Rotación alta'};
+  if(u>=4) return {k:'media', t:'Rotación media'};
+  if(u>=1) return {k:'baja', t:'Rotación baja'};
+  return {k:'nula', t:'Sin ventas'};
+}
+function perfHTML(sku){
+  const p = PERF[sku.codigo];
+  if(!p) return '<div class="perf-none">Aún no subido a Mercado Libre: todavía no tiene datos de rendimiento.</div>';
+  const r = rotInfo(p.uds);
+  const conv = p.vis ? String(p.conv).replace('.', ',') + '%' : '—';
+  const sem = (p.uds/30*7).toFixed(1).replace('.', ',');
+  const mg = p.mgars != null ? fmtMoney(p.mgars) : '—';
+  const mgs = p.mg != null ? String(p.mg).replace('.', ',') + '% de margen' : 'sin ventas';
+  let nota = '';
+  if(p.uds === 0 && p.vis > 0){
+    nota = `${p.vis} visitas y ninguna venta: ${p.act ? 'revisá fotos, título y stock antes de tocar el precio' : 'la publicación está pausada por falta de stock'}.`;
+  } else if(p.pu && Math.abs(p.pu/sku.precioHoy - 1) > 0.08){
+    nota = `Vendió a un promedio de ${fmtMoney(p.pu)}, ${p.pu < sku.precioHoy ? 'menos' : 'más'} que el precio de hoy (${fmtMoney(sku.precioHoy)}).`;
+  } else if(p.act === 0){
+    nota = 'Sus publicaciones están pausadas por falta de stock (confirmado por Mercado Libre): reponer para volver a vender.';
+  }
+  return `
+    <div class="perf">
+      <div class="perf-head">
+        <span class="perf-title">Rendimiento · ${PERF_PERIODO}</span>
+      </div>
+      <div class="perf-grid">
+        <div><div class="k">Ventas</div><div class="v tnum">${p.ventas}</div><div class="s tnum">${p.uds} u. · ${fmtMoney(p.br)}</div></div>
+        <div><div class="k">Conversión</div><div class="v tnum">${conv}</div><div class="s tnum">${p.vis} visitas</div></div>
+        <div><div class="k">Margen en $</div><div class="v tnum">${mg}</div><div class="s tnum">${mgs}</div></div>
+        <div><div class="k">Rotación</div><div class="v tnum">${sem} u./sem.</div><div class="s tnum">${p.u7} u. últimos 7 días · ${p.act} de ${p.pubs} activas</div></div>
+      </div>
+      ${nota ? `<div class="perf-note">${nota}</div>` : ''}
+    </div>`;
+}
+
+function renderCards(){
+  document.getElementById('cards').innerHTML = ORDER.map(cardHTML).join('');
+}
+
+function renderChips(){
+  const counts = {all:SEED.length, revisar:0, subir:0, nicho:0, bien:0};
+  SEED.forEach(s => counts[s.bucket]++);
+  const defs = [
+    {key:'all', label:'Todos'},
+    {key:'revisar', label:'Para revisar'},
+    {key:'subir', label:'Margen para subir'},
+    {key:'nicho', label:'Nicho propio'},
+    {key:'bien', label:'Bien ubicado'},
+  ];
+  document.getElementById('chips').innerHTML = defs.map(d =>
+    `<button type="button" class="chip${d.key===currentFilter?' active':''}" data-filter="${d.key}">${d.label}<span class="c">(${counts[d.key]})</span></button>`
+  ).join('');
+  document.querySelectorAll('.chip').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      currentFilter = btn.dataset.filter;
+      renderChips();
+      applyFilter();
+    });
+  });
+}
+function applyFilter(){
+  document.querySelectorAll('.card').forEach(card=>{
+    const show = currentFilter === 'all' || card.dataset.bucket === currentFilter;
+    card.hidden = !show;
+  });
+}
+
+function update(codigo){
+  const sku = SKU_BY_CODE[codigo];
+  const st = state[codigo];
+  const floor = floorPrice(sku, st.fulfillment, st.cuotas);
+  const bump = sku.precioHoy * 1.075;
+
+  ensureScale(codigo, Math.max(st.precioElegido, isFinite(floor)?floor:0, bump, st.compMax||0));
+  ensureScale(codigo, Math.min(st.precioElegido, st.compMin>0?st.compMin:st.precioElegido));
+  const sc = scaleCache[codigo];
+
+  const rangeEl = document.getElementById('range-'+codigo);
+  rangeEl.min = sc.min; rangeEl.max = sc.max; rangeEl.step = sc.step;
+  rangeEl.value = st.precioElegido;
+  document.getElementById('priceinput-'+codigo).value = Math.round(st.precioElegido);
+
+  const pct = v => Math.max(0, Math.min(100, (v - sc.min) / (sc.max - sc.min) * 100));
+  document.getElementById('tick-today-'+codigo).style.left = pct(sku.precioHoy)+'%';
+  document.getElementById('ticklabel-today-'+codigo).style.left = pct(sku.precioHoy)+'%';
+  document.getElementById('tick-bump-'+codigo).style.left = pct(bump)+'%';
+  document.getElementById('ticklabel-bump-'+codigo).style.left = pct(bump)+'%';
+  const fp = pct(floor);
+  document.getElementById('tick-floor-'+codigo).style.left = fp+'%';
+  document.getElementById('ticklabel-floor-'+codigo).style.left = fp+'%';
+
+  const trackcomp = document.getElementById('trackcomp-'+codigo);
+  if(st.compMin > 0 || st.compMax > 0){
+    trackcomp.style.display = 'block';
+    const l = pct(st.compMin), r = pct(st.compMax);
+    trackcomp.style.left = l+'%';
+    trackcomp.style.width = Math.max(0, r-l)+'%';
+  } else {
+    trackcomp.style.display = 'none';
+  }
+  const trackunder = document.getElementById('trackunder-'+codigo);
+  const legend = document.getElementById('legend-'+codigo);
+  if(st.compMin > 0){
+    trackunder.style.display = 'block';
+    trackunder.style.left = '0%';
+    trackunder.style.width = pct(st.compMin)+'%';
+  } else {
+    trackunder.style.display = 'none';
+  }
+  legend.style.visibility = (st.compMin > 0 || st.compMax > 0) ? 'visible' : 'hidden';
+  const trackover = document.getElementById('trackover-'+codigo);
+  if(st.compMax > 0){
+    const o = pct(st.compMax);
+    trackover.style.display = 'block';
+    trackover.style.left = o+'%';
+    trackover.style.width = Math.max(0, 100-o)+'%';
+  } else {
+    trackover.style.display = 'none';
+  }
+
+  const dotsEl = document.getElementById('dots-'+codigo);
+  function rowHTML(list, cls, topPx, label){
+    const bins = {};
+    (list||[]).forEach(v=>{ const k = Math.round(pct(v)/2.5); (bins[k] = bins[k]||[]).push(v); });
+    let html = '', h = 0;
+    Object.keys(bins).forEach(k=>{
+      const arr = bins[k].slice().sort((x,y)=>x-y);
+      const shown = Math.min(arr.length, 6);
+      const left = Math.min(97, Math.max(3, k*2.5));
+      const tip = arr.length + (arr.length>1 ? ' publicaciones ' : ' publicación ') + label + ': ' + arr.map(fmtMoney).join(', ');
+      html += `<div class="stack ${cls}" style="top:${topPx}px; left:${left}%" title="${tip}">${'<i></i>'.repeat(shown)}${arr.length>1 ? '<span>'+arr.length+'</span>' : ''}</div>`;
+      h = Math.max(h, shown*10 + (arr.length>1 ? 15 : 0));
+    });
+    return {html:html, h:h};
+  }
+  const rowA = rowHTML(sku.rev, 'tri', 52, 'del mismo BodyCare');
+  const rowB = rowHTML(sku.sim, 'sim', 52 + (rowA.h ? rowA.h + 8 : 0), 'de productos similares');
+  dotsEl.innerHTML = rowA.html + rowB.html;
+  const totalH = 52 + (rowA.h ? rowA.h + 8 : 0) + rowB.h + 6;
+  document.getElementById('wrap-'+codigo).style.height = ((rowA.h || rowB.h) ? Math.max(68, totalH) : 68) + 'px';
+
+  let refTxt = `Hoy ${fmtMoney(sku.precioHoy)} · +7,5% ${fmtMoney(bump)} · Piso 70% ${fmtMoney(floor)}`;
+  if(sku.nVariantes > 1 && sku.precioMinVar !== sku.precioMaxVar){
+    refTxt += ` · variantes hoy entre ${fmtMoney(sku.precioMinVar)} y ${fmtMoney(sku.precioMaxVar)}`;
+  }
+  if(sku.compMin > 0) refTxt += ` · Similares (${(sku.sim||[]).length} pub.) ${fmtMoney(sku.compMin)} a ${fmtMoney(sku.compMax)}`;
+  if(sku.revMin > 0) refTxt += ` · Mismo BodyCare (${sku.revN} pub.) ${sku.revMin===sku.revMax?fmtMoney(sku.revMin):fmtMoney(sku.revMin)+' a '+fmtMoney(sku.revMax)}`;
+  document.getElementById('refline-'+codigo).textContent = refTxt;
+
+  const m = marginOf(sku, st.precioElegido, st.fulfillment, st.cuotas);
+  const rec = recibis(sku, st.precioElegido, st.fulfillment, st.cuotas);
+  const marginStat = document.getElementById('stat-margin-'+codigo);
+  marginStat.classList.remove('good','mid','warn');
+  marginStat.classList.add(!isFinite(m) ? 'warn' : m >= 0.70 ? 'good' : m >= 0.50 ? 'mid' : 'warn');
+  document.getElementById('marginval-'+codigo).textContent = fmtPct(m);
+  document.getElementById('recibeval-'+codigo).textContent = fmtMoney(rec);
+
+  const statusStat = document.getElementById('stat-status-'+codigo);
+  statusStat.classList.remove('good','warn','accent','mid','neutral');
+  let statusTxt, statusCls;
+  if(st.compMin <= 0 && st.compMax <= 0){
+    statusTxt = 'Sin competencia registrada'; statusCls = 'neutral';
+  } else if(st.precioElegido < st.compMin){
+    statusTxt = '▼ Más barato que todos'; statusCls = 'mid';
+  } else if(st.precioElegido > st.compMax){
+    statusTxt = '▲ Más caro que todos'; statusCls = 'warn';
+  } else {
+    statusTxt = '● Dentro del mercado'; statusCls = 'good';
+  }
+  document.getElementById('statusval-'+codigo).textContent = statusTxt;
+  statusStat.classList.add(statusCls);
+
+  document.querySelectorAll(`.seg[data-codigo="${codigo}"] button`).forEach(b=>{
+    b.classList.toggle('active', b.dataset.val === st.fulfillment);
+  });
+  const cuotasBtn = document.getElementById('cuotas-'+codigo);
+  cuotasBtn.textContent = 'Cuotas: ' + (st.cuotas ? 'Sí' : 'No');
+  cuotasBtn.classList.toggle('active', st.cuotas);
+
+  document.getElementById('compmin-'+codigo).value = st.compMin;
+  document.getElementById('compmax-'+codigo).value = st.compMax;
+}
+
+function updateAll(){ SEED.forEach(s => update(s.codigo)); }
+
+async function saveSku(codigo){
+  const el = document.getElementById('save-'+codigo);
+  if(!db){ if(el) el.textContent = ''; return; }
+  const st = state[codigo];
+  try{
+    el.textContent = 'Guardando…';
+    await db.doc('skus/'+codigo).set({
+      fulfillment: st.fulfillment,
+      cuotas: st.cuotas,
+      precioElegido: st.precioElegido,
+      compOverride: !!st.compOverride,
+      compMin: st.compOverride ? st.compMin : null,
+      compMax: st.compOverride ? st.compMax : null,
+      updatedAt: Date.now(),
+    });
+    el.textContent = 'Guardado ✓';
+    setTimeout(()=>{ if(el.textContent === 'Guardado ✓') el.textContent = ''; }, 2500);
+  }catch(e){
+    el.textContent = 'No se pudo guardar';
+  }
+}
+
+async function saveConfig(){
+  if(!db) return;
+  try{
+    await db.doc('config/global').set({
+      costoEnvioFull: config.costoEnvioFull,
+      costoEnvioFlex: config.costoEnvioFlex,
+      topeRonda: config.topeRonda,
+      updatedAt: Date.now(),
+    });
+  }catch(e){}
+}
+
+function attachHandlers(){
+  document.querySelectorAll('.seg button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const codigo = btn.closest('.seg').dataset.codigo;
+      state[codigo].fulfillment = btn.dataset.val;
+      update(codigo);
+      saveSku(codigo);
+    });
+  });
+  document.querySelectorAll('.pill-toggle').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const codigo = btn.dataset.codigo;
+      state[codigo].cuotas = !state[codigo].cuotas;
+      update(codigo);
+      saveSku(codigo);
+    });
+  });
+  document.querySelectorAll('input[type=range]').forEach(input=>{
+    input.addEventListener('input', ()=>{
+      const codigo = input.dataset.codigo;
+      state[codigo].precioElegido = Number(input.value);
+      update(codigo);
+    });
+    input.addEventListener('change', ()=>{
+      saveSku(input.dataset.codigo);
+    });
+  });
+  document.querySelectorAll('.stat.price input').forEach(input=>{
+    input.addEventListener('input', ()=>{
+      const codigo = input.dataset.codigo;
+      const v = Number(input.value);
+      if(isFinite(v) && v >= 0){ state[codigo].precioElegido = v; update(codigo); }
+    });
+    input.addEventListener('change', ()=>{
+      saveSku(input.dataset.codigo);
+    });
+  });
+  document.querySelectorAll('[data-action="reset"]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const codigo = btn.dataset.codigo;
+      state[codigo].precioElegido = SKU_BY_CODE[codigo].precioHoy;
+      update(codigo);
+      saveSku(codigo);
+    });
+  });
+  document.querySelectorAll('[data-action="bump"]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const codigo = btn.dataset.codigo;
+      state[codigo].precioElegido = Math.round(SKU_BY_CODE[codigo].precioHoy * 1.075);
+      update(codigo);
+      saveSku(codigo);
+    });
+  });
+  document.querySelectorAll('[data-action="edit-comp"]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const el = document.getElementById('compedit-'+btn.dataset.codigo);
+      el.hidden = !el.hidden;
+    });
+  });
+  document.querySelectorAll('[data-action="save-comp"]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const codigo = btn.dataset.codigo;
+      const min = Number(document.getElementById('compmin-'+codigo).value) || 0;
+      const max = Number(document.getElementById('compmax-'+codigo).value) || 0;
+      state[codigo].compMin = min;
+      state[codigo].compMax = max;
+      state[codigo].compOverride = true;
+      document.getElementById('compedit-'+codigo).hidden = true;
+      update(codigo);
+      saveSku(codigo);
+    });
+  });
+  document.querySelectorAll('[data-action="reset-comp"]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const codigo = btn.dataset.codigo;
+      const r = combRange(SKU_BY_CODE[codigo]);
+      state[codigo].compMin = r[0]; state[codigo].compMax = r[1]; state[codigo].compOverride = false;
+      document.getElementById('compedit-'+codigo).hidden = true;
+      update(codigo);
+      saveSku(codigo);
+    });
+  });
+  document.getElementById('cfg-full').addEventListener('change', (e)=>{
+    config.costoEnvioFull = Number(e.target.value) || 0;
+    computeAllScales(); updateAll(); saveConfig();
+  });
+  document.getElementById('cfg-flex').addEventListener('change', (e)=>{
+    config.costoEnvioFlex = Number(e.target.value) || 0;
+    computeAllScales(); updateAll(); saveConfig();
+  });
+}
+
+async function loadFromDb(){
+  if(!db) return;
+  try{
+    const snap = await db.doc('config/global').get();
+    if(snap && snap.exists){
+      const d = snap.data();
+      config = {...config, ...d};
+    }
+  }catch(e){}
+  await Promise.all(SEED.map(async (sku)=>{
+    try{
+      const snap = await db.doc('skus/'+sku.codigo).get();
+      if(snap && snap.exists){
+        const d = snap.data();
+        if(!d.compOverride){ delete d.compMin; delete d.compMax; }
+        state[sku.codigo] = {...state[sku.codigo], ...d};
+      }
+    }catch(e){}
+  }));
+}
+
+(async function init(){
+  computeAllScales();
+  renderChips();
+  renderCards();
+  attachHandlers();
+  document.getElementById('cfg-full').value = config.costoEnvioFull;
+  document.getElementById('cfg-flex').value = config.costoEnvioFlex;
+  updateAll();
+  applyFilter();
+
+  try{
+    db = (typeof window.claude !== 'undefined' && window.claude.use) ? await window.claude.use('db') : null;
+  }catch(e){ db = null; }
+
+  const statusEl = document.getElementById('db-status');
+  if(!db){
+    statusEl.hidden = false;
+    statusEl.textContent = 'No se detectó guardado automático en esta vista — los cambios no se van a conservar entre visitas.';
+  } else {
+    statusEl.hidden = true;
+    await loadFromDb();
+    document.getElementById('cfg-full').value = config.costoEnvioFull;
+    document.getElementById('cfg-flex').value = config.costoEnvioFlex;
+    computeAllScales();
+    updateAll();
+  }
+})();
+</script>
+
+</body></html>
