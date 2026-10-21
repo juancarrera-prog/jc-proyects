@@ -252,6 +252,15 @@ function recibis(sku, precio, fulfillment, cuotas){
   const finCost = cuotas ? sku.costoFinCuotas : 0;
   return precio * (1 - sku.comision - finCost) - sku.cargoFijo - costoEnvio;
 }
+function shipOf(f){ return f === 'full' ? config.costoEnvioFull : config.costoEnvioFlex; }
+// Al cambiar el costo de envío (por pasar a Full o por editar el costo), el precio simulado se traslada:
+// sube lo necesario para que, después de la comisión, lo que recibís no baje.
+function passShipping(codigo, shipOld, shipNew){
+  const sku = SKU_BY_CODE[codigo], st = state[codigo];
+  const k = 1 - sku.comision - (st.cuotas ? sku.costoFinCuotas : 0);
+  if(k <= 0) return;
+  st.precioElegido = Math.max(0, Math.round(st.precioElegido + (shipNew - shipOld) / k));
+}
 function marginOf(sku, precio, fulfillment, cuotas){
   const r = recibis(sku, precio, fulfillment, cuotas);
   if(r <= 0) return -Infinity;
@@ -603,7 +612,9 @@ function attachHandlers(){
   document.querySelectorAll('.seg button').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       const codigo = btn.closest('.seg').dataset.codigo;
+      const shipOld = shipOf(state[codigo].fulfillment);
       state[codigo].fulfillment = btn.dataset.val;
+      passShipping(codigo, shipOld, shipOf(state[codigo].fulfillment));
       update(codigo);
       saveSku(codigo);
     });
@@ -682,11 +693,15 @@ function attachHandlers(){
     });
   });
   document.getElementById('cfg-full').addEventListener('change', (e)=>{
+    const old = config.costoEnvioFull;
     config.costoEnvioFull = Number(e.target.value) || 0;
+    SEED.forEach(k => { if(state[k.codigo].fulfillment === 'full'){ passShipping(k.codigo, old, config.costoEnvioFull); saveSku(k.codigo); } });
     computeAllScales(); updateAll(); saveConfig();
   });
   document.getElementById('cfg-flex').addEventListener('change', (e)=>{
+    const old = config.costoEnvioFlex;
     config.costoEnvioFlex = Number(e.target.value) || 0;
+    SEED.forEach(k => { if(state[k.codigo].fulfillment === 'flex'){ passShipping(k.codigo, old, config.costoEnvioFlex); saveSku(k.codigo); } });
     computeAllScales(); updateAll(); saveConfig();
   });
 }
