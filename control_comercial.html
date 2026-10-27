@@ -1410,6 +1410,8 @@ function enviarResumenEjecutivo() {
   const sfB7   = v => parseFloat(v)>35?'🟢':parseFloat(v)>=30?'🟡':'🔴';
   const sfPerf = v => parseFloat(v)>=25?'🟢':parseFloat(v)>0?'🟡':'🔴';
   const pad    = (s,n) => String(s).padEnd(n);
+  // Valores del Control Comercial vienen en MILES -> se muestran en MILLONES (igual que el dash)
+  const fmtK   = v => v != null ? '$' + (parseFloat(v)/1000).toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' M' : '—';
 
   // Título de período legible: "Enero a Julio 2026" en vez de "Ene+Feb+...+Jul 2026"
   const mesesSel = MESES_CC_SELECCIONADOS.length ? MESES_CC_SELECCIONADOS : _mesesPorDefecto();
@@ -1423,18 +1425,25 @@ function enviarResumenEjecutivo() {
   const agCons   = parseFloat(ag.consumidoAnual||0);
 
   // ── BIG 7 (siempre los 7 originales — CLIENTES_COMERCIAL, nunca los 12 de la tabla) ──
-  const rowsB7 = calcRentabilidad(); // ya viene restringido a CLIENTES_COMERCIAL
+  // El resumen usa UN solo período (el del Control Comercial) en todas las secciones,
+  // para que coincida con el dash. Se fuerza temporalmente en Big 7 / Performance / Social.
+  const _rentOrig = MESES_RENT_SELECCIONADOS.slice();
+  MESES_RENT_SELECCIONADOS.splice(0, MESES_RENT_SELECCIONADOS.length, ...mesesSel);
+  let rowsB7;
+  try { rowsB7 = calcRentabilidad(); } finally { MESES_RENT_SELECCIONADOS.splice(0, MESES_RENT_SELECCIONADOS.length, ..._rentOrig); }
   const b7ClienteData = CLIENTES_COMERCIAL.map(n => clientes.find(c=>c.nombre===n)).filter(Boolean);
   const tB7Inv = b7ClienteData.reduce((a,c)=>a+(parseFloat(c.inv)||0),0);
   const tB7Presup = b7ClienteData.reduce((a,c)=>a+(parseFloat(c.presup)||0),0);
   const tB7Cmb = rowsB7.reduce((a,r)=>a+(r.cmb||0),0);
   const tB7CmbPresup = b7ClienteData.reduce((a,c)=>a+(parseFloat(c.cmbPresup)||0),0);
   const tB7VsPct = tB7Presup>0 ? ((tB7Inv-tB7Presup)/tB7Presup)*100 : 0;
-  const tB7CmoPromedio = rowsB7.length ? rowsB7.reduce((a,r)=>a+(r.inv>0?(r.cm/r.inv)*100:0),0)/rowsB7.length : 0;
+  // CMO % del total Big 7 = CMO $ total / Inv. período total (igual que la fila TOTAL del dash)
+  const tB7Inv2 = rowsB7.reduce((a,r)=>a+(r.inv||0),0);
+  const tB7CmoPromedio = tB7Inv2>0 ? (rowsB7.reduce((a,r)=>a+(r.cm||0),0)/tB7Inv2)*100 : 0;
 
   const facLines = b7ClienteData.map(c => {
     const vsP = parseFloat(c.vs||0);
-    return `${pad(c.nombre,22)}: ${fmt(c.inv)}  |  ${arrow(vsP)} ${Math.abs(vsP).toFixed(1)}%`;
+    return `${pad(c.nombre,22)}: ${fmtK(c.inv)}  |  ${arrow(vsP)} ${Math.abs(vsP).toFixed(1)}%`;
   }).join('\n');
 
   const cmbLines = rowsB7.map(r => {
@@ -1446,7 +1455,7 @@ function enviarResumenEjecutivo() {
   }).join('\n');
 
   // ── PERFORMANCE — Con OH y Sin OH, sin Bagó (todavía no tiene Fee cargado en Performance) ──
-  const mesesPerf = MESES_PERF_SELECCIONADOS.length ? MESES_PERF_SELECCIONADOS : _mesesPorDefecto();
+  const mesesPerf = mesesSel;
   const perfBase = Object.keys(DIRECTORES_PERF).filter(n => n !== 'Bagó').map(nombre => {
     let totalCosto=0, fee=0;
     mesesPerf.forEach(m=>{
@@ -1476,7 +1485,7 @@ function enviarResumenEjecutivo() {
     : '  Sin datos de Fee cargados en esta sesión.';
 
   // ── SOCIAL — Sin OH, con un segundo total que incluye el costo de Ignis M&C (sin Fee propio) ──
-  const mesesSocial = MESES_SOCIAL_SELECCIONADOS.length ? MESES_SOCIAL_SELECCIONADOS : _mesesPorDefecto();
+  const mesesSocial = mesesSel;
   const socialBase = Object.keys(DIRECTORES_SOCIAL).map(nombre => {
     let totalCosto=0, fee=0;
     mesesSocial.forEach(m=>{
@@ -1514,13 +1523,13 @@ function enviarResumenEjecutivo() {
     ``,
     `*1. TOTAL AGENCIA*`,
     `────────────────────────────`,
-    `Inversión:       ${fmt(ag.inv)}  ${arrow(agVs)} ${Math.abs(agVs).toFixed(1)}% vs Presup`,
-    `CMB:             ${fmt(ag.cmb)}  ${arrow(agVsCmb)} ${Math.abs(agVsCmb).toFixed(1)}% vs Presup`,
+    `Inversión:       ${fmtK(ag.inv)}  ${arrow(agVs)} ${Math.abs(agVs).toFixed(1)}% vs Presup`,
+    `CMB:             ${fmtK(ag.cmb)}  ${arrow(agVsCmb)} ${Math.abs(agVsCmb).toFixed(1)}% vs Presup`,
     `Consumido anual: ${agCons.toFixed(1)}%  ${bar(agCons)}`,
     ``,
     `*2. CLIENTES BIG 7*`,
     `────────────────────────────`,
-    `Inversión: ${fmt(tB7Inv)}  ${arrow(tB7VsPct)} ${Math.abs(tB7VsPct).toFixed(1)}% vs Presup  |  CMB: ${fmt(tB7Cmb)}  |  CMO promedio: ${tB7CmoPromedio.toFixed(1)}% ${sfB7(tB7CmoPromedio)}`,
+    `Inversión: ${fmtK(tB7Inv)}  ${arrow(tB7VsPct)} ${Math.abs(tB7VsPct).toFixed(1)}% vs Presup  |  CMB: ${fmtK(tB7Cmb)}  |  CMO promedio: ${tB7CmoPromedio.toFixed(1)}% ${sfB7(tB7CmoPromedio)}`,
     ``,
     `Facturación (Vs Presupuesto)`,
     `\`\`\``,
@@ -1569,7 +1578,7 @@ function enviarResumenEjecutivo() {
 
   const facRows = rowsHtml(b7ClienteData.map(c => {
     const vsP = parseFloat(c.vs||0);
-    return [c.nombre, fmt(c.inv), `${arrow(vsP)} ${Math.abs(vsP).toFixed(1)}%`, null];
+    return [c.nombre, fmtK(c.inv), `${arrow(vsP)} ${Math.abs(vsP).toFixed(1)}%`, null];
   }));
   const cmbRows = rowsHtml(rowsB7.map(r => {
     const cd = clientes.find(c=>c.nombre===r.nombre)||{};
@@ -1586,13 +1595,13 @@ function enviarResumenEjecutivo() {
 
     ${h3('1. Total Agencia')}
     <table width="100%" cellpadding="0" cellspacing="0" style="width:100%;max-width:100%;min-width:0;table-layout:fixed;font-size:14px;border-collapse:collapse;margin-bottom:8px"><colgroup><col style="width:34%"><col style="width:33%"><col style="width:33%"></colgroup>
-      <tr><td style="padding:4px 0;color:#333">Inversión</td><td style="text-align:right;font-weight:600">${fmt(ag.inv)}</td><td style="text-align:right;word-break:break-word;color:${agVs>=0?'#1a8a4a':'#c0392b'}">${arrow(agVs)} ${Math.abs(agVs).toFixed(1)}% vs Presup</td></tr>
-      <tr><td style="padding:4px 0;color:#333">CMB</td><td style="text-align:right;font-weight:600">${fmt(ag.cmb)}</td><td style="text-align:right;word-break:break-word;color:${agVsCmb>=0?'#1a8a4a':'#c0392b'}">${arrow(agVsCmb)} ${Math.abs(agVsCmb).toFixed(1)}% vs Presup</td></tr>
+      <tr><td style="padding:4px 0;color:#333">Inversión</td><td style="text-align:right;font-weight:600">${fmtK(ag.inv)}</td><td style="text-align:right;word-break:break-word;color:${agVs>=0?'#1a8a4a':'#c0392b'}">${arrow(agVs)} ${Math.abs(agVs).toFixed(1)}% vs Presup</td></tr>
+      <tr><td style="padding:4px 0;color:#333">CMB</td><td style="text-align:right;font-weight:600">${fmtK(ag.cmb)}</td><td style="text-align:right;word-break:break-word;color:${agVsCmb>=0?'#1a8a4a':'#c0392b'}">${arrow(agVsCmb)} ${Math.abs(agVsCmb).toFixed(1)}% vs Presup</td></tr>
       <tr><td style="padding:4px 0;color:#333">Consumido anual</td><td colspan="2" style="text-align:right">${agCons.toFixed(1)}%</td></tr>
     </table>
 
     ${h3('2. Clientes Big 7')}
-    ${subtotal(`Inversión: <b>${fmt(tB7Inv)}</b> (${arrow(tB7VsPct)}${Math.abs(tB7VsPct).toFixed(1)}% vs Presup) · CMB: <b>${fmt(tB7Cmb)}</b> · CMO promedio: <b style="color:${colorSf(sfB7(tB7CmoPromedio))}">${tB7CmoPromedio.toFixed(1)}%</b>`)}
+    ${subtotal(`Inversión: <b>${fmtK(tB7Inv)}</b> (${arrow(tB7VsPct)}${Math.abs(tB7VsPct).toFixed(1)}% vs Presup) · CMB: <b>${fmtK(tB7Cmb)}</b> · CMO promedio: <b style="color:${colorSf(sfB7(tB7CmoPromedio))}">${tB7CmoPromedio.toFixed(1)}%</b>`)}
     <p style="font-size:12px;text-transform:uppercase;color:#666;letter-spacing:1px;margin-bottom:4px">Facturación (Vs Presupuesto)</p>
     ${table(tableHead('Cliente','Inversión','Vs Presup.'), facRows)}
     <p style="font-size:12px;text-transform:uppercase;color:#666;letter-spacing:1px;margin-bottom:4px">CMB y CMO (Sin OH)</p>
