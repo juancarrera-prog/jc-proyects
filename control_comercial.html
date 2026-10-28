@@ -270,6 +270,23 @@ tfoot td,tr.total-row td{border-top:1px solid #6b6864}
 
 .dir-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:9px;vertical-align:middle}
 </style>
+
+/* Commercial UI 2026: espaciado tipografico Radar + pills rojo IGNIS */
+:root { --red: #E93325; --red-soft: rgba(233,51,37,.12); }
+.header-title h1 { letter-spacing: -0.02em; }
+.header-title p { letter-spacing: 0.02em; }
+.page-tab { letter-spacing: 0.02em; }
+.period-badge { letter-spacing: 0.02em; }
+.filter-label, .mes-label { letter-spacing: 0.06em; }
+.dir-btn, .rent-tab { letter-spacing: 0.01em; }
+.slack-btn { letter-spacing: 0.02em; }
+.section-title { letter-spacing: 0.02em; }
+.section-sub { letter-spacing: 0.01em; }
+th { letter-spacing: 0.05em; }
+.kpi-label { letter-spacing: 0.06em; }
+.alert-panel-title { letter-spacing: 0.04em; }
+.badge { letter-spacing: 0.02em; }
+.dir-btn.active, .rent-tab.active { background: #E93325; border-color: #E93325; color: #FFFFFF; font-weight: 700; }
 </style>
 </head>
 <body>
@@ -316,7 +333,7 @@ tfoot td,tr.total-row td{border-top:1px solid #6b6864}
     </div>
 
     <div class="director-filter">
-      <span class="filter-label">Meses (suman)</span>
+      <span class="filter-label">Meses</span>
       <div id="mesesCCSelector" style="display:flex;gap:6px;flex-wrap:wrap"></div>
     </div>
 
@@ -537,7 +554,7 @@ tfoot td,tr.total-row td{border-top:1px solid #6b6864}
     </div>
 
     <div class="director-filter">
-      <span class="filter-label">Meses · Bagó (suman)</span>
+      <span class="filter-label">Meses</span>
       <div id="mesesBagoSelector" style="display:flex;gap:6px;flex-wrap:wrap"></div>
     </div>
     <div class="table-card" id="bagoCard">
@@ -580,7 +597,7 @@ tfoot td,tr.total-row td{border-top:1px solid #6b6864}
     <div id="rent-consolidado" class="rent-section">
 
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap">
-        <span class="filter-label">Mes de análisis</span>
+        <span class="filter-label">Meses</span>
         <div id="mesSelectorRent" style="display:none"></div>
       </div>
 
@@ -651,7 +668,7 @@ tfoot td,tr.total-row td{border-top:1px solid #6b6864}
 
   <div id="perf-consolidado" class="rent-section" style="display:block">
     <div class="mes-selector-row">
-      <span class="mes-label">MES DE ANÁLISIS</span>
+      <span class="mes-label">MESES</span>
       <div id="mesSelectorPerf" class="mes-btns"></div>
     </div>
     <div id="kpisPerf" class="kpis"></div>
@@ -729,7 +746,7 @@ tfoot td,tr.total-row td{border-top:1px solid #6b6864}
 
   <div id="social-consolidado" class="rent-section" style="display:block">
     <div class="mes-selector-row">
-      <span class="mes-label">MES DE ANÁLISIS</span>
+      <span class="mes-label">MESES</span>
       <div id="mesSelectorSocial" class="mes-btns"></div>
     </div>
     <div id="kpisSocial" class="kpis"></div>
