@@ -35,7 +35,7 @@
     justify-content: space-between;
     gap: 24px;
   }
-  .doc-eyebrow { font-size: 9px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #E5453D; margin-bottom: 6px; }
+  .doc-eyebrow { font-size: 9px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #E93325; margin-bottom: 6px; }
   .doc-title { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 4px; }
   .doc-sub { font-size: 11px; color: #888480; }
   .doc-meta-block { text-align: right; }
@@ -67,8 +67,8 @@
   }
   .team-pill:hover { border-color: #555; color: #F0EEE8; }
   .team-pill.active {
-    background: #E5453D;
-    border-color: #E5453D;
+    background: #E93325;
+    border-color: #E93325;
     color: white;
   }
 
@@ -104,8 +104,8 @@
   }
   .client-pill:hover:not(:disabled) { border-color: #4A4A4A; color: #F0EEE8; }
   .client-pill.active {
-    background: #C8211D;
-    border-color: #C8211D;
+    background: #E93325;
+    border-color: #E93325;
     color: white;
   }
   .client-pill[data-always-active="1"] {
@@ -179,7 +179,7 @@
     transition: background 0.25s ease;
   }
   .family-header:hover { background: #181818; }
-  .family-header:focus-visible { outline: 2px solid #E5453D; outline-offset: -2px; }
+  .family-header:focus-visible { outline: 2px solid #E93325; outline-offset: -2px; }
 
   .fam-badge {
     display: inline-flex; align-items:center; justify-content:center;
@@ -195,13 +195,13 @@
   .fam-d .fam-badge { background: #50C0A0; }
 
   .fam-title {
-    color: #E5453D;
+    color: #E93325;
     font-size: 11px; font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
   .fam-count {
-    color: #B0322C;
+    color: #E93325;
     font-size: 9px; font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -209,7 +209,7 @@
   }
   .fam-chevron {
     margin-left: auto;
-    color: #E5453D;
+    color: #E93325;
     font-size: 11px;
     transition: transform 0.35s cubic-bezier(.65,0,.35,1);
     display: inline-block;
@@ -254,7 +254,7 @@
     transition: background 0.2s ease;
   }
   .subcat-header:hover { background: #FAFAF8; }
-  .subcat-header:focus-visible { outline: 2px solid #C8211D; outline-offset: -2px; }
+  .subcat-header:focus-visible { outline: 2px solid #E93325; outline-offset: -2px; }
 
   .subcat-chevron {
     color: #B0AEAD;
@@ -263,7 +263,7 @@
     display: inline-block;
     width: 10px;
   }
-  .subcat-header[aria-expanded="true"] .subcat-chevron { transform: rotate(90deg); color: #C8211D; }
+  .subcat-header[aria-expanded="true"] .subcat-chevron { transform: rotate(90deg); color: #E93325; }
 
   .subcat-title {
     font-size: 11px; font-weight: 600; color: #1A1A1A;
@@ -288,7 +288,7 @@
   /* ── COLUMN HEADER (black/red) ── */
   .col-header td {
     background: #0C0C0C;
-    color: #E5453D;
+    color: #E93325;
     font-size: 9px;
     font-weight: 700;
     letter-spacing: 0.08em;
@@ -331,11 +331,11 @@
     margin: 1px 2px 1px 0;
     letter-spacing: 0.03em;
   }
-  .bt-a { background: rgba(200,33,29,0.08); color: #9B1A17; border: 0.5px solid rgba(200,33,29,0.2); }
+  .bt-a { background: rgba(233,51,37,0.08); color: #E93325; border: 0.5px solid rgba(233,51,37,0.2); }
   .bt-b { background: #F0EFED; color: #666460; border: 0.5px solid #DDDBD9; }
   .bt-all { background: #EEF5FD; color: #2B6CB0; border: 0.5px solid #B3D0F0; }
   .bt-agency { background: #F0F9F4; color: #276749; border: 0.5px solid #B3DFCA; }
-  .bt-line { background: rgba(200,33,29,0.08); color: #9B1A17; border: 0.5px solid rgba(200,33,29,0.2); }
+  .bt-line { background: rgba(233,51,37,0.08); color: #E93325; border: 0.5px solid rgba(233,51,37,0.2); }
 
   .notes-cell { font-size: 10px; color: #666460; line-height: 1.6; }
   .notes-cell strong { color: #333; font-weight: 600; }
@@ -383,6 +383,53 @@
     .subcat { opacity: 1 !important; transform: none !important; }
     .entregable-row td { opacity: 1 !important; transform: none !important; }
   }
+
+  /* Identidad Value IGNIS 2026: Inter, negro y rojo oficial */
+  html, body, .page-wrap { background: #000000; }
+  body { color: #F0EEE8; font-family: 'Inter', system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .framework-brand-identity { display: flex; align-items: center; gap: 20px; min-width: 0; }
+  .framework-isologo { width: 64px; height: 84px; object-fit: contain; flex-shrink: 0; }
+  .hint-bar { background: #111111; border-color: #292929; color: #B0AEA8; }
+  .client-note { background: #251B0C; border-color: #514024; color: #F0D7A0; }
+  .client-note strong { color: #FFE1A0; }
+  .sow-wrap { background: #101010; border-color: #2A2A2A; }
+  .family { border-color: #292929; }
+  .family-body { background: #101010; }
+  .subcat, .subcat-header { background: #191919; border-color: #343434; }
+  .subcat-header:hover { background: #242424; }
+  .subcat-title { color: #F0EEE8; }
+  .subcat-count { color: #C5C0BA; background: #333333; }
+  .subcat-header[aria-expanded="true"] + .subcat-body { border-color: #343434; }
+  .entregable-row td { background: #191919; border-color: #303030; color: #E6E3DF; }
+  .entregable-row:hover td { background: #242424; }
+  .del-name, .timing-main { color: #F0EEE8; }
+  .del-sub, .timing-cell, .notes-cell { color: #B7B2AC; }
+  .notes-cell strong { color: #F0EEE8; }
+  .bt-a, .bt-line { background: rgba(233,51,37,0.14); color: #FF877C; border-color: rgba(233,51,37,0.38); }
+  .bt-b { background: #303030; color: #E3E0DC; border-color: #484848; }
+  .bt-all { background: #172537; color: #9BC7F6; border-color: #345679; }
+  .bt-agency { background: #142B24; color: #9CE1BE; border-color: #33604C; }
+  .internal-badge { background: #332711; color: #FFE09A; border-color: #6B5429; }
+  .internal-row td { background: #1C1A16; }
+  .internal-row:hover td { background: #28241D; }
+  .future-wrap { background: #201C0E; border-color: #8A6D00; }
+  .future-header { color: #F5CF65; }
+  .future-name { color: #F8E1A0; }
+  .future-desc { color: #D8C58E; }
+  .fam-a .fam-badge, .fam-b .fam-badge, .fam-c .fam-badge, .fam-d .fam-badge { background: #E93325; }
+  @media (max-width: 600px) {
+    .framework-brand-identity { gap: 12px; }
+    .framework-isologo { width: 44px; height: 62px; }
+    .doc-header { padding: 20px 18px; flex-wrap: wrap; }
+  }
+  @media print {
+    html, body, .page-wrap { background: #FFFFFF; color: #1A1A1A; }
+    .hint-bar { background: #F5F5F2; color: #555; }
+    .family-body, .sow-wrap, .subcat, .subcat-header, .entregable-row td { background: #FFFFFF; color: #1A1A1A; }
+    .subcat-title, .del-name, .timing-main, .notes-cell strong { color: #1A1A1A; }
+    .del-sub, .timing-cell, .notes-cell { color: #555; }
+  }
+
 </style>
 </head>
 <body>
@@ -390,10 +437,13 @@
 
   <!-- HEADER -->
   <div class="doc-header">
-    <div>
-      <div class="doc-eyebrow">Ignis Media Agency</div>
-      <div class="doc-title">Framework — Branding</div>
-      <div class="doc-sub">Scope de servicios por equipo y cliente</div>
+    <div class="framework-brand-identity">
+      <img class="framework-isologo" src="https://drive.google.com/thumbnail?id=1PDtPs6Uoux-ilXjBxplN_wKZbchXtp0c&sz=w240" alt="IGNIS — isologo vertical oficial" />
+      <div>
+        <div class="doc-eyebrow">Ignis Media Agency</div>
+        <div class="doc-title">Framework — Branding</div>
+        <div class="doc-sub">Scope de servicios por equipo y cliente</div>
+      </div>
     </div>
     <div class="doc-meta-block">
       <div class="doc-meta-row">Fecha <span>Agosto 2026</span></div>
