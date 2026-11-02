@@ -2351,6 +2351,7 @@ const MARCAS_BAGO_DISPLAY = {
   'ESOPRAZOL': 'Esoprazol', 'ANAFLEX': 'Anaflex', 'FACIALES': 'Faciales',
   'CORPORALES': 'Corporales', 'CAPILARES': 'Capilares', 'SOLARES': 'Solares',
   'BAGO+': 'Bagó+', 'DIOXAFLEX': 'Dioxaflex', 'INSTITUCIONAL': 'Institucional',
+  'SIMPLE': 'Simple',
 };
 
 function _sumarPeriodoMarca(producto) {
@@ -2380,11 +2381,42 @@ function aplicarBagoMarcasReal() {
   Object.keys(MARCAS_BAGO_DISPLAY).forEach(producto => {
     const nombreDisplay = MARCAS_BAGO_DISPLAY[producto];
     const calc = _sumarPeriodoMarca(producto);
-    if (calc.inv === 0 && calc.presup === 0) return; // sin datos en ningún lado, no mostrar (ej: Institucional sin presup y sin inv en el período)
+    if (calc.inv === 0 && calc.presup === 0) { DATA.bago = DATA.bago.filter(r => r.nombre !== nombreDisplay); return; } // sin datos en el período: no mostrar (y no dejar valores viejos de otra selección de meses)
     let row = DATA.bago.find(r => r.nombre === nombreDisplay);
     if (!row) { row = { nombre: nombreDisplay }; DATA.bago.push(row); }
     Object.assign(row, calc);
   });
+}
+
+/* ===== Integridad de fees: nunca mostrar un cero silencioso como válido ===== */
+function mostrarAvisoFees(mensajes) {
+  ['page-performance', 'page-social'].forEach(pid => {
+    const page = document.getElementById(pid);
+    if (!page) return;
+    let box = document.getElementById('avisoFees_' + pid);
+    if (!mensajes || !mensajes.length) { if (box) box.remove(); return; }
+    if (!box) {
+      box = document.createElement('div');
+      box.id = 'avisoFees_' + pid;
+      box.style.cssText = 'margin:0 0 12px 0;padding:10px 14px;border:1px solid #ff4455;border-left:4px solid #ff4455;background:rgba(255,68,85,.12);color:#ff8a95;font-size:12.5px;border-radius:6px;line-height:1.45';
+      page.insertBefore(box, page.firstChild);
+    }
+    box.innerHTML = '<b>Fees no confiables</b> — ' + mensajes.map(m => String(m).replace(/</g, '&lt;')).join('<br>');
+  });
+}
+function verificarIntegridadFees(json) {
+  const msgs = [];
+  if (json.fees_perf_auto === null || json.fees_perf_auto === undefined)     msgs.push('El endpoint no devolvió fees de Performance.');
+  if (json.fees_social_auto === null || json.fees_social_auto === undefined) msgs.push('El endpoint no devolvió fees de Redes.');
+  const d = json.fees_diagnostico;
+  if (!d) {
+    msgs.push('El endpoint no incluye el control de fees (fees_diagnostico): el Apps Script publicado es una versión anterior.');
+  } else if (d.ok === false) {
+    ['Performance', 'Redes'].forEach(t => { if (d[t] && d[t].ok === false) (d[t].errores || []).forEach(e => msgs.push(t + ': ' + e)); });
+  }
+  mostrarAvisoFees(msgs);
+  if (msgs.length) console.error('[Fees] integridad:', msgs);
+  else console.log('[Fees] integridad OK — Sheet vs endpoint concilian');
 }
 
 async function loadData() {
@@ -2511,6 +2543,7 @@ async function loadData() {
     if (json.costos_social_auto) TABLA_COSTOS_SOCIAL = json.costos_social_auto;
     if (json.fees_perf_auto)   INGRESOS_PERF   = json.fees_perf_auto;
     if (json.fees_social_auto) INGRESOS_SOCIAL = json.fees_social_auto;
+    verificarIntegridadFees(json);
     if (json.fte_vendido_perf_auto)   FTE_VENDIDO_PERF   = json.fte_vendido_perf_auto;
     if (json.fte_vendido_social_auto) FTE_VENDIDO_SOCIAL = json.fte_vendido_social_auto;
     initMesesCC();
@@ -2538,6 +2571,7 @@ async function loadData() {
     }, 100);
   } catch(e) {
     console.warn('Rentabilidad sin conexion, usando datos locales:', e.message);
+    mostrarAvisoFees(['Sin conexión con el Sheet (' + e.message + '): los fees de Performance y Social NO están cargados y se muestran vacíos. No usar estos números.']);
     window._rentDataReady = true;
     window._perfDataReady = true;
     setTimeout(() => {
@@ -3296,7 +3330,7 @@ function guardarCostos() {
 ═══════════════════════════════════════════════════════════ */
 
 const CLIENTES_COMERCIAL = ['Bagó','Banco Patagonia','La Paulina','Pfizer','McCain','Escorial','Universal Assistance'];
-const BAGO_MARCAS = ['Esoprazol','Anaflex','Faciales','Corporales','Capilares','Solares','Bagó +','Dioxaflex','Institucional'];
+const BAGO_MARCAS = ['Esoprazol','Anaflex','Faciales','Corporales','Capilares','Solares','Bagó +','Dioxaflex','Institucional','Simple'];
 const MESES_COMERCIAL = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
 // Estructura de datos embebidos Control Comercial
