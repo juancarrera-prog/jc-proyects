@@ -312,6 +312,17 @@ td {border-bottom-color:rgba(255,255,255,.09);}
 
 
 @media(max-width:768px){.wrap{padding-left:16px;padding-right:16px}.header{padding-top:20px}}</style>
+<style id="ignis-dashboard-motion">/* Transiciones de controles: sin animar el fondo ni las cifras. */
+.page-tab, .rent-tab, .dir-btn, .cli-btn, .slack-btn {
+  transition: background-color 160ms ease, border-color 160ms ease,
+              color 160ms ease, box-shadow 160ms ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .page-tab, .rent-tab, .dir-btn, .cli-btn, .slack-btn {
+    transition: none !important;
+  }
+}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -3559,6 +3570,50 @@ function cargarDatosComercialDesdeSheet(json) {
 
 /* INIT */
 loadData();
+</script>
+<script id="ignis-dashboard-motion-script">/* Solo presentación: los handlers existentes siguen actualizando los datos. */
+(() => {
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let pendingFrame = 0;
+  let currentAnimation = null;
+
+  const stopMotion = () => {
+    cancelAnimationFrame(pendingFrame);
+    pendingFrame = 0;
+    if (currentAnimation) currentAnimation.cancel();
+    currentAnimation = null;
+  };
+
+  reducedMotion.addEventListener('change', stopMotion);
+  document.addEventListener('click', event => {
+    const control = event.target instanceof Element && event.target.closest(
+      '.page-tab, .rent-tab, .dir-btn, .cli-btn'
+    );
+    if (!control) return;
+    const isPageTab = control.classList.contains('page-tab');
+    const sourcePageId = control.closest('.page')?.id;
+    if (!isPageTab && !sourcePageId) return;
+    stopMotion();
+    if (reducedMotion.matches) return;
+
+    // Captura el contexto antes de que un selector mensual regenere sus botones.
+    pendingFrame = requestAnimationFrame(() => {
+      pendingFrame = 0;
+      if (reducedMotion.matches) return;
+      const page = isPageTab
+        ? document.querySelector('.page.active')
+        : document.getElementById(sourcePageId);
+      if (!page || !page.classList.contains('active') || !page.animate) return;
+      currentAnimation = page.animate(
+        isPageTab
+          ? [{ opacity: 0.86, transform: 'translateY(3px)' },
+             { opacity: 1, transform: 'translateY(0)' }]
+          : [{ opacity: 0.92 }, { opacity: 1 }],
+        { duration: isPageTab ? 200 : 160, easing: 'cubic-bezier(.2,.7,.2,1)' }
+      );
+    });
+  }, true);
+})();
 </script>
 </body>
 </html>
