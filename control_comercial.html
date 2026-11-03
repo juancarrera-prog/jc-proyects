@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Control Comercial · Ignis</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -321,6 +321,95 @@ td {border-bottom-color:rgba(255,255,255,.09);}
   .page-tab, .rent-tab, .dir-btn, .cli-btn, .slack-btn {
     transition: none !important;
   }
+}
+</style>
+<meta name="theme-color" content="#0a0d12">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style id="ignis-responsive">.mobile-records, .table-swipe-hint { display:none; }
+@media (max-width: 768px) {
+  html, body {width:100%;min-width:0;}
+  .wrap {width:100%;padding:0 max(14px,env(safe-area-inset-right)) max(28px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));}
+  .wrap > *, .page, .rent-section {min-width:0;max-width:100%;}
+  .header {display:block;padding:calc(20px + env(safe-area-inset-top)) 0 18px;}
+  .header-left {gap:12px;min-width:0;}
+  .header-title {min-width:0;}
+  .header-title h1 {font-size:clamp(18px,5.5vw,24px);line-height:1.15;}
+  .header-title p {font-size:9px;line-height:1.5;}
+  .logo-mark,.logo-mark img {width:36px;height:36px;}
+  .header-right {display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px;width:100%;}
+  .period-badge {grid-column:1/-1;min-width:0;flex-wrap:wrap;line-height:1.6;font-size:9px;padding:8px 10px;}
+  #periodoLabel {overflow-wrap:anywhere;}
+  .header-right .slack-btn {min-height:44px;justify-content:center;padding:10px 8px;font-size:10px;white-space:normal;text-align:center;}
+  .page-tabs {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:16px 0 22px;border:0;}
+  .page-tab {min-width:0;min-height:46px;padding:12px 7px;text-align:left;font-size:10px;letter-spacing:0!important;border:1px solid rgba(255,255,255,.14);background:rgba(9,12,16,.82);white-space:normal;}
+  .page-tab::before {margin-right:6px;}
+  .page-tab.active {border-color:var(--red);background:rgba(233,51,37,.12);}
+  .page-tab .tab-badge {width:14px;height:14px;margin-left:4px;font-size:9px;}
+  .director-filter {gap:7px;margin-bottom:16px;}
+  .director-filter > .filter-label {flex-basis:100%;}
+  .dir-btn,.rent-tab,.cli-btn,.modal-mes-btn {min-height:44px;padding:9px 12px;font-size:11px;white-space:normal;line-height:1.35;}
+  .director-filter > .dir-btn {max-width:100%;text-align:left;}
+  #mesesCCSelector,#mesesBagoSelector {display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px!important;width:100%;}
+  #mesesCCSelector .rent-tab,#mesesBagoSelector .rent-tab {padding:8px 0;min-width:0;font-size:10px;}
+  .mes-selector-row {display:flex;flex-wrap:wrap;gap:8px;}
+  .mes-btns,.cliente-selector {display:flex;flex-wrap:wrap;gap:7px;min-width:0;max-width:100%;}
+  .section-header {align-items:flex-start;flex-wrap:wrap;gap:8px;margin-top:22px;}
+  .section-header > div {min-width:0;max-width:100%;}
+  .section-title {font-size:18px;line-height:1.3;overflow-wrap:anywhere;}
+  .section-sub {font-size:11px;line-height:1.55;}
+  .section-header [style*="flex-shrink:0"] {flex-wrap:wrap;}
+  #kpisAgencia {flex-direction:column;gap:0!important;}
+  #kpisAgencia > div {min-width:0;width:100%;padding:16px 10px!important;}
+  #kpisAgencia > div:nth-child(2) {width:auto!important;height:1px;margin:0 12px!important;padding:0!important;}
+  #kpisAgencia > div > div:nth-child(2) {display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:2px!important;}
+  #kpisAgencia svg {width:64px;height:64px;max-width:100%;}
+  #kpisAgencia svg + div + div {font-size:9px!important;letter-spacing:0!important;}
+  #kpisAgencia > div > div:nth-child(3) {display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px!important;}
+  #kpisAgencia > div > div:nth-child(3) > div {min-width:0!important;padding:10px 7px!important;}
+  #kpisAgencia > div > div:nth-child(3) > div:last-child {grid-column:1/-1;}
+  .kpis {grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+  .kpi {min-width:0;padding:14px 10px;background:rgba(9,12,16,.88);}
+  .kpi-value {font-size:clamp(22px,6.3vw,29px);overflow-wrap:anywhere;}
+  .kpi-label {font-size:9px;letter-spacing:.05em;line-height:1.5;}
+  .kpi-sub {font-size:10px;line-height:1.5;}
+  .bottom-grid,.ranking-grid {grid-template-columns:minmax(0,1fr);gap:12px;}
+  .rank-card,.chart-card,.mini-card {min-width:0;padding:14px;}
+  .rank-name {min-width:0;overflow-wrap:anywhere;}
+  .table-card {max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;}
+  .table-card table {min-width:720px;}
+  .table-card th,.table-card td {padding:11px 10px;font-size:12px;}
+  .table-card th:first-child,.table-card td:first-child {position:sticky;left:0;z-index:1;background:#10151b;min-width:125px;max-width:160px;box-shadow:2px 0 5px rgba(0,0,0,.25);}
+  .table-swipe-hint {display:block;color:#b2b5ba;font-size:11px;margin:8px 0;line-height:1.5;}
+  .mobile-source-table {display:none;}
+  .mobile-records {display:grid;gap:10px;margin-bottom:16px;}
+  .mobile-record {border:1px solid rgba(255,255,255,.16);background:rgba(9,12,16,.93);border-radius:8px;overflow:hidden;}
+  .mobile-record summary {padding:15px 13px;cursor:pointer;list-style:none;}
+  .mobile-record summary::-webkit-details-marker {display:none;}
+  .mobile-record-title {display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:14px;font-weight:650;line-height:1.4;}
+  .mobile-record-title::after {content:'+';font-size:21px;color:#c7c9cd;font-weight:400;}
+  .mobile-record[open] .mobile-record-title::after {content:'−';}
+  .mobile-record-preview {display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;margin-top:12px;}
+  .mobile-record-preview small,.mobile-record-field dt {display:block;color:#aeb2b9;font-size:10px;line-height:1.45;text-transform:uppercase;letter-spacing:.03em;}
+  .mobile-record-preview strong {display:block;font-size:16px;margin-top:4px;font-variant-numeric:tabular-nums;}
+  .mobile-record-preview .positive {color:#00c853;}
+  .mobile-record-preview .negative {color:#ff6675;}
+  .mobile-record-fields {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 10px;padding:14px 13px 18px;border-top:1px solid rgba(255,255,255,.1);}
+  .mobile-record-field {min-width:0;}
+  .mobile-record-field dd {margin:5px 0 0;font-size:13px;line-height:1.5;overflow-wrap:anywhere;}
+  .mobile-total {padding:14px;font-size:12px;line-height:1.6;background:rgba(9,12,16,.93);border:1px solid rgba(255,255,255,.16);border-radius:8px;}
+  .mobile-total strong {display:block;font-size:13px;margin-bottom:6px;}
+  .alert-panel {padding:14px;}
+  .alert-items {display:grid;grid-template-columns:minmax(0,1fr);}
+  .alert-item {font-size:12px;line-height:1.5;}
+  .modal-overlay {padding:10px;}
+  .modal-box {max-height:calc(100dvh - 20px);padding:22px 14px;}
+  .modal-title {font-size:19px;padding-right:24px;}
+  .modal-grid {grid-template-columns:repeat(2,minmax(0,1fr));}
+  input,select,textarea,.modal-field input,.fte-inline-input {font-size:16px!important;max-width:100%;}
+  .modal-actions {flex-wrap:wrap;}
+  .modal-actions button,.btn-action {min-height:44px;}
+  body::before {background-attachment:scroll!important;}
 }
 </style>
 </head>
@@ -3613,6 +3702,106 @@ loadData();
       );
     });
   }, true);
+})();
+</script>
+<script id="ignis-responsive-script">/* Representación móvil de los mismos valores que ya renderizan las tablas. */
+(() => {
+  const mobile = window.matchMedia('(max-width: 768px)');
+  const normalize = text => text.replace(/\s+/g, ' ').trim();
+  const sources = ['tbodyClientes', 'tbodyBago'];
+  const expanded = new Map();
+  const textNode = (tag, text, className) => {
+    const node = document.createElement(tag);
+    node.textContent = text;
+    if (className) node.className = className;
+    return node;
+  };
+  const render = id => {
+    if (!mobile.matches) return;
+    const body = document.getElementById(id);
+    const table = body?.closest('table');
+    const card = body?.closest('.table-card');
+    if (!table || !card) return;
+    let list = document.getElementById(id + '-mobile');
+    if (!list) {
+      list = document.createElement('div');
+      list.id = id + '-mobile';
+      list.className = 'mobile-records';
+      list.setAttribute('aria-label', id === 'tbodyClientes' ? 'Detalle por cliente' : 'Detalle por marca');
+      card.before(list);
+    }
+    const openNames = expanded.get(id) || new Set();
+    list.querySelectorAll('details').forEach(d => {
+      if (d.open) openNames.add(d.dataset.name); else openNames.delete(d.dataset.name);
+    });
+    expanded.set(id, openNames);
+    const headings = Array.from(table.querySelectorAll('thead th'), h => normalize(h.textContent));
+    const fragment = document.createDocumentFragment();
+    let recordCount = 0;
+    Array.from(body.rows).forEach(row => {
+      const cells = Array.from(row.cells, c => normalize(c.textContent));
+      if (!cells.length) return;
+      if (cells.length !== headings.length) {
+        // Totales con colspan: conservar importes y etiquetas del listado original.
+        const total = textNode('div', '', 'mobile-total');
+        total.append(textNode('strong', cells[0]));
+        const labels = id === 'tbodyClientes' && /^TOTAL$/i.test(cells[0])
+          ? ['Inversión', 'Presupuesto', 'CMB', 'CMB presupuestado'] : [];
+        cells.slice(1).filter(Boolean).forEach((value, i) => total.append(textNode('div', (labels[i] ? labels[i] + ': ' : '') + value)));
+        fragment.append(total);
+        return;
+      }
+      const name = cells[0];
+      const details = document.createElement('details');
+      details.className = 'mobile-record';
+      details.dataset.name = name;
+      details.open = openNames.has(name);
+      const summary = document.createElement('summary');
+      summary.append(textNode('div', name, 'mobile-record-title'));
+      const preview = document.createElement('div');
+      preview.className = 'mobile-record-preview';
+      const indexes = [headings.findIndex(h => /^INV\./i.test(h)), headings.findIndex(h => /^VS PRESUP/i.test(h))];
+      indexes.forEach(index => {
+        if (index < 0) return;
+        const item = document.createElement('div');
+        item.append(textNode('small', headings[index]));
+        const value = textNode('strong', cells[index]);
+        if (cells[index].includes('▼')) value.className = 'negative';
+        else if (cells[index].includes('▲')) value.className = 'positive';
+        item.append(value);
+        preview.append(item);
+      });
+      summary.append(preview);
+      details.append(summary);
+      const fields = document.createElement('dl');
+      fields.className = 'mobile-record-fields';
+      cells.slice(1).forEach((value, i) => {
+        const field = document.createElement('div');
+        field.className = 'mobile-record-field';
+        field.append(textNode('dt', headings[i + 1]), textNode('dd', value));
+        fields.append(field);
+      });
+      details.append(fields);
+      fragment.append(details);
+      recordCount++;
+    });
+    if (recordCount > 0) list.replaceChildren(fragment);
+    else list.replaceChildren();
+    card.classList.toggle('mobile-source-table', recordCount > 0);
+  };
+  sources.forEach(id => {
+    const body = document.getElementById(id);
+    if (body) new MutationObserver(() => render(id)).observe(body, {childList:true, subtree:true, characterData:true});
+    render(id);
+  });
+  mobile.addEventListener('change', () => sources.forEach(render));
+  document.querySelectorAll('.table-card').forEach(card => {
+    if (sources.some(id => card.querySelector('#' + id))) return;
+    const hint = textNode('p', 'Deslizá hacia los costados para ver todas las columnas.', 'table-swipe-hint');
+    card.before(hint);
+    card.tabIndex = 0;
+    card.setAttribute('aria-label', 'Tabla con desplazamiento horizontal');
+  });
 })();
 </script>
 </body>
