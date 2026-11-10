@@ -5,7 +5,15 @@ Aplicación familiar móvil con Google Sheets + Google Apps Script. No usa Fireb
 ## Archivos
 - `Code.gs`: backend; lee/escribe las tres pestañas de la planilla, con bloqueo de concurrencia.
 - `Index.html`: interfaz móvil para compras, pendientes y prioridades del hogar.
-- `tests/`: pruebas locales del catálogo y de compatibilidad con los datos existentes (Node.js, sin dependencias).
+- `tests/`: pruebas locales del catálogo, tema y accesos rápidos, con compatibilidad con los datos existentes (Node.js, sin dependencias).
+
+## Apariencia y accesos rápidos
+- El botón **Modo oscuro / Modo claro** está disponible desde la pantalla inicial, antes de introducir la clave, y también en el encabezado después de ingresar.
+- La primera visita usa la apariencia del sistema. La elección manual se recuerda en ese navegador mediante la única preferencia local `casa.theme`. Si el navegador bloquea ese almacenamiento, el cambio sigue funcionando durante la sesión. La clave y los datos familiares no se guardan allí.
+- En **Compras → Mi lista**, **+ Pan**, **+ Leche** y **+ Huevos** agregan productos en un toque. Los botones muestran **✓** cuando el producto ya está pendiente. Los productos completados se pueden volver a agregar mediante el comportamiento del backend existente.
+- **★ Tus favoritos** muestra hasta seis accesos rápidos compartidos. **Ver favoritos** abre el catálogo filtrado para consultar o agregar el resto. Las estrellas del catálogo mantienen el protocolo existente de `changeCasaCatalog`.
+- Los botones rápidos usan `changeCasa(pin, 'compras', 'add', {producto, categoria})`. No se requieren nuevas funciones, propiedades ni pestañas en el backend actual. Con una respuesta antigua que no incluya catálogo, los botones y la lista siguen funcionando; los favoritos requieren el `Code.gs` con soporte de catálogo.
+- Esta actualización de apariencia y accesos rápidos sólo modifica `Index.html`; conserva `Code.gs` y no ejecuta operaciones contra la planilla familiar durante las pruebas.
 
 ## Compras: lista y catálogo
 - **Mi lista** conserva el ingreso rápido y las acciones de completar, eliminar y vaciar.
@@ -35,6 +43,8 @@ Pestañas existentes: `CASA_Compras`, `CASA_Pendientes`, `CASA_Semaforo`. La act
 3. Elegí **Implementar → Administrar implementaciones**, seleccioná la implementación actual y tocá el lápiz **Editar**. En **Versión**, elegí **Nueva versión**, agregá una descripción y pulsá **Implementar**. Conservá los permisos y la cuenta de ejecución existentes. Al editar la implementación actual se mantiene el mismo enlace `/exec`.
 4. Abrí de nuevo el enlace en ambos teléfonos. Probá: buscar un producto, agregarlo, marcarlo favorito, crear uno propio y actualizar el otro teléfono. Verificá que al vaciar la compra sigan disponibles el producto propio y la estrella.
 
+Si ya tenés el backend de catálogo de este repositorio, para la actualización de modo oscuro y botones rápidos alcanza con reemplazar **Index**, guardar y publicar una **Nueva versión** de la implementación actual. No hace falta volver a configurar la clave ni modificar la planilla.
+
 Actualizar GitHub no publica automáticamente el proyecto de Apps Script. Referencia: https://developers.google.com/apps-script/concepts/deployments#edit_a_versioned_deployment
 
 ## Seguridad y límites
@@ -50,5 +60,6 @@ Actualizar GitHub no publica automáticamente el proyecto de Apps Script. Refere
 ## Desarrollo
 Modificá ambos archivos en este directorio, replicá los cambios en el proyecto Apps Script y publicá una versión nueva. La planilla es la fuente de datos persistente.
 
-Desde la raíz del repositorio, ejecutá `node --test casa/tests/catalog.test.cjs`. Las pruebas usan servicios de Apps Script simulados y datos ficticios; no acceden a la planilla ni contienen la clave familiar. La comprobación final del despliegue y del teclado debe hacerse en un iPhone real.
+Desde la raíz del repositorio, ejecutá `node --test casa/tests/catalog.test.cjs casa/tests/interface.test.cjs`. Las pruebas usan servicios de Apps Script simulados y datos ficticios; no acceden a la planilla ni contienen la clave familiar. Cubren autenticación, persistencia de favoritos, duplicados, respuestas del backend anterior, modos claro/oscuro y almacenamiento local bloqueado. La comprobación final del despliegue y del teclado debe hacerse en un iPhone real.
+
 
