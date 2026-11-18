@@ -805,7 +805,7 @@ td {border-bottom-color:rgba(255,255,255,.09);}
     </div>
     <div class="section-header">
       <div><div class="section-title">Tabla Consolidada · Performance</div><div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-        <div class="section-sub">Fee − Costo de Equipo · CMO % = CMO $ / Fee</div>
+        <div class="section-sub">Fee − Costo de Equipo · CMO % = CMO $ / Fee · Costos salariales según vigencia de cada mes · sin OH salvo que actives «Con OH».</div>
         <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
           <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#666;white-space:nowrap"><div style="width:8px;height:8px;border-radius:50%;background:#ff4455;flex-shrink:0"></div>CMO % ≤ 0%</div>
           <div style="width:1px;height:12px;background:#333"></div>
@@ -1869,7 +1869,42 @@ function slackMsgToHtmlEmail(text) {
 
 
 /* ── SOCIAL FUNCTIONS ── */
-function getColCostoSocial(mes) { return MAPA_MES_COSTO_SOCIAL[mes] || MES_VIGENTE_SOCIAL; }
+// La tarifa de diciembre 2025 es la base de enero 2026.
+// Cada mes usa la última columna de salarios cuya vigencia ya comenzó.
+function indiceVigenciaCosto(columna) {
+  if (columna === 'Diciembre') return 0;
+  if (columna === 'Diciembre 2026') return 12;
+  const i = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre'].indexOf(columna);
+  return i < 0 ? -1 : i + 1;
+}
+function columnaCostoVigente(tabla, mes) {
+  const objetivo = mes === 'Total' ? 12 : ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'].indexOf(mes) + 1;
+  const columnas = [...new Set(Object.values(tabla).flatMap(c => Object.keys(c)))]
+    .filter(c => indiceVigenciaCosto(c) >= 0 && indiceVigenciaCosto(c) <= objetivo)
+    .sort((a,b) => indiceVigenciaCosto(a) - indiceVigenciaCosto(b));
+  if (!columnas.length) throw new Error('No hay salarios vigentes para ' + mes);
+  return columnas[columnas.length - 1];
+}
+function actualizarVigenciasSalariales() {
+  for (const [nombre, tabla] of [['Big 7', TABLA_COSTOS], ['Performance', TABLA_COSTOS_PERF], ['Social', TABLA_COSTOS_SOCIAL]]) {
+    if (!Object.keys(tabla).length) throw new Error('Salarios sin cargar: ' + nombre);
+    for (const [puesto, costos] of Object.entries(tabla)) {
+      for (const col of ['Diciembre','Febrero','Julio','Septiembre','Noviembre']) {
+        if (!Number.isFinite(costos[col]) || costos[col] <= 0) throw new Error('Falta salario de ' + col + ': ' + nombre + ' / ' + puesto);
+      }
+    }
+  }
+  MES_VIGENTE = columnaCostoVigente(TABLA_COSTOS, 'Total');
+  MES_VIGENTE_PERF = columnaCostoVigente(TABLA_COSTOS_PERF, 'Total');
+  MES_VIGENTE_SOCIAL = columnaCostoVigente(TABLA_COSTOS_SOCIAL, 'Total');
+  for (const mes of MESES_2026.filter(m => m !== 'Total')) {
+    MAPA_MES_COSTO[mes] = columnaCostoVigente(TABLA_COSTOS, mes);
+    MAPA_MES_COSTO_PERF[mes] = columnaCostoVigente(TABLA_COSTOS_PERF, mes);
+    MAPA_MES_COSTO_SOCIAL[mes] = columnaCostoVigente(TABLA_COSTOS_SOCIAL, mes);
+  }
+}
+
+function getColCostoSocial(mes) { return columnaCostoVigente(TABLA_COSTOS_SOCIAL, mes); }
 function getCostoPuestoSocial(puesto, mes) { const col=getColCostoSocial(mes); return (TABLA_COSTOS_SOCIAL[puesto]&&TABLA_COSTOS_SOCIAL[puesto][col])||0; }
 
 function calcCostoEquipoSocial(cliente, mes) {
@@ -2009,6 +2044,7 @@ function renderSocialCompleto() {
   if (!MESES_SOCIAL_SELECCIONADOS.length) initMesesSocial(); else renderPillsMesesSocial();
   const rows=calcRentabilidadSocial();
   renderKPIsSocial(rows); renderSocialConsolidado(rows); renderRankingSocial(rows);
+  setTimeout(()=>renderChartSocial(rows),80);
   setTimeout(()=>renderChartFTESelector('social'),80);
 }
 
@@ -2681,6 +2717,7 @@ async function loadData({background = false} = {}) {
     if (json.fte_social_auto)  CLIENTES_FTE_SOCIAL = json.fte_social_auto;
     if (json.costos_perf_auto)   TABLA_COSTOS_PERF   = json.costos_perf_auto;
     if (json.costos_social_auto) TABLA_COSTOS_SOCIAL = json.costos_social_auto;
+    actualizarVigenciasSalariales();
     if (json.fees_perf_auto)   INGRESOS_PERF   = json.fees_perf_auto;
     if (json.fees_social_auto) INGRESOS_SOCIAL = json.fees_social_auto;
     verificarIntegridadFees(json);
@@ -2712,7 +2749,7 @@ async function loadData({background = false} = {}) {
   } catch(e) {
     lecturaCompleta = false;
     console.warn('Rentabilidad sin conexion, usando datos locales:', e.message);
-    mostrarAvisoFees(['Sin conexión con el Sheet (' + e.message + '): los fees de Performance y Social NO están cargados y se muestran vacíos. No usar estos números.']);
+    mostrarAvisoFees(['No se pudo completar la lectura de costos y fees (' + e.message + '). La última lectura puede estar desactualizada: no usar estos números hasta recuperar la conexión.']);
     window._rentDataReady = true;
     window._perfDataReady = true;
     setTimeout(() => {
@@ -2785,6 +2822,7 @@ function toggleOH(tipo) {
     renderKPIsSocial(rows);
     renderSocialConsolidado(rows);
     renderRankingSocial(rows);
+    setTimeout(() => renderChartSocial(rows), 60);
     setTimeout(() => renderChartFTE(Object.keys(DIRECTORES_SOCIAL).filter(c=>INCLUIR_IGNIS_SOCIAL||c!=='Ignis M&C').find(c=>document.querySelector('#chartFTESocialSelector .dir-btn.active')?.textContent===c)||Object.keys(DIRECTORES_SOCIAL).filter(c=>INCLUIR_IGNIS_SOCIAL||c!=='Ignis M&C')[0],'social'), 60);
   }
 }
@@ -2800,7 +2838,7 @@ function switchPerfTab(tab, btn) {
 }
 
 /* PERFORMANCE - calculos */
-function getColCostoPerf(mes) { return MAPA_MES_COSTO_PERF[mes] || MES_VIGENTE_PERF; }
+function getColCostoPerf(mes) { return columnaCostoVigente(TABLA_COSTOS_PERF, mes); }
 function getCostoPuestoPerf(puesto, mes) { const col=getColCostoPerf(mes); return (TABLA_COSTOS_PERF[puesto]&&TABLA_COSTOS_PERF[puesto][col])||0; }
 function calcCostoEquipoPerf(cliente, mes) {
   if (mes === 'Total') {
@@ -3160,7 +3198,7 @@ function guardarCostosPerf() {
 }
 
 /* RENTABILIDAD - calculos */
-function getColCosto(mes) { return MAPA_MES_COSTO[mes] || MES_VIGENTE; }
+function getColCosto(mes) { return columnaCostoVigente(TABLA_COSTOS, mes); }
 function getCostoPuesto(puesto, mes) { const col = getColCosto(mes); return (TABLA_COSTOS[puesto] && TABLA_COSTOS[puesto][col]) || 0; }
 function getCostoConOH(costoBase, esPerf) {
   const oh = esPerf ? OH_PERF : OH_EQUIPO;
