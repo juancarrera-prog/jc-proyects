@@ -431,6 +431,7 @@ td {border-bottom-color:rgba(255,255,255,.09);}
         <div class="live-dot"></div>
         Período: <span id="periodoLabel">Cargando...</span>
       </div>
+      <span id="estadoActualizacionDatos" role="status" style="font-size:10px;color:var(--text-muted)">Actualizando datos…</span>
       <button class="slack-btn" onclick="enviarAlertas()">Enviar alertas Slack</button>
       <button class="slack-btn" onclick="enviarResumenEjecutivo()" style="background:linear-gradient(135deg,#e8001c,#c20018);color:#fff;border-color:#e8001c">Resumen Ejecutivo</button>
     </div>
@@ -1523,7 +1524,7 @@ function renderKPIsGauge(data, prefix) {
 async function fetchConRetry(url, intentos=3, delay=1500) {
   for (let i=0; i<intentos; i++) {
     try {
-      const res = await fetch(url, { redirect: 'follow' });
+      const res = await fetch(url + (url.includes('?') ? '&' : '?') + '_fresh=' + Date.now(), { redirect: 'follow', cache: 'no-store' });
       if (!res.ok) throw new Error('HTTP '+res.status);
       return await res.json();
     } catch(e) {
@@ -2247,7 +2248,8 @@ function renderChartFTESelector(tipo) {
   const selId = tipo==='social' ? 'chartFTESocialSelector' : 'chartFTEPerfSelector';
   const cont = document.getElementById(selId);
   if (!cont) return;
-  const first = clientes[0];
+  const previo = cont.querySelector(".dir-btn.active")?.textContent;
+  const first = clientes.includes(previo) ? previo : clientes[0];
   cont.innerHTML = clientes.map(c =>
     `<button class="dir-btn${c===first?' active':''}" onclick="selectClienteFTEChart('${c}','${tipo}',this)">${c}</button>`
   ).join('');
@@ -2546,7 +2548,16 @@ function verificarIntegridadFees(json) {
   else console.log('[Fees] integridad OK — Sheet vs endpoint concilian');
 }
 
-async function loadData() {
+let cargaDatosEnCurso = false;
+let ultimaLecturaDatos = 0;
+
+async function loadData({background = false} = {}) {
+  if (cargaDatosEnCurso) return;
+  cargaDatosEnCurso = true;
+  let lecturaCompleta = true;
+  const estadoDatos = document.getElementById('estadoActualizacionDatos');
+  if (estadoDatos) estadoDatos.textContent = 'Actualizando datos…';
+  try {
   // Control Comercial
   try {
     const raw = await fetchConRetry(API_URL);
@@ -2555,16 +2566,18 @@ async function loadData() {
     renderTablas(raw);
     if (raw.agencia) renderKPIsAgencia(raw.agencia);
   } catch(e) {
+    lecturaCompleta = false;
     console.error('loadData error:', e);
+    if (!background) {
     document.getElementById('tbodyClientes').innerHTML = '<tr class="loading-row"><td colspan="11" style="color:#ff4455">No se pudo conectar: '+e.message+'</td></tr>';
     document.getElementById('tbodyBago').innerHTML     = '<tr class="loading-row"><td colspan="7" style="color:#ff4455">Error de conexion: '+e.message+'</td></tr>';
     document.getElementById('periodoLabel').textContent = 'Sin conexion';
+    }
   }
 
   // Rentabilidad (script nuevo - GET)
   try {
-    const res2 = await fetch(SCRIPT_URL);
-    const json = await res2.json();
+    const json = await fetchConRetry(SCRIPT_URL);
 
     if (json.costos && Object.keys(json.costos).length > 0) {
       Object.entries(json.costos).forEach(([puesto, meses]) => {
@@ -2673,8 +2686,8 @@ async function loadData() {
     verificarIntegridadFees(json);
     if (json.fte_vendido_perf_auto)   FTE_VENDIDO_PERF   = json.fte_vendido_perf_auto;
     if (json.fte_vendido_social_auto) FTE_VENDIDO_SOCIAL = json.fte_vendido_social_auto;
-    initMesesCC();
-    initMesesBago();
+    if (!background) { initMesesCC(); initMesesBago(); }
+    else { renderPillsMesesCC(); renderPillsMesesBago(); }
     aplicarControlComercialReal();
 
     console.log('Rentabilidad cargada desde Sheet');
@@ -2697,6 +2710,7 @@ async function loadData() {
       }
     }, 100);
   } catch(e) {
+    lecturaCompleta = false;
     console.warn('Rentabilidad sin conexion, usando datos locales:', e.message);
     mostrarAvisoFees(['Sin conexión con el Sheet (' + e.message + '): los fees de Performance y Social NO están cargados y se muestran vacíos. No usar estos números.']);
     window._rentDataReady = true;
@@ -2712,6 +2726,15 @@ async function loadData() {
         renderSocialCompleto();
       }
     }, 100);
+  }
+  } finally {
+    cargaDatosEnCurso = false;
+    if (lecturaCompleta) ultimaLecturaDatos = Date.now();
+    if (estadoDatos) {
+      estadoDatos.textContent = lecturaCompleta
+        ? 'Actualizado ' + new Date(ultimaLecturaDatos).toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit'}) + ' · automático cada 5 min'
+        : 'No se completó la actualización · reintentaremos automáticamente';
+    }
   }
 }
 
@@ -3660,6 +3683,17 @@ function cargarDatosComercialDesdeSheet(json) {
 
 /* INIT */
 loadData();
+function actualizarDatosSiCorresponde() {
+  if (document.visibilityState !== 'visible' || cargaDatosEnCurso) return;
+  if (Date.now() - ultimaLecturaDatos < 60000) return;
+  if (document.activeElement?.matches('input, textarea, select, [contenteditable="true"]')) return;
+  loadData({background:true});
+}
+setInterval(actualizarDatosSiCorresponde, 5 * 60 * 1000);
+document.addEventListener('visibilitychange', actualizarDatosSiCorresponde);
+window.addEventListener('focus', actualizarDatosSiCorresponde);
+window.addEventListener('online', actualizarDatosSiCorresponde);
+window.addEventListener('pageshow', event => { if (event.persisted) actualizarDatosSiCorresponde(); });
 </script>
 <script id="ignis-dashboard-motion-script">/* Solo presentación: los handlers existentes siguen actualizando los datos. */
 (() => {
