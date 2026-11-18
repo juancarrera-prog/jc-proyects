@@ -241,7 +241,7 @@
 
   <section class="panel">
     <h2>Pipeline detallado</h2>
-    <p class="mkt-note pipeline-date-note" style="margin-bottom:12px;">Fecha registrada en el Sheet. Si difiere, se muestra también la fecha del primer correo relevante localizado.</p>
+    <p class="mkt-note pipeline-date-note" style="margin-bottom:12px;">Fecha registrada en el Sheet. Si la conexión omite una fecha, se muestra la última fecha verificada. Cuando difiere, también figura el primer correo relevante localizado.</p>
     <div class="table-scroll">
       <table>
         <thead>
@@ -798,7 +798,13 @@ function detectionFor(name, raw) {
   const value = (raw ?? "").trim();
   const [sheetDate, mailDate] = DETECTION_EVIDENCE.get(name) ?? [];
   if (!value || value.toUpperCase() === "COMPLETAR") {
-    if (sheetDate === "" && mailDate) return { detectionDate: mailDate, detectionNote: "Fuente: correo" };
+    if (sheetDate) {
+      return {
+        detectionDate: sheetDate,
+        detectionNote: mailDate && sheetDate !== mailDate ? "Correo: " + mailDate : "",
+      };
+    }
+    if (mailDate) return { detectionDate: mailDate, detectionNote: "Fuente: correo" };
     return { detectionDate: "Sin dato", detectionNote: "" };
   }
   const isoDate = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
