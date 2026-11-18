@@ -192,6 +192,11 @@
   .pill.gap { background: var(--surface-2); color: var(--text-muted); border: 0.5px dashed var(--border); }
   .pill.gana-ignis { background: var(--red-bg); color: var(--red-soft); border: 0.5px solid var(--red-border); font-size: 9px; }
   .pill.pierde-ignis { background: var(--amber-bg); color: var(--amber); border: 0.5px solid var(--amber-border); font-size: 9px; }
+  .pipeline-subtext { color: var(--text-muted); font-size: 10px; font-weight: 400; line-height: 1.5; margin-top: 6px; }
+  .prospect-detail { margin-top: 7px; font-size: 10.5px; font-weight: 400; line-height: 1.6; color: var(--text-secondary); }
+  .prospect-detail summary { color: var(--red); cursor: pointer; white-space: nowrap; }
+  .prospect-detail[open] { min-width: 220px; max-width: 320px; }
+  .prospect-detail div { margin-top: 7px; }
 </style>
 </head>
 <body>
@@ -238,7 +243,7 @@
         <thead>
           <tr>
             <th>Prospect</th><th>Contacto</th><th>Estado</th><th>Fuente</th>
-            <th>Responsable</th><th>Valor potencial</th><th>Último contacto</th><th>Próxima acción</th>
+            <th title="Persona o vínculo por el que ingresó la oportunidad; no asignación de gestión">Responsable · ingreso</th><th>Valor potencial</th><th>Último contacto</th><th>Próxima acción</th>
           </tr>
         </thead>
         <tbody id="pipelineBody"></tbody>
@@ -349,18 +354,328 @@ const SHEET_NAME = "Pipeline";
 const CSV_URL_GVIZ = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:csv&sheet=" + encodeURIComponent(SHEET_NAME);
 const CSV_URL_EXPORT = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/export?format=csv&gid=0";
 
-const SNAPSHOT_DATA = [
-  {prospect:"Elementos", contacto:"Dani", fuente:"COMPLETAR", responsable:"COMPLETAR", estado:"Pausado sin novedad", valor:null, moneda:"", ultimo:"—", proxima:"Reconectar con nuevo contacto del cliente"},
-  {prospect:"Pampa y Rabieta", contacto:"Sebas", fuente:"COMPLETAR", responsable:"COMPLETAR", estado:"Perdido", valor:null, moneda:"", ultimo:"25-3", proxima:"—"},
-  {prospect:"Loma Negra", contacto:"Sebas", fuente:"COMPLETAR", responsable:"COMPLETAR", estado:"Aprobado / Ganado", valor:null, moneda:"", ultimo:"29-4", proxima:"Seguimiento post Kick Off"},
-  {prospect:"Mestizo - Hummus", contacto:"Mati", fuente:"COMPLETAR", responsable:"COMPLETAR", estado:"Pausado sin novedad", valor:null, moneda:"", ultimo:"30-3", proxima:"Reconectar en 2do semestre"},
-  {prospect:"SPL", contacto:"Jota", fuente:"COMPLETAR", responsable:"COMPLETAR", estado:"Perdido", valor:null, moneda:"", ultimo:"27-4", proxima:"—"},
-  {prospect:"Hendel", contacto:"Sebas - Nacho Elorza", fuente:"COMPLETAR", responsable:"COMPLETAR", estado:"Aprobado / Ganado", valor:null, moneda:"", ultimo:"12-6", proxima:"Iniciar servicio / Kick off"},
-  {prospect:"Florida DS", contacto:"—", fuente:"COMPLETAR", responsable:"COMPLETAR", estado:"Brief recibido", valor:null, moneda:"", ultimo:"22-6", proxima:"Preparar y enviar propuesta"},
-  {prospect:"Rutini", contacto:"Santiago Olivera", fuente:"COMPLETAR", responsable:"COMPLETAR", estado:"En conversación", valor:200000, moneda:"USD", ultimo:"Semana 15-6", proxima:"Solicitar brief formal"},
-  {prospect:"Laboratorio König - Producto CIDAR", contacto:"Contacto de Sebastián Terzi", fuente:"COMPLETAR", responsable:"COMPLETAR", estado:"Propuesta enviada", valor:80000000, moneda:"ARS (confirmar)", ultimo:"Semana 11-8", proxima:"Definir alternativa de inversión"},
-  {prospect:"Universidad Barceló", contacto:"Contacto de Matías Domínguez", fuente:"COMPLETAR", responsable:"COMPLETAR", estado:"En conversación", valor:null, moneda:"", ultimo:"Semana 11-8", proxima:"Confirmar fecha de reunión"},
+const SNAPSHOT_ROWS = [
+  [
+    "Prospect",
+    "Contacto",
+    "Scope solicitado",
+    "Fuente",
+    "Responsable",
+    "Estado",
+    "Valor potencial (monto)",
+    "Moneda",
+    "Fecha detección",
+    "Último contacto",
+    "Próxima acción",
+    "Fecha próxima acción",
+    "Notas",
+    "Presupuesto / período",
+    "Medios",
+    "Detalle estado comercial"
+  ],
+  [
+    "Elementos",
+    "Dani",
+    "",
+    "Contacto directo cliente",
+    "Daniela Kravanja",
+    "Pausado sin novedad",
+    "400.000.000",
+    "ARS",
+    "26-2",
+    "",
+    "",
+    "COMPLETAR",
+    "Se fue Gonza (contacto del cliente) al momento de enviar las credenciales"
+  ],
+  [
+    "Pampa y Rabieta",
+    "Sebas",
+    "Branding - Escenarios de Inversión",
+    "Referido interno",
+    "Sebastian Terzi",
+    "Perdido",
+    "500.000.000",
+    "ARS",
+    "20-3",
+    "25-3",
+    "",
+    "",
+    "Avanzaron con otra propuesta ya que no tenían definiciones del cliente y estaban en avanzado proceso"
+  ],
+  [
+    "Loma Negra",
+    "Sebas",
+    "Branding - Ejercicios",
+    "Referido interno",
+    "COMPLETAR",
+    "Aprobado / Ganado",
+    "150.000.000",
+    "ARS",
+    "15-3",
+    "",
+    "",
+    "COMPLETAR"
+  ],
+  [
+    "Mestizo - Hummus",
+    "Mati",
+    "Cotización de Medios",
+    "Referido interno",
+    "Sebastian Terzi",
+    "Pausado sin novedad",
+    "COMPLETAR",
+    "COMPLETAR",
+    "18-2",
+    "30-3",
+    "Reconectar en 2do semestre",
+    "COMPLETAR",
+    "Dijo que para el 2do semestre quizás activen algo"
+  ],
+  [
+    "SPL",
+    "Jota",
+    "BrandFormance",
+    "Referido interno",
+    "Juan Navarro",
+    "Perdido",
+    "100.000.000",
+    "ARS",
+    "06-04",
+    "27-4",
+    "",
+    "",
+    "Se le presentó una estrategia sumado al Fee de Creatividad y Perfo, pero declinó"
+  ],
+  [
+    "Hendel",
+    "Nacho Elorza",
+    "Performance",
+    "Referido interno",
+    "Sebastian Terzi",
+    "Aprobado / Ganado",
+    "200.000.000",
+    "ARS",
+    "27-05",
+    "12-6",
+    "Iniciar servicio / Kick off",
+    "COMPLETAR",
+    "Aprobada la propuesta"
+  ],
+  [
+    "Florida DS",
+    "",
+    "Performance",
+    "Contacto directo cliente",
+    "Juan Carrera",
+    "Pausado sin novedad",
+    "0",
+    "ARS",
+    "COMPLETAR",
+    "22-6",
+    "Preparar y enviar propuesta",
+    "COMPLETAR",
+    "Pasaron brief"
+  ],
+  [
+    "Rutini",
+    "Santiago Olivera",
+    "Branding",
+    "Referido interno",
+    "Sebastian Terzi",
+    "Brief recibido",
+    "300.000.000",
+    "ARS",
+    "16-06",
+    "",
+    "Reu con el cliente",
+    "28-08",
+    "Envío de Plan"
+  ],
+  [
+    "Laboratorio König - Producto CIDAR",
+    "Primo de S. Terzi",
+    "Branding",
+    "Referido interno",
+    "Sebastian Terzi",
+    "Perdido",
+    "80.000.000",
+    "ARS (confirmar)",
+    "21-07",
+    "20-08",
+    "",
+    "",
+    "Avanzaron con otra agencia por costos"
+  ],
+  [
+    "Universidad Barceló",
+    "Promobrands",
+    "Branding - Performance",
+    "Referido interno",
+    "Matías Dominguez",
+    "Perdido",
+    "100.000.000",
+    "ARS",
+    "03-08",
+    "28-09",
+    "",
+    "",
+    "Avanzaron con otra agencia"
+  ],
+  [
+    "TH Marine",
+    "Mike Newton",
+    "Perforamnce",
+    "Contacto directo cliente",
+    "Juan Navarro",
+    "Aprobado / Ganado",
+    "",
+    "USD",
+    "01-07",
+    "",
+    "On Going"
+  ],
+  [
+    "MSC Cruceros",
+    "Local Planet",
+    "Branding - Performance",
+    "Local Planet",
+    "Sol Terzi",
+    "Aprobado / Ganado",
+    "650.000",
+    "USD",
+    "15-05",
+    "",
+    "On Going"
+  ],
+  [
+    "Toyota",
+    "Industria",
+    "Branding",
+    "Contacto directo cliente",
+    "Matías Dominguez",
+    "Propuesta enviada",
+    "",
+    "",
+    "01-09",
+    "",
+    "Completar el PAS de Medios.",
+    "",
+    "Juano confirmó el 18/11/2026: pliego entregado y PAS de Medios en curso. La fecha de último contacto no se modifica porque no se informó una fecha de contacto con el cliente.",
+    null,
+    null,
+    "Pliego entregado · PAS de Medios en curso"
+  ],
+  [
+    "Smart Fit",
+    "Lorena Lugo",
+    "Agencia de medios / presentación regional",
+    "Evento",
+    "Daniela Kravanja",
+    "En conversación",
+    "",
+    "",
+    "10/09/2026",
+    "04/11/2026",
+    "Coordinar reunión con Lorena y el Head de Marketing.",
+    "",
+    "Credenciales enviadas el 10/09. Lorena retomó el contacto el 04/11 para presentar al Head de Marketing. Sin brief ni propuesta económica. Origen de ingreso: Daniela conoció a Lorena en el evento de Luzu TV y derivó su interés; Juan Manuel Rey envió credenciales.",
+    "A definir",
+    "A definir con el cliente",
+    "Reunión solicitada por el cliente"
+  ],
+  [
+    "Granger",
+    "Camila Fourcade / Rodrigo Sabena",
+    "Performance B2C y B2B; estrategia, segmentación y reporting",
+    "Otro",
+    "Yami Machado (La Paulina)",
+    "Brief recibido",
+    "15000000",
+    "ARS",
+    "11/11/2026",
+    "18/11/2026",
+    "Validar capacidad con Vicky / Hub y definir alcance, FTE y fee.",
+    "",
+    "Referido por La Paulina. Reunión 16/11; métricas y reorganización recibidas. Credenciales enviadas 17/11; Camila respondió 18/11. Inversión aproximada de ARS 15 M/mes, con potencial de ARS 20 M+. Documento alternativo de ARS 10 M incluye ARS 2 M de lanzamiento; conciliar escenarios. Sin fee enviado. Origen de ingreso: Camila escribió a Commercial: Nos pasó tu contacto Yami Machado. Referencia de La Paulina confirmada en resumen comercial.",
+    "≈ ARS 15 M / mes · potencial 20 M+",
+    "Meta y Google · B2C: MercadoLibre / TiendaNube · B2B: leads distribuidores",
+    "Alcance en evaluación interna; cliente revisando credenciales"
+  ],
+  [
+    "Paula / Digital Community",
+    "Paula Poma León",
+    "Lanzamiento de alimento ultra premium para perros y gatos; awareness Argentina",
+    "Otro",
+    "Alejandra Lorezo (según mail)",
+    "Propuesta enviada",
+    "",
+    "ARS",
+    "05/11/2026",
+    "12/11/2026",
+    "Confirmar comprensión del fee mensual y obtener devolución sobre la propuesta.",
+    "",
+    "Campaña de 4 meses en 2027; inicio estimado en marzo, por confirmar. Propuesta preliminar por email el 11/11: planificación, implementación, optimización, reporting y reuniones. Fee ARS 4 M + IVA por mes; 0,44 FTE; total 4 meses ARS 16 M + IVA, separado de inversión en medios. Paula consultó si ARS 4 M cubría toda la campaña y si reemplazaba comisión. Aclaradas condiciones vigentes; falta confirmar comprensión y aceptación. Origen de ingreso: Paula escribió a Commercial: Me pasó el contacto Alejandra Lorezo. Nombre transcripto como figura en el correo; identidad no ampliada.",
+    "ARS 90–135 M / campaña de 4 meses",
+    "Meta (Instagram / Facebook) y YouTube · Content Lab / prensa paga opcionales",
+    "Propuesta preliminar por email · sin aceptación"
+  ],
+  [
+    "Wyndham",
+    "Ayelén Cejas",
+    "Pitch regional Paid Media 2027 · LATAM y Estados Unidos",
+    "Referido interno",
+    "Sebastián Terzi",
+    "Brief recibido",
+    "",
+    "",
+    "13/11/2026",
+    "13/11/2026",
+    "Analizar brief y confirmar participación antes del 20/11. Si avanzamos, preparar propuesta para el 15/12.",
+    "20/11/2026",
+    "Invitación recibida. Sebastián Terzi acusó recibo el 13/11 y anunció análisis previo a confirmar. Confirmación 20/11; propuesta 15/12; presentaciones enero y selección febrero 2027. No se confirmó participación ni se envió propuesta económica. Presupuesto del adjunto pendiente de revisar. Origen de ingreso: Origen informado por Juano: contacto recibido por Sebastián Terzi. La invitación disponible está dirigida a Matías Domínguez, Sebastián Terzi y Alicia Lorenzo; Sebastián respondió el 13/11 acusando recibo y anunciando análisis previo a confirmar participación.",
+    "Pendiente de revisar en brief",
+    "Paid Media · mix pendiente de validar en brief",
+    "Invitación a pitch · participación pendiente"
+  ],
+  [
+    "TotalEnergies · ATL",
+    "Mariana Palomeque / Florencia Ameriso",
+    "Licitación ATL: estrategia, planificación, negociación, implementación, optimización y reporting",
+    "Referido interno",
+    "Juan Navarro / Juan Manuel Rey",
+    "Brief recibido",
+    "70000000",
+    "ARS",
+    "16/11/2026",
+    "16/11/2026",
+    "Definir participación y revisar brief / viabilidad. Propuesta técnico-económica con costos y honorarios al 25/11 EOD.",
+    "25/11/2026",
+    "Ingresó por Juan Navarro; Juan Manuel Rey y Juano analizaron tiempos y presupuesto. ARS 70 M totales para diciembre 2026–marzo 2027, según intercambio interno: validar contra brief. Promedio calculado ARS 17,5 M/mes. Sin confirmación de participación ni propuesta enviada. Facturación a mes vencido; pago a 45 días. Origen de ingreso: Mariana Palomeque envió licitación. Navarro la recibió a través de una excompañera y la derivó a Commercial. Rey también recibió el mismo mail y lo reenvió a Juano.",
+    "ARS 70 M / 4 meses · referencia interna a validar",
+    "ATL · mix pendiente de revisar en brief",
+    "Licitación recibida · participación pendiente"
+  ],
+  [
+    "Shopee",
+    "Gabriela Ishida",
+    "Primera campaña de TV en Argentina: awareness y confianza",
+    "Contacto directo cliente",
+    "Eugenia Olivari",
+    "Detectado",
+    "",
+    "",
+    "17/11/2026",
+    "17/11/2026",
+    "Responder y coordinar call de 30 min para la semana del 23/11; preparar credenciales, casos TV y rango piloto.",
+    "",
+    "Ingresó el 17/11 y Eugenia Olivari lo derivó a Juan Manuel Rey, Sebastián Terzi y Matías Domínguez. Consulta planificación, negociación y compra de TV en AMBA y otras plazas, alcance y presupuesto piloto sugerido por Ignis. No consta respuesta saliente en el hilo revisado. Origen de ingreso: Gabriela Ishida escribió a info@ignis-arg.com. Eugenia Olivari, asistente de Alejandro Terzi (Chairman de Ignis), derivó el contacto a Juan Manuel Rey y Sebastián Terzi, con copia a Matías Domínguez. Rey reenvió a Juano. El rol de Eugenia fue confirmado por Juano.",
+    "Sin monto · solicitan rango piloto a Ignis",
+    "TV abierta y paga · consulta adicional sobre OOH y radio",
+    "Contacto entrante · primera respuesta pendiente"
+  ]
 ];
+const SNAPSHOT_DATA = rowsToData(SNAPSHOT_ROWS);
 
 let DATA = SNAPSHOT_DATA;
 let liveMode = false;
@@ -397,6 +712,12 @@ function parseMonto(s) {
 function rowsToData(rows) {
   return rows.slice(1).filter(r => r[0] && r[0].trim()).map(r => ({
     prospect: r[0] || "",
+    scope: (r[2] || "").trim(),
+    notas: (r[12] || "").trim(),
+    presupuesto: (r[13] || "").trim(),
+    medios: (r[14] || "").trim(),
+    detalleEstado: (r[15] || "").trim(),
+    fechaProxima: (r[11] || "").trim(),
     contacto: r[1] || "—",
     fuente: (r[3] || "").trim() || "COMPLETAR",
     responsable: (r[4] || "").trim() || "COMPLETAR",
@@ -473,12 +794,19 @@ function renderHBars(containerId, categories, counts, color) {
   }).join("");
 }
 
+function renderProspectDetail(d) {
+  const fields = [["Medios", d.medios], ["Alcance", d.scope], ["Notas", d.notas]];
+  const lines = fields.filter(([, value]) => value).map(([label, value]) =>
+    '<div><b>' + label + ':</b> ' + esc(value) + '</div>').join("");
+  return lines ? '<details class="prospect-detail"><summary>Ver detalle</summary>' + lines + '</details>' : "";
+}
+
 function renderAll() {
   const now = new Date();
   const stamp = now.toLocaleDateString("es-AR") + " " + now.toLocaleTimeString("es-AR", {hour:"2-digit", minute:"2-digit"});
   document.getElementById("meta").textContent = liveMode
     ? "Conectado en vivo · actualizado " + stamp + " · " + DATA.length + " oportunidades"
-    : "Snapshot sin conexión (datos migrados del 18/08/2026) · " + DATA.length + " oportunidades";
+    : "Snapshot sin conexión (actualizado al 18/11/2026) · " + DATA.length + " oportunidades";
 
   const total = DATA.length;
   const ganadas = DATA.filter(d => d.estado === "Aprobado / Ganado").length;
@@ -505,14 +833,14 @@ function renderAll() {
 
   document.getElementById("pipelineBody").innerHTML = DATA.map(d => `
     <tr>
-      <td class="prospect-name">${esc(d.prospect)}</td>
+      <td class="prospect-name">${esc(d.prospect)}${renderProspectDetail(d)}</td>
       <td>${esc(d.contacto)}</td>
-      <td><span class="badge ${statusClass(d.estado)}">${esc(d.estado)}</span></td>
+      <td><span class="badge ${statusClass(d.estado)}">${esc(d.estado)}</span>${d.detalleEstado ? '<div class="pipeline-subtext">' + esc(d.detalleEstado) + '</div>' : ''}</td>
       <td>${d.fuente === "COMPLETAR" ? '<span class="todo">completar</span>' : esc(d.fuente)}</td>
       <td>${d.responsable === "COMPLETAR" ? '<span class="todo">completar</span>' : esc(d.responsable)}</td>
-      <td>${fmtValor(d.valor, d.moneda)}</td>
+      <td>${d.presupuesto ? esc(d.presupuesto) : fmtValor(d.valor, d.moneda)}</td>
       <td>${esc(d.ultimo)}</td>
-      <td>${esc(d.proxima)}</td>
+      <td>${esc(d.proxima)}${d.fechaProxima && d.fechaProxima !== "COMPLETAR" ? '<div class="pipeline-subtext">Fecha: ' + esc(d.fechaProxima) + '</div>' : ''}</td>
     </tr>
   `).join("");
 }
