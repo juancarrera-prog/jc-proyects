@@ -28,6 +28,9 @@
     --amber:          #D9A72C;
     --amber-bg:       rgba(217,167,44,0.14);
     --amber-border:   rgba(217,167,44,0.35);
+    --green:          #6FCD92;
+    --green-bg:       rgba(111,205,146,0.14);
+    --green-border:   rgba(111,205,146,0.38);
   }
   html[data-theme="light"], html[data-theme="light"] body {
     color-scheme: light;
@@ -48,6 +51,9 @@
     --amber:          #8A6D00;
     --amber-bg:       #FFFBEF;
     --amber-border:   #C9A227;
+    --green:          #207442;
+    --green-bg:       #EDF8F0;
+    --green-border:   #81AE90;
   }
 
   * { box-sizing: border-box; }
@@ -136,9 +142,9 @@
     display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 3px;
     font-size: 9.5px; font-weight: 700; letter-spacing: 0.03em; white-space: nowrap;
   }
-  .badge.won  { background: var(--red-bg); color: var(--red-soft); border: 0.5px solid var(--red-border); }
+  .badge.won  { background: var(--green-bg); color: var(--green); border: 0.5px solid var(--green-border); }
   .badge.lost { background: rgba(233,51,37,0.22); color: var(--red); border: 0.5px solid var(--red-border); }
-  .badge.paused { background: var(--amber-bg); color: var(--amber); border: 0.5px solid var(--amber-border); }
+  .badge.pending { background: var(--amber-bg); color: var(--amber); border: 0.5px solid var(--amber-border); }
   .badge.neutral { background: var(--surface-2); color: var(--text-secondary); border: 0.5px solid var(--border); }
 
   .howto { color: var(--text-secondary); font-size: 11.5px; line-height: 1.7; }
@@ -880,7 +886,9 @@ async function tryLoadLive() {
 function statusClass(estado) {
   if (estado === "Aprobado / Ganado") return "won";
   if (estado === "Perdido") return "lost";
-  if (estado === "Pausado sin novedad") return "paused";
+  if (["Brief recibido", "Detectado", "En conversación", "Pausado sin novedad"].includes(estado)) {
+    return "pending";
+  }
   return "neutral";
 }
 
@@ -898,9 +906,10 @@ function renderHBars(containerId, categories, counts, color) {
   const el = document.getElementById(containerId);
   el.innerHTML = categories.map((cat, i) => {
     const pct = Math.round((counts[i] / max) * 100);
+    const barColor = typeof color === "function" ? color(cat) : color;
     return `<div class="hbar-row">
       <div class="cat">${esc(cat)}</div>
-      <div class="hbar-track"><div class="hbar-fill" style="width:${pct}%; background:${color}"></div></div>
+      <div class="hbar-track"><div class="hbar-fill" style="width:${pct}%; background:${barColor}"></div></div>
       <div class="n">${counts[i]}</div>
     </div>`;
   }).join("");
@@ -940,7 +949,8 @@ function renderAll() {
 
   const countByEstado = ESTADOS.map(e => DATA.filter(d => d.estado === e).length);
   const countByFuente = FUENTES.map(f => DATA.filter(d => d.fuente === f).length);
-  renderHBars("chartEstado", ESTADOS, countByEstado, "var(--red)");
+  const statusBarColors = { won: "var(--green)", pending: "var(--amber)" };
+  renderHBars("chartEstado", ESTADOS, countByEstado, estado => statusBarColors[statusClass(estado)] ?? "var(--red)");
   renderHBars("chartFuente", FUENTES, countByFuente, "var(--red-soft)");
 
   document.getElementById("pipelineBody").innerHTML = DATA.map(d => `
