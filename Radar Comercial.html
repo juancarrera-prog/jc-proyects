@@ -241,7 +241,7 @@
 
   <section class="panel">
     <h2>Pipeline detallado</h2>
-    <p class="mkt-note pipeline-date-note" style="margin-bottom:12px;">Fecha registrada en el Sheet. Si la conexión omite una fecha, se muestra la última fecha verificada. Cuando difiere, también figura el primer correo relevante localizado.</p>
+    <p class="mkt-note pipeline-date-note" style="margin-bottom:12px;">Ordenado por fecha de detección, de la más antigua a la más reciente. Se usa la fecha del Sheet o la última verificada si la conexión la omite. Si la fecha del primer correo difiere, también se muestra.</p>
     <div class="table-scroll">
       <table>
         <thead>
@@ -350,7 +350,7 @@
 // Los campos marcados "COMPLETAR" están pendientes de confirmar con el equipo.
 // ---------------------------------------------------------------------
 const ESTADOS = ["Detectado", "En conversación", "Brief recibido", "Propuesta enviada", "Aprobado / Ganado", "Perdido", "Pausado sin novedad"];
-const FUENTES = ["Referido interno", "Contacto directo cliente", "Comvergence", "Scopen", "RECMA", "Evento", "Otro"];
+const FUENTES = ["Referido interno", "Contacto directo cliente", "Comvergence", "Scopen", "RECMA", "Evento", "Local Planet", "Otro"];
 
 // Google Sheet conectado el 18/08/2026 (Juan).
 const SHEET_ID = "1WMcZIDvkJJZeWWjeEsZsk3MtV7ivm3KzlRm_KVHnrxE";
@@ -699,7 +699,9 @@ const DETECTION_EVIDENCE = new Map([
   ["Paula / Digital Community",["05/11/2026","05/11/2026"]],
   ["Wyndham",["13/11/2026","13/11/2026"]],
   ["TotalEnergies · ATL",["16/11/2026","16/11/2026"]],
-  ["Shopee",["17/11/2026","17/11/2026"]]
+  ["Shopee",["17/11/2026","17/11/2026"]],
+  ["MediaPro",["","28/09/2026"]],
+  ["Local Planet · Pitch internacional sin gluten",["","12/11/2026"]]
 ]);
 
 // Mostrar los cambios de revisión mientras los campos conserven su valor original en el Sheet.
@@ -727,6 +729,12 @@ const REVIEW_UPDATES = new Map([
     [15,"Contacto entrante · primera respuesta pendiente","Primera respuesta enviada · reunión en coordinación"]
   ]]
 ]);
+
+// Oportunidades verificadas por correo y pendientes de incorporar al Sheet.
+const SUPPLEMENTAL_ROWS = [
+  ["MediaPro","Juan Ignacio Costa","Comunicación 2027 · Brand Performance B2B para servicios audiovisuales, con foco en marca y generación de demanda.","Referido interno","Juan Navarro","Propuesta enviada","","","","20/10/2026","Retomar con Juan Ignacio Costa cuando tenga devolución de Dirección.","","Oportunidad detectada el 28/09 por Juan Navarro, excompañero de Juan Ignacio Costa. Presentación y propuesta comercial enviadas el 02/10. Seguimientos de Juan Carrera el 08/10 y el 20/10. El 08/10 Juan Ignacio confirmó recepción y dijo que esperaba una reunión con Dirección. El seguimiento del 20/10 sigue sin respuesta.","","","Propuesta enviada · pendiente de definición de Dirección"],
+  ["Local Planet · Pitch internacional sin gluten","Simona Tencheva (Local Planet)","Relevamiento de capacidades para un posible pitch internacional de una empresa europea de alimentos sin gluten, activa en más de 20 mercados.","Local Planet","Juan Pablo Echeverría","Detectado","","","","19/11/2026","Completar el Excel con Juanchi y pasárselo a Juan Pablo. Envío interno estimado para el 20/11.","","Simona Tencheva pidió el 12/11 detallar los servicios que Ignis puede cubrir, cómo los prestaría y dónde necesitaría apoyo externo o de la red. Juan Pablo derivó el pedido ese día y consultó el 19/11. Juan Carrera respondió que el archivo estaba en preparación. El cliente todavía no fue identificado en el hilo y el brief formal está pendiente.","","","Excel de capacidades en preparación"]
+];
 
 const SNAPSHOT_DATA = rowsToData(SNAPSHOT_ROWS);
 
@@ -766,14 +774,19 @@ function rowsToData(rows) {
   if (rows[0]?.[0]?.trim() !== "Prospect" || rows[0]?.[8]?.trim() !== "Fecha detección") {
     throw new Error("La respuesta no corresponde a la pestaña Pipeline.");
   }
-  return rows.slice(1).filter(r => r[0]?.trim()).map(row => {
+  const pipelineRows = rows.slice(1).filter(row => row[0]?.trim());
+  if (!pipelineRows.length) return [];
+
+  const pipelineNames = new Set(pipelineRows.map(row => row[0].trim().toLowerCase()));
+  const supplemental = SUPPLEMENTAL_ROWS.filter(row => !pipelineNames.has(row[0].toLowerCase()));
+  return pipelineRows.concat(supplemental).map(row => {
     const name = row[0].trim();
     const updates = REVIEW_UPDATES.get(name);
     const reviewed = updates?.every(([col, previous]) => (row[col] ?? "").trim() === previous) ?? false;
     const r = reviewed ? row.slice() : row;
     if (reviewed) updates.forEach(([col, , value]) => { r[col] = value; });
     return {
-      reviewed,
+      reviewed: reviewed || supplemental.includes(row),
       ...detectionFor(name, row[8]),
       prospect: r[0] || "",
       scope: (r[2] || "").trim(),
@@ -791,7 +804,14 @@ function rowsToData(rows) {
       ultimo: (r[9] || "").trim() || "—",
       proxima: (r[10] || "").trim() || "—",
     };
-  });
+  }).sort((a, b) => detectionSortKey(a.detectionDate) - detectionSortKey(b.detectionDate));
+}
+
+function detectionSortKey(date) {
+  const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(date);
+  if (!match) return Number.MAX_SAFE_INTEGER;
+  const [, day, month, year] = match;
+  return Number(year + month + day);
 }
 
 function detectionFor(name, raw) {
@@ -898,7 +918,7 @@ function renderAll() {
   const stamp = now.toLocaleDateString("es-AR") + " " + now.toLocaleTimeString("es-AR", {hour:"2-digit", minute:"2-digit"});
   document.getElementById("meta").textContent = liveMode
     ? "Conectado en vivo · actualizado " + stamp + " · " + DATA.length + " oportunidades"
-    : "Snapshot sin conexión (actualizado al 18/11/2026) · " + DATA.length + " oportunidades";
+    : "Snapshot sin conexión (actualizado al 19/11/2026) · " + DATA.length + " oportunidades";
 
   const total = DATA.length;
   const ganadas = DATA.filter(d => d.estado === "Aprobado / Ganado").length;
