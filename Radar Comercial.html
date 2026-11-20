@@ -147,18 +147,6 @@
   .badge.pending { background: var(--amber-bg); color: var(--amber); border: 0.5px solid var(--amber-border); }
   .badge.neutral { background: var(--surface-2); color: var(--text-secondary); border: 0.5px solid var(--border); }
 
-  .howto { color: var(--text-secondary); font-size: 11.5px; line-height: 1.7; }
-  .howto code {
-    background: var(--surface-2); border: 1px solid var(--border); border-radius: 4px;
-    padding: 1px 6px; font-size: 10.5px; color: var(--text-primary);
-  }
-  .howto ol { margin: 8px 0 0; padding-left: 20px; }
-  .howto li { margin-bottom: 4px; }
-  .conn-status { font-size: 10px; font-weight: 700; letter-spacing: 0.04em; }
-  .conn-status.live { color: var(--red); }
-  .conn-status.off { color: var(--text-muted); }
-  .err-detail { font-size: 10px; color: var(--text-muted); margin-top: 8px; font-family: ui-monospace, monospace; word-break: break-all; }
-
   .table-scroll { overflow-x: auto; }
 
   /* ── TABS ── */
@@ -266,21 +254,6 @@
         </thead>
         <tbody id="pipelineBody"></tbody>
       </table>
-    </div>
-  </section>
-
-  <section class="panel">
-    <h2 id="liveHeading">Conexión con Google Sheets</h2>
-    <div class="howto">
-      <span class="conn-status off" id="connStatus">● sin conexión — mostrando snapshot</span>
-      <div style="margin-top:10px;">Este dashboard intenta leer en vivo la pestaña <b>Pipeline</b> de tu Google Sheet. Si el estado de arriba no dice "conectado":</div>
-      <ol>
-        <li>Que el archivo sea un Google Sheet nativo en Drive (ya lo es).</li>
-        <li>En el Sheet: <code>Archivo → Compartir → Compartir con otras personas → Cualquier persona con el enlace → Lector</code>.</li>
-        <li>Tocá "Reintentar conexión" abajo. Si tu organización de Google restringe el uso compartido fuera del dominio, este método no va a funcionar y hay que resolverlo distinto (avisame).</li>
-      </ol>
-      <button class="theme-toggle" onclick="tryLoadLive()" style="margin-top:10px;">Reintentar conexión</button>
-      <div class="err-detail" id="errDetail"></div>
     </div>
   </section>
 
@@ -873,9 +846,6 @@ async function fetchCSV(url) {
 }
 
 async function tryLoadLive() {
-  const heading = document.getElementById("connStatus");
-  const errEl = document.getElementById("errDetail");
-  errEl.textContent = "";
   let lastError = null;
   for (const url of [CSV_URL_GVIZ, CSV_URL_EXPORT]) {
     try {
@@ -885,8 +855,6 @@ async function tryLoadLive() {
       if (!parsed.length) throw new Error("Respuesta sin filas de datos (" + url + ")");
       DATA = parsed;
       liveMode = true;
-      heading.textContent = "● conectado en vivo a Google Sheets" + (DATA.some(d => d.reviewed) ? " · incluye datos de revisión" : "");
-      heading.className = "conn-status live";
       renderAll();
       return;
     } catch (e) {
@@ -895,9 +863,6 @@ async function tryLoadLive() {
   }
   DATA = SNAPSHOT_DATA;
   liveMode = false;
-  heading.textContent = "● sin conexión — mostrando snapshot";
-  heading.className = "conn-status off";
-  errEl.textContent = "Último error: " + (lastError ? lastError.message : "desconocido");
   console.warn("No se pudo conectar en vivo, muestro snapshot:", lastError);
   renderAll();
 }
