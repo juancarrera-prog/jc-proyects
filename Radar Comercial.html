@@ -170,6 +170,11 @@
   }
   .tab-btn:hover { border-color: var(--red); color: var(--text-primary); }
   .tab-btn.active { background: var(--red); border-color: var(--red); color: #fff; }
+  .pipeline-filter-btn { padding: 6px 14px; }
+  .pipeline-filter-btn[aria-pressed="true"] { background: var(--red); border-color: var(--red); color: #fff; }
+  .pipeline-filter-btn:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 2px; }
+  .pipeline-filter-count { color: var(--text-secondary); }
+  .pipeline-empty { color: var(--text-secondary); text-align: center; }
   .tab-panel { display: none; }
   .tab-panel.active { display: block; }
 
@@ -245,9 +250,12 @@
     </figure>
   </div>
 
+  <div class="tab-nav" id="pipelineStatusFilters" role="group" aria-label="Filtrar oportunidades por estado"></div>
+
   <section class="panel">
     <h2>Pipeline detallado</h2>
     <p class="mkt-note pipeline-date-note" style="margin-bottom:12px;">Ordenado por fecha de detección, de la más antigua a la más reciente. Se usa la fecha del Sheet o la última verificada si la conexión la omite. Si la fecha del primer correo difiere, también se muestra.</p>
+    <p class="filters-count pipeline-filter-count" id="pipelineFilterCount" role="status" aria-atomic="true"></p>
     <div class="table-scroll">
       <table>
         <thead>
@@ -756,6 +764,7 @@ const SNAPSHOT_DATA = rowsToData(SNAPSHOT_ROWS);
 
 let DATA = SNAPSHOT_DATA;
 let liveMode = false;
+const selectedPipelineStates = new Set();
 
 function parseCSV(text) {
   const rows = [];
@@ -932,6 +941,33 @@ function renderProspectDetail(d) {
   return lines ? '<details class="prospect-detail"><summary>Ver detalle</summary>' + lines + '</details>' : "";
 }
 
+function initPipelineFilters() {
+  const group = document.getElementById("pipelineStatusFilters");
+  const labels = { "Aprobado / Ganado": "Ganados", "Perdido": "Perdidos" };
+  for (const state of ["", ...ESTADOS]) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "tab-btn pipeline-filter-btn";
+    button.textContent = state ? (labels[state] ?? state) : "Todos";
+    button.dataset.state = state;
+    button.setAttribute("aria-controls", "pipelineBody");
+    button.setAttribute("aria-pressed", String(!state));
+    button.addEventListener("click", () => {
+      if (!state) selectedPipelineStates.clear();
+      else if (selectedPipelineStates.has(state)) selectedPipelineStates.delete(state);
+      else selectedPipelineStates.add(state);
+
+      for (const pill of group.querySelectorAll("button")) {
+        const value = pill.dataset.state;
+        const pressed = value ? selectedPipelineStates.has(value) : !selectedPipelineStates.size;
+        pill.setAttribute("aria-pressed", String(pressed));
+      }
+      renderPipeline();
+    });
+    group.append(button);
+  }
+}
+
 function renderAll() {
   const now = new Date();
   const stamp = now.toLocaleDateString("es-AR") + " " + now.toLocaleTimeString("es-AR", {hour:"2-digit", minute:"2-digit"});
@@ -963,7 +999,22 @@ function renderAll() {
   renderHBars("chartEstado", ESTADOS, countByEstado, estado => statusBarColors[statusClass(estado)] ?? "var(--red)");
   renderHBars("chartFuente", FUENTES, countByFuente, "var(--red-soft)");
 
-  document.getElementById("pipelineBody").innerHTML = DATA.map(d => `
+  renderPipeline();
+}
+
+function renderPipeline() {
+  const visible = selectedPipelineStates.size
+    ? DATA.filter(d => selectedPipelineStates.has(d.estado))
+    : DATA;
+  document.getElementById("pipelineFilterCount").textContent = selectedPipelineStates.size
+    ? `${visible.length} de ${DATA.length} oportunidades`
+    : "";
+  const body = document.getElementById("pipelineBody");
+  if (!visible.length) {
+    body.innerHTML = '<tr><td class="pipeline-empty" colspan="9">No hay oportunidades con los estados seleccionados.</td></tr>';
+    return;
+  }
+  body.innerHTML = visible.map(d => `
     <tr>
       <td class="prospect-name">${esc(d.prospect)}${renderProspectDetail(d)}</td>
       <td>${esc(d.contacto)}</td>
@@ -1209,6 +1260,7 @@ function toggleTheme() {
   root.setAttribute("data-theme", current === "light" ? "dark" : "light");
 }
 
+initPipelineFilters();
 renderAll();
 tryLoadLive();
 initMercadoFilters();
