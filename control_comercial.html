@@ -1351,11 +1351,12 @@ function renderKPIsComercial(clientes) {
   // Render Big7 donuts — SOLO los 7 clientes originales (Bagó...Universal Assistance),
   // no toda la tabla Clientes (que ahora incluye Novo Nordisk/Marfrig/Goodyear/Loma Negra/Molino)
   const clientesBig7 = clientes.filter(r => CLIENTES_COMERCIAL.includes(r.nombre));
-  let b7Inv=0, b7Presup=0, b7Cmb=0, b7CmbPresup=0;
-  clientesBig7.forEach(r => { b7Inv += parseFloat(r.inv)||0; b7Presup += parseFloat(r.presup)||0; b7Cmb += parseFloat(r.cmb)||0; b7CmbPresup += parseFloat(r.cmbPresup||0); });
+  let b7Inv=0, b7Presup=0, b7Cmb=0, b7CmbPresup=0, b7Ingresos=0;
+  clientesBig7.forEach(r => { b7Inv += parseFloat(r.inv)||0; b7Presup += parseFloat(r.presup)||0; b7Cmb += parseFloat(r.cmb)||0; b7CmbPresup += parseFloat(r.cmbPresup||0); b7Ingresos += parseFloat(r.ingresos)||0; });
   const b7vsPct = b7Presup > 0 ? ((b7Inv - b7Presup) / b7Presup) * 100 : null;
   const b7vsCmb = b7CmbPresup > 0 ? ((b7Cmb - b7CmbPresup) / b7CmbPresup) * 100 : null;
-  const b7cmbPct = b7Inv > 0 ? (b7Cmb / b7Inv) * 100 : null;
+  // CMB % = CMB / facturación total, igual que clientes y Total Agencia.
+  const b7cmbPct = b7Ingresos !== 0 ? (b7Cmb / b7Ingresos) * 100 : null;
   const b7cons = clientesBig7.length > 0
     ? clientesBig7.reduce((a,r) => a + (parseFloat(r.consumidoAnual)||0), 0) / clientesBig7.length
     : null;
@@ -2486,7 +2487,7 @@ function _sumarPeriodoCliente(clave) {
   const cmbPct = ingresos !== 0 ? (cmb / ingresos) * 100 : 0;
 
   // cmbPct se guarda como string con "%" — así lo esperan renderTablas/renderKPIsGauge/renderChart, igual que el resto del dashboard
-  return { inv, presup, vs, consumidoAnual, presupAnual, cmb, cmbPresup, vsCmb, cmbPct: cmbPct.toFixed(1) + '%' };
+  return { inv, ingresos, presup, vs, consumidoAnual, presupAnual, cmb, cmbPresup, vsCmb, cmbPct: cmbPct.toFixed(1) + '%' };
 }
 
 function aplicarControlComercialReal() {
