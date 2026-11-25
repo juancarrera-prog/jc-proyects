@@ -99,7 +99,6 @@
     padding: 16px; display: flex; flex-direction: column; gap: 4px;
   }
   .kpi .value { font-size: 25px; font-weight: 700; font-variant-numeric: proportional-nums; }
-  .kpi .value.potential-value { display: grid; gap: 4px; font-size: 15px; line-height: 1.2; }
   .kpi .label { font-size: 9.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-secondary); }
 
   .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
@@ -705,39 +704,34 @@ const DETECTION_EVIDENCE = new Map([
 
 const ACTIVE_PIPELINE_STATES = new Set(["Detectado", "En conversación", "Brief recibido", "Propuesta enviada"]);
 
-// Importes con períodos o rangos que no pueden representarse en la columna numérica.
+// Tipo de cambio de referencia BCRA A 3500 del 24/11/2026, en ARS por USD.
+const USD_TO_ARS = 1592.0227;
+
+// Para cada ficha se conserva el presupuesto visible, seguido de los importes y su frecuencia.
 const POTENTIAL_BREAKDOWN = new Map([
-  ["Granger", ["≈ ARS 15 M / mes · potencial 20 M+", [["ARS", "pauta / mes", 15000000]]]],
-  ["Paula / Digital Community", ["ARS 90–135 M / campaña de 4 meses", [["ARS", "pauta / 4 meses", 90000000, 135000000]]]],
-  ["TotalEnergies · ATL", ["ARS 70 M / 4 meses · referencia interna a validar", [["ARS", "pauta / 4 meses", 70000000]]]],
-  ["Wyndham Hotels & Resorts", ["USD 350.000 / año · inversión estimada en medios", [["USD", "pauta / año", 350000]]]],
-  ["MediaPro", ["Fee: ARS 11.500.000/mes + IVA · Pauta: USD 36.000/año (referencia anualizada)", [["USD", "pauta / año", 36000], ["ARS", "fee / mes", 11500000]]]],
+  ["Granger", ["≈ ARS 15 M / mes · potencial 20 M+", [{currency: "ARS", amount: 15000000, monthly: true}]]],
+  ["Paula / Digital Community", ["ARS 90–135 M / campaña de 4 meses", [{currency: "ARS", amount: (90000000 + 135000000) / 2}]]],
+  ["TotalEnergies · ATL", ["ARS 70 M / 4 meses · referencia interna a validar", [{currency: "ARS", amount: 70000000}]]],
+  ["Wyndham Hotels & Resorts", ["USD 350.000 / año · inversión estimada en medios", [{currency: "USD", amount: 350000}]]],
+  ["MediaPro", ["Fee: ARS 11.500.000/mes + IVA · Pauta: USD 36.000/año (referencia anualizada)", [
+    {currency: "USD", amount: 36000},
+    {currency: "ARS", amount: 11500000, monthly: true},
+  ]]],
 ]);
 
-function renderActivePotential(opportunities) {
-  const totals = new Map();
+function annualPotentialArs(opportunities) {
+  let total = 0;
   for (const opportunity of opportunities) {
-    const [budget, breakdown] = POTENTIAL_BREAKDOWN.get(opportunity.prospect) ?? [];
-    const currency = opportunity.moneda.toUpperCase();
-    const amounts = breakdown && budget === opportunity.presupuesto
+    const [displayedBudget, breakdown] = POTENTIAL_BREAKDOWN.get(opportunity.prospect) ?? [];
+    const amounts = breakdown && displayedBudget === opportunity.presupuesto
       ? breakdown
-      : [["ARS", "USD"].includes(currency) ? [currency, "período sin informar", opportunity.valor] : []];
-    for (const [code, period, minimum, maximum = minimum] of amounts) {
-      if (!(minimum > 0)) continue;
-      const label = code + " · " + period;
-      const total = totals.get(label) ?? {code, period, min: 0, max: 0};
-      total.min += minimum;
-      total.max += maximum;
-      totals.set(label, total);
+      : [{currency: opportunity.moneda.toUpperCase(), amount: opportunity.valor}];
+    for (const {currency, amount, monthly} of amounts) {
+      if (!(amount > 0) || !["ARS", "USD"].includes(currency)) continue;
+      total += amount * (monthly ? 12 : 1) * (currency === "USD" ? USD_TO_ARS : 1);
     }
   }
-  const formatAmount = (value, scale) => (value / scale).toLocaleString("es-AR", {maximumFractionDigits: 2});
-  const values = [...totals.values()].sort((a, b) => b.code.localeCompare(a.code) || b.max - a.max);
-  return values.map(({code, period, min, max}) => {
-    const scale = min >= 1000000 ? 1000000 : 1;
-    const number = min === max ? formatAmount(min, scale) : formatAmount(min, scale) + "–" + formatAmount(max, scale);
-    return `<span>${code} ${number}${scale === 1 ? "" : " M"} · ${period}</span>`;
-  }).join("") || "<span>Sin monto informado</span>";
+  return total;
 }
 
 // Montos informados para oportunidades que todavía no tienen un valor en el Sheet.
@@ -1006,16 +1000,20 @@ function renderAll() {
   const perdidas = DATA.filter(d => d.estado === "Perdido").length;
   const abiertas = total - ganadas - perdidas;
   const oportunidadesActivas = DATA.filter(d => ACTIVE_PIPELINE_STATES.has(d.estado));
+  const valorAnual = annualPotentialArs(oportunidadesActivas);
+  const valorAnualDisplay = valorAnual > 0
+    ? "ARS " + Math.round(valorAnual / 1000000).toLocaleString("es-AR") + " M"
+    : "Sin monto informado";
 
   const kpis = [
     ["Total oportunidades", total],
     ["Abiertas", abiertas],
     ["Ganadas", ganadas],
     ["Perdidas", perdidas],
-    ["Valor potencial activo", renderActivePotential(oportunidadesActivas), " potential-value"],
+    ["Valor potencial anual", valorAnualDisplay],
   ];
-  document.getElementById("kpiRow").innerHTML = kpis.map(([label, value, valueClass = ""]) =>
-    `<div class="kpi"><div class="value${valueClass}">${value}</div><div class="label">${label}</div></div>`
+  document.getElementById("kpiRow").innerHTML = kpis.map(([label, value]) =>
+    `<div class="kpi"><div class="value">${value}</div><div class="label">${label}</div></div>`
   ).join("");
 
   const countByEstado = ESTADOS.map(e => DATA.filter(d => d.estado === e).length);
