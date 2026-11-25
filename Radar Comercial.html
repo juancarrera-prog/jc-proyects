@@ -99,6 +99,7 @@
     padding: 16px; display: flex; flex-direction: column; gap: 4px;
   }
   .kpi .value { font-size: 25px; font-weight: 700; font-variant-numeric: proportional-nums; }
+  .kpi .value.potential-value { display: grid; gap: 4px; font-size: 15px; line-height: 1.2; }
   .kpi .label { font-size: 9.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-secondary); }
 
   .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
@@ -702,8 +703,51 @@ const DETECTION_EVIDENCE = new Map([
   ["Local Planet · Pitch internacional sin gluten",["","12/11/2026"]]
 ]);
 
+const ACTIVE_PIPELINE_STATES = new Set(["Detectado", "En conversación", "Brief recibido", "Propuesta enviada"]);
+
+// Importes con períodos o rangos que no pueden representarse en la columna numérica.
+const POTENTIAL_BREAKDOWN = new Map([
+  ["Granger", ["≈ ARS 15 M / mes · potencial 20 M+", [["ARS", "pauta / mes", 15000000]]]],
+  ["Paula / Digital Community", ["ARS 90–135 M / campaña de 4 meses", [["ARS", "pauta / 4 meses", 90000000, 135000000]]]],
+  ["TotalEnergies · ATL", ["ARS 70 M / 4 meses · referencia interna a validar", [["ARS", "pauta / 4 meses", 70000000]]]],
+  ["Wyndham Hotels & Resorts", ["USD 350.000 / año · inversión estimada en medios", [["USD", "pauta / año", 350000]]]],
+  ["MediaPro", ["Fee: ARS 11.500.000/mes + IVA · Pauta: USD 36.000/año (referencia anualizada)", [["USD", "pauta / año", 36000], ["ARS", "fee / mes", 11500000]]]],
+]);
+
+function renderActivePotential(opportunities) {
+  const totals = new Map();
+  for (const opportunity of opportunities) {
+    const [budget, breakdown] = POTENTIAL_BREAKDOWN.get(opportunity.prospect) ?? [];
+    const currency = opportunity.moneda.toUpperCase();
+    const amounts = breakdown && budget === opportunity.presupuesto
+      ? breakdown
+      : [["ARS", "USD"].includes(currency) ? [currency, "período sin informar", opportunity.valor] : []];
+    for (const [code, period, minimum, maximum = minimum] of amounts) {
+      if (!(minimum > 0)) continue;
+      const label = code + " · " + period;
+      const total = totals.get(label) ?? {code, period, min: 0, max: 0};
+      total.min += minimum;
+      total.max += maximum;
+      totals.set(label, total);
+    }
+  }
+  const formatAmount = (value, scale) => (value / scale).toLocaleString("es-AR", {maximumFractionDigits: 2});
+  const values = [...totals.values()].sort((a, b) => b.code.localeCompare(a.code) || b.max - a.max);
+  return values.map(({code, period, min, max}) => {
+    const scale = min >= 1000000 ? 1000000 : 1;
+    const number = min === max ? formatAmount(min, scale) : formatAmount(min, scale) + "–" + formatAmount(max, scale);
+    return `<span>${code} ${number}${scale === 1 ? "" : " M"} · ${period}</span>`;
+  }).join("") || "<span>Sin monto informado</span>";
+}
+
+// Montos informados para oportunidades que todavía no tienen un valor en el Sheet.
+const REVIEWED_VALUES = new Map([
+  ["Toyota", {amount: 4000000000, currency: "ARS"}],
+]);
+
 // Mostrar los cambios de revisión mientras los campos conserven su valor original en el Sheet.
 const REVIEW_UPDATES = new Map([
+  ["Rutini", [[5, "Brief recibido", "Pausado sin novedad"]]],
   ["Toyota", [
     [9,"","19/11/2026"],
     [10,"Completar el PAS de Medios.","Completar y entregar el PAS de Medios revisado dentro del plazo prorrogado."],
@@ -740,6 +784,7 @@ const REVIEW_UPDATES = new Map([
 
 // Oportunidades verificadas por correo y pendientes de incorporar al Sheet.
 const SUPPLEMENTAL_ROWS = [
+  ["Olga · Digital 2027","Sol Tomaselli","Estrategia y gestión de campañas en redes sociales para impulsar la venta de entradas de cuatro eventos previstos para 2027.","Contacto directo cliente","Daniela Kravanja","En conversación","","","24/11/2026","24/11/2026","Validar objetivos de venta e inversión y preparar una propuesta por evento.","","Reunión con el equipo de Marketing de Olga el 24/11. Fecha del contacto inicial sin confirmar.","","","Reunión realizada · propuesta en evaluación"],
   ["MediaPro","Juan Ignacio Costa","Comunicación 2027 · Brand Performance B2B para servicios audiovisuales, con foco en marca y generación de demanda.","Referido interno","Juan Navarro","Propuesta enviada","","","","20/10/2026","Retomar con Juan Ignacio Costa cuando tenga devolución de Dirección.","","Oportunidad detectada el 28/09 por Juan Navarro, excompañero de Juan Ignacio Costa. Presentación y propuesta comercial enviadas el 02/10. Seguimientos de Juan Carrera el 08/10 y el 20/10. El 08/10 Juan Ignacio confirmó recepción y dijo que esperaba una reunión con Dirección. El seguimiento del 20/10 sigue sin respuesta.","Fee: ARS 11.500.000/mes + IVA · Pauta: USD 36.000/año (referencia anualizada)","","Propuesta enviada · pendiente de definición de Dirección"],
   ["Local Planet · Pitch internacional sin gluten","Simona Tencheva (Local Planet)","Relevamiento de capacidades para un posible pitch internacional de una empresa europea de alimentos sin gluten, activa en más de 20 mercados.","Local Planet","Juan Pablo Echeverría","Detectado","","","","19/11/2026","Completar el Excel con Juanchi y pasárselo a Juan Pablo. Envío interno estimado para el 20/11.","","Simona Tencheva pidió el 12/11 detallar los servicios que Ignis puede cubrir, cómo los prestaría y dónde necesitaría apoyo externo o de la red. Juan Pablo derivó el pedido ese día y consultó el 19/11. Juan Carrera respondió que el archivo estaba en preparación. El cliente todavía no fue identificado en el hilo y el brief formal está pendiente.","","","Excel de capacidades en preparación"]
 ];
@@ -794,8 +839,13 @@ function rowsToData(rows) {
     const reviewed = updates?.every(([col, previous]) => (row[col] ?? "").trim() === previous) ?? false;
     const r = reviewed ? row.slice() : row;
     if (reviewed) updates.forEach(([col, , value]) => { r[col] = value; });
+    const sheetAmount = parseMonto(r[6]);
+    const sheetCurrency = (r[7] || "").trim();
+    const reviewedValue = REVIEWED_VALUES.get(name);
+    const useReviewedValue = reviewedValue && sheetAmount === null
+      && (!sheetCurrency || sheetCurrency.toUpperCase() === reviewedValue.currency);
     return {
-      reviewed: reviewed || supplemental.includes(row),
+      reviewed: reviewed || !!useReviewedValue || supplemental.includes(row),
       ...detectionFor(name, row[8]),
       prospect: r[0] || "",
       scope: (r[2] || "").trim(),
@@ -808,8 +858,8 @@ function rowsToData(rows) {
       fuente: (r[3] || "").trim() || "COMPLETAR",
       responsable: (r[4] || "").trim() || "COMPLETAR",
       estado: (r[5] || "").trim() || "Detectado",
-      valor: parseMonto(r[6]),
-      moneda: (r[7] || "").trim(),
+      valor: useReviewedValue ? reviewedValue.amount : sheetAmount,
+      moneda: useReviewedValue ? reviewedValue.currency : sheetCurrency,
       ultimo: (r[9] || "").trim() || "—",
       proxima: (r[10] || "").trim() || "—",
     };
@@ -955,18 +1005,17 @@ function renderAll() {
   const ganadas = DATA.filter(d => d.estado === "Aprobado / Ganado").length;
   const perdidas = DATA.filter(d => d.estado === "Perdido").length;
   const abiertas = total - ganadas - perdidas;
-  const valorAbiertoUSD = DATA.filter(d => d.moneda === "USD" && d.estado !== "Aprobado / Ganado" && d.estado !== "Perdido")
-    .reduce((s, d) => s + (d.valor || 0), 0);
+  const oportunidadesActivas = DATA.filter(d => ACTIVE_PIPELINE_STATES.has(d.estado));
 
   const kpis = [
     ["Total oportunidades", total],
     ["Abiertas", abiertas],
     ["Ganadas", ganadas],
     ["Perdidas", perdidas],
-    ["Valor potencial abierto (USD)", "$" + valorAbiertoUSD.toLocaleString("es-AR")],
+    ["Valor potencial activo", renderActivePotential(oportunidadesActivas), " potential-value"],
   ];
-  document.getElementById("kpiRow").innerHTML = kpis.map(([label, value]) =>
-    `<div class="kpi"><div class="value">${value}</div><div class="label">${label}</div></div>`
+  document.getElementById("kpiRow").innerHTML = kpis.map(([label, value, valueClass = ""]) =>
+    `<div class="kpi"><div class="value${valueClass}">${value}</div><div class="label">${label}</div></div>`
   ).join("");
 
   const countByEstado = ESTADOS.map(e => DATA.filter(d => d.estado === e).length);
