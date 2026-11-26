@@ -736,7 +736,7 @@ td {border-bottom-color:rgba(255,255,255,.09);}
         <div><div class="section-title">Tabla Consolidada · Rentabilidad</div><div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
         <div class="section-sub">CMB = Venta Facturable + Honorarios + Fees − Compra Indirecta · CMO % = CMO $ / Inv. Período</div>
         <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
-          <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#666;white-space:nowrap"><div style="width:8px;height:8px;border-radius:50%;background:#ff4455;flex-shrink:0"></div>CMO % ≤ 30%</div>
+          <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#666;white-space:nowrap"><div style="width:8px;height:8px;border-radius:50%;background:#ff4455;flex-shrink:0"></div>CMO % &lt; 30%</div>
           <div style="width:1px;height:12px;background:#333"></div>
           <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#666;white-space:nowrap"><div style="width:8px;height:8px;border-radius:50%;background:#f5c400;flex-shrink:0"></div>30% – 35%</div>
           <div style="width:1px;height:12px;background:#333"></div>
@@ -1215,6 +1215,7 @@ function getProgressBar(raw) {
   return `<div class="progress-wrap"><div class="progress-bg"><div class="progress-fill" style="width:${pct}%;background:${color}"></div></div><span class="progress-pct" style="color:${color}">${v.toFixed(0)}%</span></div>`;
 }
 function getSemaforoOH(pct, esPerf = false) {
+  if (!Number.isFinite(pct)) return '<span style="color:var(--text-muted)">—</span>';
   // Barra siempre al 100% de ancho — el color indica el semáforo
   const ancho = 100;
   let color;
@@ -1571,19 +1572,24 @@ function enviarResumenEjecutivo() {
   // ── BIG 7 (siempre los 7 originales — CLIENTES_COMERCIAL, nunca los 12 de la tabla) ──
   // El resumen usa UN solo período (el del Control Comercial) en todas las secciones,
   // para que coincida con el dash. Se fuerza temporalmente en Big 7 / Performance / Social.
+  const mesesBig7 = MESES_RENT_SELECCIONADOS.length ? MESES_RENT_SELECCIONADOS.slice() : mesesSel;
+  const periodoBig7 = mesesBig7.join(', ') + ' 2026' + (ohActivoEquipo ? ' · Con OH 123%' : ' · Sin OH');
   const _rentOrig = MESES_RENT_SELECCIONADOS.slice();
-  MESES_RENT_SELECCIONADOS.splice(0, MESES_RENT_SELECCIONADOS.length, ...mesesSel);
+  MESES_RENT_SELECCIONADOS.splice(0, MESES_RENT_SELECCIONADOS.length, ...mesesBig7);
   let rowsB7;
-  try { rowsB7 = calcRentabilidad(); } finally { MESES_RENT_SELECCIONADOS.splice(0, MESES_RENT_SELECCIONADOS.length, ..._rentOrig); }
-  const b7ClienteData = CLIENTES_COMERCIAL.map(n => clientes.find(c=>c.nombre===n)).filter(Boolean);
+  try { rowsB7 = calcRentabilidad().map(filaBig7Visible); } finally { MESES_RENT_SELECCIONADOS.splice(0, MESES_RENT_SELECCIONADOS.length, ..._rentOrig); }
+  if (rowsB7.some(r => !Number.isFinite(r.costoVisible))) { alert('Resumen pendiente: completar la dotación y los salarios de Big 7 para el período seleccionado.'); return; }
+  const b7ClienteData = clientesComercialesPeriodoBig7(mesesBig7);
   const tB7Inv = b7ClienteData.reduce((a,c)=>a+(parseFloat(c.inv)||0),0);
   const tB7Presup = b7ClienteData.reduce((a,c)=>a+(parseFloat(c.presup)||0),0);
   const tB7Cmb = rowsB7.reduce((a,r)=>a+(r.cmb||0),0);
   const tB7CmbPresup = b7ClienteData.reduce((a,c)=>a+(parseFloat(c.cmbPresup)||0),0);
   const tB7VsPct = tB7Presup>0 ? ((tB7Inv-tB7Presup)/tB7Presup)*100 : 0;
   // CMO % del total Big 7 = CMO $ total / Inv. período total (igual que la fila TOTAL del dash)
+  const tB7CostoVisible = rowsB7.reduce((a,r)=>a+r.costoVisible,0);
+  const tB7CMOVisible = rowsB7.reduce((a,r)=>a+r.cmVisible,0);
   const tB7Inv2 = rowsB7.reduce((a,r)=>a+(r.inv||0),0);
-  const tB7CmoPromedio = tB7Inv2>0 ? (rowsB7.reduce((a,r)=>a+(r.cm||0),0)/tB7Inv2)*100 : 0;
+  const tB7CmoPromedio = tB7Inv2>0 ? (rowsB7.reduce((a,r)=>a+r.cmVisible,0)/tB7Inv2)*100 : 0;
 
   const facLines = b7ClienteData.map(c => {
     const vsP = parseFloat(c.vs||0);
@@ -1594,7 +1600,7 @@ function enviarResumenEjecutivo() {
     const cd     = clientes.find(c=>c.nombre===r.nombre)||{};
     const cmbPct = parseFloat(String(cd.cmbPct||'0').replace('%',''));
     const vsCmb  = parseFloat(String(cd.vsCmb||'0').replace('%',''));
-    const cmoPct = r.inv>0 ? (r.cm/r.inv)*100 : 0;
+    const cmoPct = r.inv>0 ? (r.cmVisible/r.inv)*100 : 0;
     return `${pad(r.nombre,22)}: CMB ${cmbPct.toFixed(1)}%  ${arrow(vsCmb)} ${Math.abs(vsCmb).toFixed(1)}%  |  CMO ${cmoPct.toFixed(1)}% ${sfB7(cmoPct)}`;
   }).join('\n');
 
@@ -1671,16 +1677,16 @@ function enviarResumenEjecutivo() {
     `CMB:             ${fmtK(ag.cmb)}  ${arrow(agVsCmb)} ${Math.abs(agVsCmb).toFixed(1)}% vs Presup`,
     `Consumido anual: ${agCons.toFixed(1)}%  ${bar(agCons)}`,
     ``,
-    `*2. CLIENTES BIG 7*`,
+    `*2. CLIENTES BIG 7 — ${periodoBig7}*`,
     `────────────────────────────`,
-    `Inversión: ${fmtK(tB7Inv)}  ${arrow(tB7VsPct)} ${Math.abs(tB7VsPct).toFixed(1)}% vs Presup  |  CMB: ${fmtK(tB7Cmb)}  |  CMO promedio: ${tB7CmoPromedio.toFixed(1)}% ${sfB7(tB7CmoPromedio)}`,
+    `Inversión: ${fmtK(tB7Inv)}  ${arrow(tB7VsPct)} ${Math.abs(tB7VsPct).toFixed(1)}% vs Presup  |  CMB: ${fmtK(tB7Cmb)}  |  Costo Equipo: ${fmtK(tB7CostoVisible)}  |  CMO: ${fmtK(tB7CMOVisible)}  |  CMO promedio: ${tB7CmoPromedio.toFixed(1)}% ${sfB7(tB7CmoPromedio)}`,
     ``,
     `Facturación (Vs Presupuesto)`,
     `\`\`\``,
     facLines,
     `\`\`\``,
     ``,
-    `CMB y CMO (Vs Presupuesto, Sin OH)`,
+    `CMB y CMO (Vs Presupuesto, ${ohActivoEquipo ? 'Con OH 123%' : 'Sin OH'})`,
     `\`\`\``,
     cmbLines,
     `\`\`\``,
@@ -1727,7 +1733,7 @@ function enviarResumenEjecutivo() {
   const cmbRows = rowsHtml(rowsB7.map(r => {
     const cd = clientes.find(c=>c.nombre===r.nombre)||{};
     const cmbPct = parseFloat(String(cd.cmbPct||'0').replace('%',''));
-    const cmoPct = r.inv>0 ? (r.cm/r.inv)*100 : 0;
+    const cmoPct = r.inv>0 ? (r.cmVisible/r.inv)*100 : 0;
     return [r.nombre, `CMB ${cmbPct.toFixed(1)}%`, `${cmoPct.toFixed(1)}% CMO`, sfB7(cmoPct)];
   }));
   const perfRows = rowsHtml(rowsPerf.map(r => [r.nombre, fmt(r.cmoOH), `${r.pctOH.toFixed(1)}%`, sfPerf(r.pctOH)]));
@@ -1744,11 +1750,11 @@ function enviarResumenEjecutivo() {
       <tr><td style="padding:4px 0;color:#333">Consumido anual</td><td colspan="2" style="text-align:right">${agCons.toFixed(1)}%</td></tr>
     </table>
 
-    ${h3('2. Clientes Big 7')}
-    ${subtotal(`Inversión: <b>${fmtK(tB7Inv)}</b> (${arrow(tB7VsPct)}${Math.abs(tB7VsPct).toFixed(1)}% vs Presup) · CMB: <b>${fmtK(tB7Cmb)}</b> · CMO promedio: <b style="color:${colorSf(sfB7(tB7CmoPromedio))}">${tB7CmoPromedio.toFixed(1)}%</b>`)}
+    ${h3('2. Clientes Big 7 — ' + periodoBig7)}
+    ${subtotal(`Inversión: <b>${fmtK(tB7Inv)}</b> (${arrow(tB7VsPct)}${Math.abs(tB7VsPct).toFixed(1)}% vs Presup) · CMB: <b>${fmtK(tB7Cmb)}</b> · Costo Equipo: <b>${fmtK(tB7CostoVisible)}</b> · CMO: <b>${fmtK(tB7CMOVisible)}</b> · CMO promedio: <b style="color:${colorSf(sfB7(tB7CmoPromedio))}">${tB7CmoPromedio.toFixed(1)}%</b>`)}
     <p style="font-size:12px;text-transform:uppercase;color:#666;letter-spacing:1px;margin-bottom:4px">Facturación (Vs Presupuesto)</p>
     ${table(tableHead('Cliente','Inversión','Vs Presup.'), facRows)}
-    <p style="font-size:12px;text-transform:uppercase;color:#666;letter-spacing:1px;margin-bottom:4px">CMB y CMO (Sin OH)</p>
+    <p style="font-size:12px;text-transform:uppercase;color:#666;letter-spacing:1px;margin-bottom:4px">CMB y CMO (${ohActivoEquipo ? 'Con OH 123%' : 'Sin OH'})</p>
     ${table(tableHead('Cliente','CMB %','CMO %'), cmbRows)}
 
     ${h3('3. Performance (sin Bagó)')}
@@ -2712,6 +2718,8 @@ async function loadData({background = false} = {}) {
     if (json.presupuesto_cmb)   PRESUP_CMB   = json.presupuesto_cmb;
     if (json.bago_marcas_inv)    BAGO_MARCAS_INV    = json.bago_marcas_inv;
     if (json.bago_marcas_presup) BAGO_MARCAS_PRESUP = json.bago_marcas_presup;
+    DOTACION_BAGO_BRANDING = json.dotacion_bago_branding || null;
+    COSTOS_BIG7_LEIDOS = !!json.costos_big7_auto && Object.keys(json.costos_big7_auto).length > 0;
     if (json.fte_big7_auto)    CLIENTES_FTE  = json.fte_big7_auto;
     if (json.costos_big7_auto) TABLA_COSTOS  = json.costos_big7_auto;
     if (json.fte_perf_auto)    CLIENTES_FTE_PERF   = json.fte_perf_auto;
@@ -2749,6 +2757,8 @@ async function loadData({background = false} = {}) {
     }, 100);
   } catch(e) {
     lecturaCompleta = false;
+    COSTOS_BIG7_LEIDOS = false;
+    mostrarAvisoCostosBig7(['No se pudieron actualizar los salarios: ' + e.message]);
     console.warn('Rentabilidad sin conexion, usando datos locales:', e.message);
     mostrarAvisoFees(['No se pudo completar la lectura de costos y fees (' + e.message + '). La última lectura puede estar desactualizada: no usar estos números hasta recuperar la conexión.']);
     window._rentDataReady = true;
@@ -2802,6 +2812,7 @@ function toggleOH(tipo) {
     renderConsolidado(rows);
     renderRanking(rows);
     setTimeout(() => renderChart(rows), 60);
+    if (document.getElementById('rent-detalle') && document.getElementById('rent-detalle').style.display !== 'none') renderDetalle(clienteDetalleActivo);
   } else if (tipo === 'perf') {
     ohActivoPerf = !ohActivoPerf;
     const btn = document.getElementById('btnOHPerf');
@@ -3199,18 +3210,77 @@ function guardarCostosPerf() {
 }
 
 /* RENTABILIDAD - calculos */
+let DOTACION_BAGO_BRANDING = null;
+let COSTOS_BIG7_LEIDOS = false;
+let ERRORES_COSTOS_BIG7 = new Set();
+
+function mostrarAvisoCostosBig7(mensajes) {
+  const page = document.getElementById('page-rentabilidad');
+  if (!page) return;
+  let box = document.getElementById('avisoCostosBig7');
+  if (!mensajes.length) { if (box) box.remove(); return; }
+  if (!box) {
+    box = document.createElement('div'); box.id = 'avisoCostosBig7';
+    box.style.cssText = 'margin:0 0 12px;padding:12px;border:1px solid #ff4455;color:#ff8a95;background:rgba(255,68,85,.12);border-radius:6px;font-size:13px';
+    box.setAttribute('role','alert'); page.prepend(box);
+  }
+  box.textContent = 'Costo de equipo incompleto — ' + [...new Set(mensajes)].join(' · ') + '. Los costos y CMO afectados se muestran como — hasta completar los datos.';
+}
+function recursosCosteoBig7(cliente, mes) {
+  if (cliente !== 'Bagó') return (CLIENTES_FTE[cliente] && CLIENTES_FTE[cliente][mes]) || {};
+  const diag = DOTACION_BAGO_BRANDING && DOTACION_BAGO_BRANDING.diagnostico;
+  if (!diag || !diag.meses || !diag.meses[mes] || !diag.meses[mes].ok || !DOTACION_BAGO_BRANDING.meses[mes]) {
+    ERRORES_COSTOS_BIG7.add('Bagó: falta dotación aprobada de ' + mes + ' en Dotacion_Bago_Branding');
+    return null;
+  }
+  const recursos = DOTACION_BAGO_BRANDING.meses[mes];
+  const esperados = ['Accounts Director','SR Branding Coordinator','Branding Coordinator','SR Media Planner','JR Media Planner','SR Branding Analyst','JR Branding Analyst','Branding Assistant'];
+  if (esperados.some(p => !Number.isInteger(recursos[p]) || recursos[p] < 0)) {
+    ERRORES_COSTOS_BIG7.add('Bagó: dotación inválida de ' + mes); return null;
+  }
+  return recursos;
+}
+function fmtPctBig7(v) { return Number.isFinite(v) ? v.toFixed(1) : '—'; }
+function clientesComercialesPeriodoBig7(meses) {
+  const original = MESES_CC_SELECCIONADOS.slice();
+  try {
+    MESES_CC_SELECCIONADOS.splice(0,MESES_CC_SELECCIONADOS.length,...meses);
+    return CLIENTES_COMERCIAL.map(nombre => ({nombre,..._sumarPeriodoCliente(nombre)}));
+  } finally { MESES_CC_SELECCIONADOS.splice(0,MESES_CC_SELECCIONADOS.length,...original); }
+}
+function filaBig7Visible(r) {
+  const costo = r.costoEq * (ohActivoEquipo ? 1 + OH_EQUIPO : 1);
+  return { ...r, costoVisible: costo, cmVisible: r.cmb - costo,
+    pctVisible: Number.isFinite(costo) ? (r.inv > 0 ? (r.cmb - costo) / r.inv * 100 : 0) : NaN };
+}
+
 function getColCosto(mes) { return columnaCostoVigente(TABLA_COSTOS, mes); }
-function getCostoPuesto(puesto, mes) { const col = getColCosto(mes); return (TABLA_COSTOS[puesto] && TABLA_COSTOS[puesto][col]) || 0; }
+function getCostoPuesto(puesto, mes) {
+  const col = getColCosto(mes), valor = TABLA_COSTOS[puesto] && TABLA_COSTOS[puesto][col];
+  if (!COSTOS_BIG7_LEIDOS || !Number.isFinite(valor) || valor <= 0) {
+    ERRORES_COSTOS_BIG7.add('Falta costo compañía vigente: ' + puesto + ' / ' + mes + ' (' + col + ')');
+    return NaN;
+  }
+  return valor;
+}
 function getCostoConOH(costoBase, esPerf) {
   const oh = esPerf ? OH_PERF : OH_EQUIPO;
   return costoBase * (1 + oh);
 }
 
 function calcCostoEquipoCliente(cliente, mes) {
-  // TABLA_COSTOS en pesos enteros → dividir por 1.000 → miles (misma escala que cmb/inv, que vienen de CONTROL_RAW en miles)
-  const puestos = (CLIENTES_FTE[cliente] && CLIENTES_FTE[cliente][mes]) || {};
+  if (mes === 'Total') {
+    const meses = MESES_RENT_SELECCIONADOS.length ? MESES_RENT_SELECCIONADOS : _mesesPorDefecto();
+    return meses.reduce((a,m) => a + calcCostoEquipoCliente(cliente,m), 0);
+  }
+  if (!COSTOS_BIG7_LEIDOS) { ERRORES_COSTOS_BIG7.add('No se completó la lectura de salarios de Big 7'); return NaN; }
+  const puestos = recursosCosteoBig7(cliente, mes);
+  if (!puestos) return NaN;
   let total = 0;
-  for (const [p, fte] of Object.entries(puestos)) total += getCostoPuesto(p, mes) * fte;
+  for (const [p, cantidad] of Object.entries(puestos)) {
+    if (!Number.isFinite(cantidad) || cantidad < 0) { ERRORES_COSTOS_BIG7.add(cliente + ': recurso inválido ' + p + ' / ' + mes); return NaN; }
+    if (cantidad > 0) total += getCostoPuesto(p, mes) * cantidad;
+  }
   return total / 1000;
 }
 let MESES_RENT_SELECCIONADOS = []; // independiente de MESES_CC_SELECCIONADOS — se inicializa en initMesesRent()
@@ -3259,11 +3329,12 @@ function _cmbInvSobreMeses(nombre, meses) {
 
 function calcRentabilidad() {
   const meses = MESES_RENT_SELECCIONADOS.length ? MESES_RENT_SELECCIONADOS : _mesesPorDefecto();
-  return CLIENTES_COMERCIAL.map(nombre => {
+  ERRORES_COSTOS_BIG7 = new Set();
+  const filas = CLIENTES_COMERCIAL.map(nombre => {
     let totalCosto = 0, totalFte = 0;
     meses.forEach(m => {
       totalCosto += calcCostoEquipoCliente(nombre, m);
-      const puestos = (CLIENTES_FTE[nombre] && CLIENTES_FTE[nombre][m]) || {};
+      const puestos = recursosCosteoBig7(nombre, m) || {};
       totalFte += Object.values(puestos).reduce((a,b) => a+b, 0);
     });
     const { inv, cmb } = (CONTROL_RAW && Object.keys(CONTROL_RAW).length)
@@ -3271,8 +3342,10 @@ function calcRentabilidad() {
       : { inv: getInvEquipoCliente(nombre), cmb: getCmbEquipoCliente(nombre) }; // fallback si todavía no llegó el Sheet nuevo
     const cm    = cmb - totalCosto;
     const cmPct = inv > 0 ? (cm / inv) * 100 : 0;
-    return { nombre, cmb, costoEq: totalCosto, cm, cmPct, fte: totalFte, inv };
+    return { nombre, cmb, costoEq: totalCosto, cm, cmPct: Number.isFinite(totalCosto) ? cmPct : NaN, fte: totalFte, inv };
   });
+  mostrarAvisoCostosBig7([...ERRORES_COSTOS_BIG7]);
+  return filas;
 }
 
 function getCmbEquipoCliente(nombre) {
@@ -3315,12 +3388,12 @@ function renderKPIsRent(rows) {
     ? rows.reduce((a,r)=>a+r.costoEq*(1+OH_EQUIPO), 0)
     : rows.reduce((a,r)=>a+r.costoEq, 0);
   const tCM  = tCmb - tCosto;
-  const tPct = tInv>0 ? (tCM/tInv)*100 : 0;
+  const tPct = Number.isFinite(tCosto) ? (tInv>0 ? (tCM/tInv)*100 : 0) : NaN;
   document.getElementById('kpisRent').innerHTML = `
     <div class="kpi"><div class="kpi-label">CMB Total</div><div class="kpi-value" style="font-size:26px">${fmtM(tCmb/1000)}</div><div class="kpi-sub">CMB del período (desde Control Comercial)</div><div class="kpi-accent" style="background:#4488ff"></div></div>
-    <div class="kpi"><div class="kpi-label">Costo Equipo Total</div><div class="kpi-value" style="font-size:26px">${fmtM(tCosto/1000)}</div><div class="kpi-sub">FTE x Costo Compania${ohActivoEquipo?' (con OH)':''}</div><div class="kpi-accent" style="background:var(--yellow)"></div></div>
+    <div class="kpi"><div class="kpi-label">Costo Equipo Total</div><div class="kpi-value" style="font-size:26px">${fmtM(tCosto/1000)}</div><div class="kpi-sub">Bagó: dotación al 100% · resto: FTE real${ohActivoEquipo?' (con OH)':''}</div><div class="kpi-accent" style="background:var(--yellow)"></div></div>
     <div class="kpi"><div class="kpi-label">CMO Total</div><div class="kpi-value" style="font-size:26px;color:${tCM>=0?'#00c853':'#ff4455'}">${fmtM(tCM/1000)}</div><div class="kpi-sub">CMB − Costo Equipo</div><div class="kpi-accent" style="background:var(--green)"></div></div>
-    <div class="kpi"><div class="kpi-label">CMO % Promedio</div><div class="kpi-value" style="font-size:26px;color:${tPct>=20?'#00c853':tPct>=5?'#f5c400':'#ff4455'}">${tPct.toFixed(1)}%</div><div class="kpi-sub">CMO $ / Inv. Período</div><div class="kpi-accent" style="background:var(--purple)"></div></div>`;
+    <div class="kpi"><div class="kpi-label">CMO % Promedio</div><div class="kpi-value" style="font-size:26px;color:${tPct>35?'#00c853':tPct>=30?'#f5c400':'#ff4455'}">${fmtPctBig7(tPct)}%</div><div class="kpi-sub">CMO $ / Inv. Período</div><div class="kpi-accent" style="background:var(--purple)"></div></div>`;
 }
 function renderConsolidado(rows) {
   const maxCM = Math.max(...rows.map(r=>r.cm));
@@ -3329,7 +3402,7 @@ function renderConsolidado(rows) {
     const costoDisplay = ohActivoEquipo ? r.costoEq*(1+OH_EQUIPO) : r.costoEq;
     const cmoDisplay   = r.cmb - costoDisplay;
     const inv          = r.inv || 0;
-    const cmoPctDisplay = inv>0 ? (cmoDisplay/inv)*100 : 0;
+    const cmoPctDisplay = Number.isFinite(costoDisplay) ? (inv>0 ? (cmoDisplay/inv)*100 : 0) : NaN;
     const pct=maxCM>0?Math.max(0,Math.min(100,(cmoDisplay/maxCM)*100)):0;
     const barColor=cmoPctDisplay>=25?'#00c853':cmoPctDisplay>0?'#f5c400':'#ff4455';
     return `<tr>
@@ -3337,15 +3410,15 @@ function renderConsolidado(rows) {
       <td class="num" style="color:#aaa">${fmtM(r.cmb/1000)}</td>
       <td class="num" style="color:var(--yellow)">${fmtM(costoDisplay/1000)}</td>
       <td class="num"><div class="cm-bar-wrap"><div class="cm-bar-bg"><div class="cm-bar-fill" style="width:${pct.toFixed(0)}%;background:${barColor}"></div></div><span style="min-width:65px;text-align:right;color:${cmoDisplay>=0?'#f0f0f0':'#ff4455'}">${fmtM(cmoDisplay/1000)}</span></div></td>
-      <td class="num" style="color:${cmoPctDisplay>35?'#00c853':cmoPctDisplay>=30?'#f5c400':'#ff4455'};font-weight:600">${cmoPctDisplay.toFixed(1)}%</td>
+      <td class="num" style="color:${cmoPctDisplay>35?'#00c853':cmoPctDisplay>=30?'#f5c400':'#ff4455'};font-weight:600">${fmtPctBig7(cmoPctDisplay)}%</td>
       <td>${ohActivoEquipo ? getSemaforoOH(cmoPctDisplay) : ''}</td></tr>`;
   }).join('');
   const tCmb=rows.reduce((a,r)=>a+r.cmb,0);
   const tC=ohActivoEquipo?rows.reduce((a,r)=>a+r.costoEq*(1+OH_EQUIPO),0):rows.reduce((a,r)=>a+r.costoEq,0);
   const tM=tCmb-tC;
   const tInv=rows.reduce((a,r)=>a+(r.inv||0),0);
-  const tP=tInv>0?(tM/tInv)*100:0;
-  html+=`<tr class="total-row"><td>TOTAL</td><td class="num" style="color:#aaa">${fmtM(tCmb/1000)}</td><td class="num" style="color:var(--yellow)">${fmtM(tC/1000)}</td><td class="num" style="color:${tM>=0?'#f0f0f0':'#ff4455'}">${fmtM(tM/1000)}</td><td class="num" style="color:${tP>35?'#00c853':tP>=30?'#f5c400':'#ff4455'}">${tP.toFixed(1)}%</td><td></td></tr>`;
+  const tP=Number.isFinite(tC)?(tInv>0?(tM/tInv)*100:0):NaN;
+  html+=`<tr class="total-row"><td>TOTAL</td><td class="num" style="color:#aaa">${fmtM(tCmb/1000)}</td><td class="num" style="color:var(--yellow)">${fmtM(tC/1000)}</td><td class="num" style="color:${tM>=0?'#f0f0f0':'#ff4455'}">${fmtM(tM/1000)}</td><td class="num" style="color:${tP>35?'#00c853':tP>=30?'#f5c400':'#ff4455'}">${fmtPctBig7(tP)}%</td><td></td></tr>`;
   document.getElementById('tbodyConsolidado').innerHTML = html;
 }
 function renderRanking(rows) {
@@ -3354,13 +3427,13 @@ function renderRanking(rows) {
   const rowsD = rows.map(r => {
     const costoD = ohActivoEquipo ? r.costoEq*(1+OH_EQUIPO) : r.costoEq;
     const cmD    = r.cmb - costoD;
-    const pctD   = r.inv>0 ? (cmD/r.inv)*100 : 0;
+    const pctD   = Number.isFinite(costoD) ? (r.inv>0 ? (cmD/r.inv)*100 : 0) : NaN;
     return {...r, cmD, pctD};
   });
   const byCM  = [...rowsD].sort((a,b)=>b.cmD-a.cmD);
   const byPct = [...rowsD].sort((a,b)=>b.pctD-a.pctD);
   document.getElementById('rankingCM').innerHTML = byCM.map((r,i)=>{const d=DIRECTORES[r.nombre]||{};return`<div class="rank-item"><div class="rank-num">${medals[i]||(i+1)}</div><div class="rank-name"><div class="client-dot" style="background:${d.color||'#606060'};display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;vertical-align:middle"></div>${r.nombre}</div><div class="rank-val" style="color:${r.cmD>=0?'#00c853':'#ff4455'}">${fmtM(r.cmD/1000)}</div></div>`;}).join('');
-  document.getElementById('rankingPct').innerHTML = byPct.map((r,i)=>`<div class="rank-item"><div class="rank-num">${medals[i]||(i+1)}</div><div class="rank-name">${r.nombre}</div><div class="rank-val" style="color:${r.pctD>35?'#00c853':r.pctD>=30?'#f5c400':'#ff4455'}">${r.pctD.toFixed(1)}%</div></div>`).join('');
+  document.getElementById('rankingPct').innerHTML = byPct.map((r,i)=>`<div class="rank-item"><div class="rank-num">${medals[i]||(i+1)}</div><div class="rank-name">${r.nombre}</div><div class="rank-val" style="color:${r.pctD>35?'#00c853':r.pctD>=30?'#f5c400':'#ff4455'}">${fmtPctBig7(r.pctD)}%</div></div>`).join('');
 }
 function renderChart(rows) {
   if (!rows) rows = calcRentabilidad();
@@ -3410,30 +3483,33 @@ function setMesDetalleActivo(mes, btn) {
   renderDetalle(clienteDetalleActivo);
 }
 function renderDetalle(cliente) {
-  renderMesSelectorDetalle();
-  actualizarBannerVigencia();
-  const mes=MES_ACTIVO, colCosto=getColCosto(mes), puestos=Object.keys(TABLA_COSTOS);
-  const fteActual=(CLIENTES_FTE[cliente]&&CLIENTES_FTE[cliente][mes])||{};
-  const ingActual=(INGRESOS[cliente]&&INGRESOS[cliente][mes])||0;
-  const invActual=(INVERSION[cliente]&&INVERSION[cliente][mes])||0;
-  const invEl=document.getElementById('inversionEditable');
-  if(invEl) invEl.value=invActual?(invActual*1000):'';
-  const ingEl=document.getElementById('ingresosEditable');
-  if(ingEl) ingEl.value=ingActual?(ingActual*1000):'';
-  const totalCostoRaw=puestos.reduce((acc,p)=>{const fte=fteActual[p]||0;return acc+getCostoPuesto(p,mes)*fte;},0);const totalCosto=totalCostoRaw/1000000;
-  let html=puestos.map(puesto=>{
-    const costoUnit=getCostoPuesto(puesto,mes), fteVal=fteActual[puesto]||0, costoMes=(costoUnit*fteVal)/1000000;
-    const pcTot=totalCosto>0?(costoMes/totalCosto)*100:0, rowStyle=fteVal>0?'':'opacity:0.35';
-    return `<tr style="${rowStyle}">
-      <td style="font-weight:500;font-size:13px">${puesto}</td>
-      <td class="num"><input type="number" class="fte-inline-input" value="${fteVal?(fteVal*100).toFixed(2):''}" placeholder="370.39" min="0" step="0.01" onchange="saveFTE('${cliente}','${mes}','${puesto}',this.value)" title="FTE ${puesto} en ${mes}"></td>
-      <td class="num" style="color:var(--yellow);font-size:12px">${fmtCosto(costoUnit)}</td>
-      <td class="num" style="color:${fteVal>0?'#f0f0f0':'#404040'};font-size:12px">${fteVal>0?fmtM(costoMes):'—'}</td>
-      <td class="num">${fteVal>0?`<div class="cm-bar-wrap"><div class="cm-bar-bg"><div class="cm-bar-fill" style="width:${Math.min(pcTot,100).toFixed(0)}%;background:var(--purple)"></div></div><span style="min-width:36px;text-align:right;color:#aaa;font-size:11px">${pcTot.toFixed(1)}%</span></div>`:'<span style="color:#303030;font-size:11px">—</span>'}</td>
-    </tr>`;
+  renderMesSelectorDetalle(); actualizarBannerVigencia();
+  const mes = MES_ACTIVO;
+  const meses = mes === 'Total' ? (MESES_RENT_SELECCIONADOS.length ? MESES_RENT_SELECCIONADOS : _mesesPorDefecto()) : [mes];
+  const puestos = Object.keys(TABLA_COSTOS), cantidades = {}, parciales = {};
+  let invalido = false;
+  for (const m of meses) {
+    const recursos = recursosCosteoBig7(cliente,m);
+    if (!recursos || !COSTOS_BIG7_LEIDOS) { invalido = true; continue; }
+    for (const [p,cantidad] of Object.entries(recursos)) {
+      cantidades[p] = (cantidades[p] || 0) + cantidad;
+      if (cantidad > 0) parciales[p] = (parciales[p] || 0) + getCostoPuesto(p,m) * cantidad;
+    }
+  }
+  const costoBase = meses.reduce((a,m) => a + calcCostoEquipoCliente(cliente,m),0) / 1000;
+  mostrarAvisoCostosBig7([...ERRORES_COSTOS_BIG7]);
+  if (invalido || !Number.isFinite(costoBase)) {
+    document.getElementById('tbodyDetalle').innerHTML = '<tr><td colspan="5">Costo pendiente: completar dotación y salarios del período.</td></tr>'; return;
+  }
+  const factor = ohActivoEquipo ? 1 + OH_EQUIPO : 1, total = costoBase * factor;
+  const filas = puestos.map(p => {
+    const q = cantidades[p] || 0, costo = (parciales[p] || 0) / 1000000 * factor;
+    const celda = cliente === 'Bagó' ? q + (mes === 'Total' ? ' personas-mes' : ' personas · 100%')
+      : mes === 'Total' ? (q*100).toFixed(2) + '%' : `<input type="number" class="fte-inline-input" value="${q ? (q*100).toFixed(2) : ''}" min="0" step="0.01" onchange="saveFTE('${cliente}','${mes}','${p}',this.value)">`;
+    const unit = mes === 'Total' ? 'Según vigencia mensual' : fmtCosto(getCostoPuesto(p,mes));
+    return `<tr><td>${p}</td><td class="num">${celda}</td><td class="num">${unit}</td><td class="num">${fmtM(costo)}</td><td class="num">${total > 0 ? (costo/total*100).toFixed(1) : '0.0'}%</td></tr>`;
   }).join('');
-  html+=`<tr class="total-row"><td colspan="2">TOTAL - ${cliente} - ${mes}</td><td style="color:var(--text-muted);font-size:11px">Col: ${colCosto}</td><td class="num" style="color:var(--yellow)">${fmtM(totalCosto)}</td><td class="num" style="color:#aaa">100%</td></tr>`;
-  document.getElementById('tbodyDetalle').innerHTML = html;
+  document.getElementById('tbodyDetalle').innerHTML = filas + `<tr class="total-row"><td colspan="3">TOTAL · ${cliente} · ${mes}${ohActivoEquipo ? ' · Con OH' : ''}</td><td class="num">${fmtM(total)}</td><td>100%</td></tr>`;
 }
 function saveFTE(cliente, mes, puesto, valor) {
   const vPct=parseFloat(valor);
