@@ -1267,6 +1267,11 @@ function switchPage(page, btn) {
   document.querySelectorAll('.page-tab').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + page).classList.add('active');
   btn.classList.add('active');
+  if (page === 'comercial' && DATA) {
+    aplicarControlComercialReal();
+    renderTablas(DATA);
+    if (DATA.agencia) renderKPIsAgencia(DATA.agencia);
+  }
   if (page === 'rentabilidad') {
     if (window._rentDataReady) {
       renderRentabilidadCompleto();
