@@ -1597,7 +1597,7 @@ function enviarResumenEjecutivo() {
   }).join('\n');
 
   const cmbLines = rowsB7.map(r => {
-    const cd     = clientes.find(c=>c.nombre===r.nombre)||{};
+    const cd     = b7ClienteData.find(c=>c.nombre===r.nombre)||{};
     const cmbPct = parseFloat(String(cd.cmbPct||'0').replace('%',''));
     const vsCmb  = parseFloat(String(cd.vsCmb||'0').replace('%',''));
     const cmoPct = r.inv>0 ? (r.cmVisible/r.inv)*100 : 0;
@@ -1731,7 +1731,7 @@ function enviarResumenEjecutivo() {
     return [c.nombre, fmtK(c.inv), `${arrow(vsP)} ${Math.abs(vsP).toFixed(1)}%`, null];
   }));
   const cmbRows = rowsHtml(rowsB7.map(r => {
-    const cd = clientes.find(c=>c.nombre===r.nombre)||{};
+    const cd = b7ClienteData.find(c=>c.nombre===r.nombre)||{};
     const cmbPct = parseFloat(String(cd.cmbPct||'0').replace('%',''));
     const cmoPct = r.inv>0 ? (r.cmVisible/r.inv)*100 : 0;
     return [r.nombre, `CMB ${cmbPct.toFixed(1)}%`, `${cmoPct.toFixed(1)}% CMO`, sfB7(cmoPct)];
@@ -3240,7 +3240,7 @@ function recursosCosteoBig7(cliente, mes) {
   }
   return recursos;
 }
-function fmtPctBig7(v) { return Number.isFinite(v) ? v.toFixed(1) : '—'; }
+function fmtPctBig7(v) { return Number.isFinite(v) ? v.toFixed(1) + '%' : '—'; }
 function clientesComercialesPeriodoBig7(meses) {
   const original = MESES_CC_SELECCIONADOS.slice();
   try {
@@ -3393,7 +3393,7 @@ function renderKPIsRent(rows) {
     <div class="kpi"><div class="kpi-label">CMB Total</div><div class="kpi-value" style="font-size:26px">${fmtM(tCmb/1000)}</div><div class="kpi-sub">CMB del período (desde Control Comercial)</div><div class="kpi-accent" style="background:#4488ff"></div></div>
     <div class="kpi"><div class="kpi-label">Costo Equipo Total</div><div class="kpi-value" style="font-size:26px">${fmtM(tCosto/1000)}</div><div class="kpi-sub">Bagó: dotación al 100% · resto: FTE real${ohActivoEquipo?' (con OH)':''}</div><div class="kpi-accent" style="background:var(--yellow)"></div></div>
     <div class="kpi"><div class="kpi-label">CMO Total</div><div class="kpi-value" style="font-size:26px;color:${tCM>=0?'#00c853':'#ff4455'}">${fmtM(tCM/1000)}</div><div class="kpi-sub">CMB − Costo Equipo</div><div class="kpi-accent" style="background:var(--green)"></div></div>
-    <div class="kpi"><div class="kpi-label">CMO % Promedio</div><div class="kpi-value" style="font-size:26px;color:${tPct>35?'#00c853':tPct>=30?'#f5c400':'#ff4455'}">${fmtPctBig7(tPct)}%</div><div class="kpi-sub">CMO $ / Inv. Período</div><div class="kpi-accent" style="background:var(--purple)"></div></div>`;
+    <div class="kpi"><div class="kpi-label">CMO % Promedio</div><div class="kpi-value" style="font-size:26px;color:${tPct>35?'#00c853':tPct>=30?'#f5c400':'#ff4455'}">${fmtPctBig7(tPct)}</div><div class="kpi-sub">CMO $ / Inv. Período</div><div class="kpi-accent" style="background:var(--purple)"></div></div>`;
 }
 function renderConsolidado(rows) {
   const maxCM = Math.max(...rows.map(r=>r.cm));
@@ -3410,7 +3410,7 @@ function renderConsolidado(rows) {
       <td class="num" style="color:#aaa">${fmtM(r.cmb/1000)}</td>
       <td class="num" style="color:var(--yellow)">${fmtM(costoDisplay/1000)}</td>
       <td class="num"><div class="cm-bar-wrap"><div class="cm-bar-bg"><div class="cm-bar-fill" style="width:${pct.toFixed(0)}%;background:${barColor}"></div></div><span style="min-width:65px;text-align:right;color:${cmoDisplay>=0?'#f0f0f0':'#ff4455'}">${fmtM(cmoDisplay/1000)}</span></div></td>
-      <td class="num" style="color:${cmoPctDisplay>35?'#00c853':cmoPctDisplay>=30?'#f5c400':'#ff4455'};font-weight:600">${fmtPctBig7(cmoPctDisplay)}%</td>
+      <td class="num" style="color:${cmoPctDisplay>35?'#00c853':cmoPctDisplay>=30?'#f5c400':'#ff4455'};font-weight:600">${fmtPctBig7(cmoPctDisplay)}</td>
       <td>${ohActivoEquipo ? getSemaforoOH(cmoPctDisplay) : ''}</td></tr>`;
   }).join('');
   const tCmb=rows.reduce((a,r)=>a+r.cmb,0);
@@ -3418,7 +3418,7 @@ function renderConsolidado(rows) {
   const tM=tCmb-tC;
   const tInv=rows.reduce((a,r)=>a+(r.inv||0),0);
   const tP=Number.isFinite(tC)?(tInv>0?(tM/tInv)*100:0):NaN;
-  html+=`<tr class="total-row"><td>TOTAL</td><td class="num" style="color:#aaa">${fmtM(tCmb/1000)}</td><td class="num" style="color:var(--yellow)">${fmtM(tC/1000)}</td><td class="num" style="color:${tM>=0?'#f0f0f0':'#ff4455'}">${fmtM(tM/1000)}</td><td class="num" style="color:${tP>35?'#00c853':tP>=30?'#f5c400':'#ff4455'}">${fmtPctBig7(tP)}%</td><td></td></tr>`;
+  html+=`<tr class="total-row"><td>TOTAL</td><td class="num" style="color:#aaa">${fmtM(tCmb/1000)}</td><td class="num" style="color:var(--yellow)">${fmtM(tC/1000)}</td><td class="num" style="color:${tM>=0?'#f0f0f0':'#ff4455'}">${fmtM(tM/1000)}</td><td class="num" style="color:${tP>35?'#00c853':tP>=30?'#f5c400':'#ff4455'}">${fmtPctBig7(tP)}</td><td></td></tr>`;
   document.getElementById('tbodyConsolidado').innerHTML = html;
 }
 function renderRanking(rows) {
@@ -3433,7 +3433,7 @@ function renderRanking(rows) {
   const byCM  = [...rowsD].sort((a,b)=>b.cmD-a.cmD);
   const byPct = [...rowsD].sort((a,b)=>b.pctD-a.pctD);
   document.getElementById('rankingCM').innerHTML = byCM.map((r,i)=>{const d=DIRECTORES[r.nombre]||{};return`<div class="rank-item"><div class="rank-num">${medals[i]||(i+1)}</div><div class="rank-name"><div class="client-dot" style="background:${d.color||'#606060'};display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;vertical-align:middle"></div>${r.nombre}</div><div class="rank-val" style="color:${r.cmD>=0?'#00c853':'#ff4455'}">${fmtM(r.cmD/1000)}</div></div>`;}).join('');
-  document.getElementById('rankingPct').innerHTML = byPct.map((r,i)=>`<div class="rank-item"><div class="rank-num">${medals[i]||(i+1)}</div><div class="rank-name">${r.nombre}</div><div class="rank-val" style="color:${r.pctD>35?'#00c853':r.pctD>=30?'#f5c400':'#ff4455'}">${fmtPctBig7(r.pctD)}%</div></div>`).join('');
+  document.getElementById('rankingPct').innerHTML = byPct.map((r,i)=>`<div class="rank-item"><div class="rank-num">${medals[i]||(i+1)}</div><div class="rank-name">${r.nombre}</div><div class="rank-val" style="color:${r.pctD>35?'#00c853':r.pctD>=30?'#f5c400':'#ff4455'}">${fmtPctBig7(r.pctD)}</div></div>`).join('');
 }
 function renderChart(rows) {
   if (!rows) rows = calcRentabilidad();
