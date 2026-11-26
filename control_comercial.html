@@ -699,7 +699,7 @@ td {border-bottom-color:rgba(255,255,255,.09);}
       <div class="mini-card">
         <div class="mini-card-title">Directores · Big Seven</div>
         <div class="dir-row"><div><div class="dir-row-name"><span class="dir-dot" style="background:#e02020"></span>Mercedes Silva (Mechi)</div><div class="dir-row-clients">Bagó (cuenta total + marcas)</div></div></div>
-        <div class="dir-row"><div><div class="dir-row-name"><span class="dir-dot" style="background:#4488ff"></span>Daniela Kravanja (Dani)</div><div class="dir-row-clients">Banco Patagonia · La Paulina · Pfizer</div></div></div>
+        <div class="dir-row"><div><div class="dir-row-name"><span class="dir-dot" style="background:#4488ff"></span>Daniela Kravanja (Dani)</div><div class="dir-row-clients">Banco Patagonia · La Paulina · Pfizer · Marfrig</div></div></div>
         <div class="dir-row"><div><div class="dir-row-name"><span class="dir-dot" style="background:#00c853"></span>Juan Pablo Echeverría (JP)</div><div class="dir-row-clients">McCain · Escorial · Universal Assistance</div></div></div>
       </div>
       <div class="mini-card">
@@ -1349,8 +1349,8 @@ function renderKPIsComercial(clientes) {
     }
   }
 
-  // Render Big7 donuts — SOLO los 7 clientes originales (Bagó...Universal Assistance),
-  // no toda la tabla Clientes (que ahora incluye Novo Nordisk/Marfrig/Goodyear/Loma Negra/Molino)
+  // Render Big7 donuts: solo el grupo CLIENTES_COMERCIAL, incluido Marfrig.
+  // Total Agencia conserva todos los clientes sin duplicar los del grupo.
   const clientesBig7 = clientes.filter(r => CLIENTES_COMERCIAL.includes(r.nombre));
   let b7Inv=0, b7Presup=0, b7Cmb=0, b7CmbPresup=0, b7Ingresos=0;
   clientesBig7.forEach(r => { b7Inv += parseFloat(r.inv)||0; b7Presup += parseFloat(r.presup)||0; b7Cmb += parseFloat(r.cmb)||0; b7CmbPresup += parseFloat(r.cmbPresup||0); b7Ingresos += parseFloat(r.ingresos)||0; });
@@ -1569,7 +1569,7 @@ function enviarResumenEjecutivo() {
   const agVsCmb  = parseFloat(String(ag.vsCmb||'0').replace('%',''));
   const agCons   = parseFloat(ag.consumidoAnual||0);
 
-  // ── BIG 7 (siempre los 7 originales — CLIENTES_COMERCIAL, nunca los 12 de la tabla) ──
+  // ── BIG 7 (grupo CLIENTES_COMERCIAL, incluido Marfrig) ──
   // El resumen usa UN solo período (el del Control Comercial) en todas las secciones,
   // para que coincida con el dash. Se fuerza temporalmente en Big 7 / Performance / Social.
   const mesesBig7 = MESES_RENT_SELECCIONADOS.length ? MESES_RENT_SELECCIONADOS.slice() : mesesSel;
@@ -3594,7 +3594,7 @@ function guardarCostos() {
    CONTROL COMERCIAL — DATOS EMBEBIDOS + MODAL DE CARGA
 ═══════════════════════════════════════════════════════════ */
 
-const CLIENTES_COMERCIAL = ['Bagó','Banco Patagonia','La Paulina','Pfizer','McCain','Escorial','Universal Assistance'];
+const CLIENTES_COMERCIAL = ['Bagó','Banco Patagonia','La Paulina','Pfizer','McCain','Escorial','Universal Assistance','Marfrig'];
 const BAGO_MARCAS = ['Esoprazol','Anaflex','Faciales','Corporales','Capilares','Solares','Bagó +','Dioxaflex','Institucional','Simple'];
 const MESES_COMERCIAL = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
